@@ -137,7 +137,7 @@ namespace Activity
         }
         private void OnClickCloseBtn()
         {
-            bool rewardADIsReady = false;//ADManager.Instance.InterstitialAdIsOk(ADEntrances.REWARD_VIDEO_CONTINUE_SPIN);
+            bool rewardADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.REWARD_VIDEO_CONTINUE_SPIN);
               
             if (rewardADIsReady)
             {

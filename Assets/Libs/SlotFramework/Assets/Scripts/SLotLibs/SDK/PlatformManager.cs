@@ -436,7 +436,7 @@ namespace Libs
         private int H5UserType = 1;
         public int GetH5UserType()
         {
-            return 0;
+            return H5UserType;
         }
         
         public bool CheckCanShowH5()

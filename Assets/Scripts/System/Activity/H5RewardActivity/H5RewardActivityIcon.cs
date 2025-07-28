@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Libs;
 using Spine.Unity;
 using Spine.Unity.Modules;
 using UnityEngine;
@@ -57,6 +58,8 @@ namespace Activity
             {
                 ChangeSkinByIndex(curShowIndex);
                 skeletonGraphic.gameObject.SetActive(true);
+                //检查是否需要显示气泡，默认不显示
+                UpdateQiPao(PlatformManager.Instance.GetH5UserType() == 1);
                 // saqian.gameObject.SetActive(true);
                 // NeedShowQiPao();
             }
@@ -67,7 +70,15 @@ namespace Activity
                 // DestroyShowQiPao();
             }
         }
-        
+
+        private void UpdateQiPao(bool isShow)
+        {
+            if (!isShow)
+            {
+                skeletonGraphic.AnimationState.SetAnimation(0,"without_pao",true);
+            }
+        }
+
         public void ChangeSkinByIndex(int index)
         {
             if (skeletonGraphic != null)

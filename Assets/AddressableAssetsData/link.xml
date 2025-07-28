@@ -1,11 +1,10 @@
 <linker>
   <assembly fullname="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="Activity.ActivityPanel" preserve="all" />
+    <type fullname="Activity.ContinueSpinDialog" preserve="all" />
     <type fullname="Activity.SpinWithDrawEndDialog" preserve="all" />
     <type fullname="Activity.SpinWithDrawStartDialog" preserve="all" />
     <type fullname="Activity.WithDrawTaskIcon" preserve="all" />
-    <type fullname="AdditionalPanel" preserve="all" />
-    <type fullname="AdditonalPanelLoad" preserve="all" />
     <type fullname="AndroidDialogAapterOffset" preserve="all" />
     <type fullname="AndroidDialogAdapter" preserve="all" />
     <type fullname="AnticipationAnimations" preserve="all" />
@@ -39,6 +38,7 @@
     <type fullname="Classic.SettingDialog" preserve="all" />
     <type fullname="Classic.SlotGameDialogManager" preserve="all" />
     <type fullname="Classic.SlotMiddlePanel" preserve="all" />
+    <type fullname="Classic.TipsDialog" preserve="all" />
     <type fullname="Classic.TopPanel" preserve="all" />
     <type fullname="Classic.WesternTreasureTest" preserve="all" />
     <type fullname="CollectElementPanel" preserve="all" />
@@ -163,6 +163,7 @@
     <type fullname="UnityEngine.Localization.PropertyVariants.TrackedProperties.FloatTrackedProperty" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.Localization.Tables.TableEntryReference" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.Localization.Tables.TableReference" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.Localization.PropertyVariants.TrackedProperties.UnityObjectProperty" preserve="nothing" serialized="true" />
   </assembly>
   <assembly fullname="Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">
     <type fullname="UnityEngine.ResourceManagement.ResourceProviders.AssetBundleProvider" preserve="all" />

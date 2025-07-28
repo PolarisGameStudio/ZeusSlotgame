@@ -404,17 +404,41 @@ namespace Libs
         #region AndroidCallUnity
 
         //h5初始化结果，只要调用就是成功
-        public void H5InitResult()
+        public void H5InitResult(string msg)
         {
+            if (string.IsNullOrEmpty(msg))
+            {
+                Debug.LogError("PlatformManager H5InitResult msg is null or empty");
+                return;
+            }
             Debug.Log("PlatformManager H5InitResult Success");
             if (_h5InitResult)
             {
                 return;
             }
             _h5InitResult = true;
+            Dictionary<string, object> data = Json.Deserialize(msg) as Dictionary<string, object>;
+            if (data == null || data.Count == 0)
+            {
+                Debug.LogError("PlatformManager H5AddCash Deserialize data is null msg="+msg);
+                return;
+            }
+            int amount = Utilities.GetInt(data, Amount_KEY, 0);
+            if (!data.ContainsKey(Amount_KEY))
+            {
+                Debug.LogError("PlatformManager H5AddCash data not contains Amount_KEY=");
+                return;
+            }
+            H5UserType = amount;
             Messenger.Broadcast<bool>(GameConstants.OnH5InitSuccess,_h5InitResult);
         }
 
+        private int H5UserType = 1;
+        public int GetH5UserType()
+        {
+            return 0;
+        }
+        
         public bool CheckCanShowH5()
         {
 #if UNITY_EDITOR

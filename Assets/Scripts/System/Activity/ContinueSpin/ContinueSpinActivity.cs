@@ -80,7 +80,7 @@ namespace Activity
         {
             base.AddListener();
             Messenger.AddListener(Task.UpdateTaskDataMsg,UpdateProgress);
-            //Messenger.AddListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
         }
         public void UpdateProgress()
         {
@@ -137,7 +137,7 @@ namespace Activity
         {
             base.RemoveListener();
             Messenger.RemoveListener(Task.UpdateTaskDataMsg,UpdateProgress);
-            //Messenger.AddListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
         }
         private void UpdateSpinCount()
         {

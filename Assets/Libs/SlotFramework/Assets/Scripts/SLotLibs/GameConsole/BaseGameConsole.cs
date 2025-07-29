@@ -642,37 +642,46 @@ public class BaseGameConsole :MonoBehaviour
 		Application.logMessageReceivedThreaded += HandleLog;
 	}
 
-	private  void HandleLog(string message, string stackTraceString, LogType type)
+	private void HandleLog(string message, string stackTraceString, LogType type)
 	{
 		if (type == LogType.Error)
 		{
 			Dictionary<string, object> events = new Dictionary<string, object>();
-			
-			Action generateData = () =>
+        
+			// 先添加基础信息
+			events.Add("message", message);
+			events.Add("stackTrace", stackTraceString);
+			events.Add("ThreadInfo", Thread.CurrentThread.ManagedThreadId);
+			events.Add("ThreadType", 
+				Thread.CurrentThread.ManagedThreadId == MainThreadId 
+					? "UnityMain" 
+					: (string.IsNullOrEmpty(Thread.CurrentThread.Name) ? "Thread" : Thread.CurrentThread.Name));
+
+			// 只有在安全的运行时环境下才收集系统信息
+			string systemInfo = "Unavailable (Edit Time)";
+			if (Application.isPlaying)
 			{
-				events.Add("message",message);
-				events.Add("stackTrace",stackTraceString);
-				events.Add("systemInfo",UnityUtil.DumpPlatformInfo());
-				
-			};
-			
+				try
+				{
+					systemInfo = UnityUtil.DumpPlatformInfo(); // ✅ 仅在 Play Mode 下调用
+				}
+				catch (Exception e)
+				{
+					systemInfo = "Failed to collect: " + e.Message;
+				}
+			}
+
+			events.Add("systemInfo", systemInfo);
+
+			// 分派到主线程或直接发送
 			if (Thread.CurrentThread.ManagedThreadId == MainThreadId)
 			{
-				events.Add("ThreadInfo", Thread.CurrentThread.ManagedThreadId);
-				events.Add("ThreadType", "UnityMain");
-				generateData();
-				
 				LogBaseEvent("UnityErrorMsg", events);
 			}
 			else
 			{
-				events.Add("ThreadInfo", Thread.CurrentThread.ManagedThreadId);
-				events.Add("ThreadType", string.IsNullOrEmpty(Thread.CurrentThread.Name) ? "Thread" : Thread.CurrentThread.Name);
-				
-				//异步线程异常收集
 				RunOnMainThread(() =>
 				{
-					generateData();
 					LogThreadBaseEvent("UnityErrorMsg", events);
 				});
 			}

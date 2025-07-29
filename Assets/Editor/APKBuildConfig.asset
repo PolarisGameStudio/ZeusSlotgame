@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: APKBuildConfig
   m_EditorClassIdentifier: 
   bundleVersion: 1.0.0
-  productName: Zeus
+  productName: Candy
   keystorePath: /Users/lifan/user.keystore
   keystorePassword: jufocus1122
   keyaliasName: wildwest
   keyaliasPassword: jukanoffice
-  outputPath: /Users/lifan/Desktop/BuildOutput/Zeus
+  outputPath: /Users/lifan/Desktop/BuildOutput/CandyFansty

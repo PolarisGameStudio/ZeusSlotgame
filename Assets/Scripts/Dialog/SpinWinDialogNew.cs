@@ -167,7 +167,7 @@ public class SpinWinDialogNew : UIDialog
             }).Play();
         }
     }
-    void PlaySpineShowAni()
+    void PlaySpineShowAni(int id)
     {
         if (skeleton!=null)
         {

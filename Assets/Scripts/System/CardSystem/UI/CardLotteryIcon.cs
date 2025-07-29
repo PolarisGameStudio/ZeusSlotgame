@@ -95,6 +95,7 @@ namespace CardSystem
             // 添加监听器的逻辑
             Debug.Log("Adding listeners for Card Lottery Icon");
             Messenger.AddListener(CardSystemConstants.LotteryChangeWeightConditionMsg, ShowRedPoint);
+            Messenger.AddListener(SlotControllerConstants.OnBlanceChangeForDisPlay, ShowRedPoint);
         }
 
         protected override void RemoveListener()
@@ -102,6 +103,7 @@ namespace CardSystem
             // 移除监听器的逻辑
             Debug.Log("Removing listeners for Card Lottery Icon");
             Messenger.RemoveListener(CardSystemConstants.LotteryChangeWeightConditionMsg, ShowRedPoint);
+            Messenger.RemoveListener(SlotControllerConstants.OnBlanceChangeForDisPlay, ShowRedPoint);
         }
         
         void OnButtonClick()

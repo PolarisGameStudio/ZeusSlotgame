@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Libs;
 using Spine.Unity;
 using Spine.Unity.Modules;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace Activity
         private bool needShowQiPao = true;
         private BaseActivity activity;
         private bool isClicked = false;
+        private bool isNormal = false;
         private void Awake()
         {
             skeletonGraphic = Utils.Utilities.RealFindObj<SkeletonGraphic>(transform, "spinAni");
@@ -47,6 +49,7 @@ namespace Activity
             if (activity is H5RewardActivity h5RewardActivity)
             {
                 showInterval = h5RewardActivity.TimeInterval;
+                isNormal = showInterval < 0;
                 UpdateIcon(h5RewardActivity.CheckCanShow());
             }
         }
@@ -57,6 +60,8 @@ namespace Activity
             {
                 ChangeSkinByIndex(curShowIndex);
                 skeletonGraphic.gameObject.SetActive(true);
+                //检查是否需要显示气泡，默认不显示
+                UpdateQiPao(PlatformManager.Instance.GetH5UserType() == 1);
                 // saqian.gameObject.SetActive(true);
                 // NeedShowQiPao();
             }
@@ -67,7 +72,15 @@ namespace Activity
                 // DestroyShowQiPao();
             }
         }
-        
+
+        private void UpdateQiPao(bool isShow)
+        {
+            if (!isShow)
+            {
+                skeletonGraphic.AnimationState.SetAnimation(0,"without_pao",true);
+            }
+        }
+
         public void ChangeSkinByIndex(int index)
         {
             if (skeletonGraphic != null)
@@ -105,27 +118,35 @@ namespace Activity
         private long lastTime = 0;
         public void OnExitH5()
         {
+            //是否被点击过
             if (!isClicked)
             {
                 return;
             }
             isClicked = false;
-            //隐藏当前显示的按钮
-            skeletonGraphic.gameObject.SetActive(false);
-            //重置计数
-            lastTime = 0;
-            //序号自增，展示下一个
-            curShowIndex = (curShowIndex==totalCount - 1) ? 0 : curShowIndex + 1;
-            // //销毁气泡展示协程
-            // needShowQiPao = false;
-            UpdateIcon(false);
-            // DestroyShowQiPao();
-            if (timeCor!=null)
+            if (isNormal)
             {
-                StopCoroutine(timeCor);
-                timeCor = null;
+                skeletonGraphic.AnimationState.SetAnimation(0, "without_pao", true);
             }
-            timeCor = StartCoroutine(StartCalculateTime());
+            else
+            {
+                //隐藏当前显示的按钮
+                skeletonGraphic.gameObject.SetActive(false);
+                //重置计数
+                lastTime = 0;
+                //序号自增，展示下一个
+                curShowIndex = (curShowIndex==totalCount - 1) ? 0 : curShowIndex + 1;
+                // //销毁气泡展示协程
+                // needShowQiPao = false;
+                UpdateIcon(false);
+                // DestroyShowQiPao();
+                if (timeCor!=null)
+                {
+                    StopCoroutine(timeCor);
+                    timeCor = null;
+                }
+                timeCor = StartCoroutine(StartCalculateTime());
+            }
         }
         
         IEnumerator StartCalculateTime()

@@ -28,6 +28,10 @@ namespace CardSystem
         protected override void Awake()
         {
             base.Awake();
+            if (btn_collect!=null)
+            {
+                UGUIEventListener.Get(btn_collect.gameObject).onClick = BtnCollectClick;
+            }
             Cards = CardSystemManager.Instance.GetCardsInfo();
             Cards.Sort((a, b) =>
             {
@@ -62,12 +66,17 @@ namespace CardSystem
             tmp_cardInfo.text = $"{CardSystemManager.Instance.GetHaveCardTypeCount()}/{CardSystemManager.Instance.GetTotalCardTypeCount()}";
         }
 
-        public override void Close()
+        protected override void BtnCloseClick(GameObject closeBtnObject)
         {
-            base.Close();
+            base.BtnCloseClick(closeBtnObject);
             CardSystemManager.Instance.ClearNewCardIndex();
-        }
 
+        }
+        private void BtnCollectClick(GameObject closeBtnObject)
+        {
+            this.Close();
+            CardSystemManager.Instance.ShowLotteryDialog();
+        }
         #region LoopScrollRect必需实现
         public void ProvideData(Transform transform, int idx)
         {

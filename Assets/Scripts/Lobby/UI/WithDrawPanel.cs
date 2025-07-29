@@ -79,35 +79,39 @@ public class WithDrawPanel : MonoBehaviour
         {
             return;
         }
-        if (tipText!=null)
+        //做一个延时操作，等待WithDrawTaskActivity切换任务
+        new DelayAction(1.1f,null,() =>
         {
-            string info = GetTipTextInfo();
-            if (string.IsNullOrEmpty(info) || info == string.Empty)
+            if (tipText!=null)
             {
-                tip.SetActive(false);
-                return;
-            }
-            tipText.text = info;
-        }
-        tip.SetActive(true);
-        tip.transform.localScale = Vector3.zero;
-        tip.transform.DOScale(new Vector3(1,1,1),tipShowTime).SetEase(Ease.OutBack).OnComplete(() =>
-        {
-            new DelayAction(tipIdleTime,null,() =>
-            {
-                if (tip!=null)
+                string info = GetTipTextInfo();
+                if (string.IsNullOrEmpty(info) || info == string.Empty)
                 {
-                    tweenerTip = tip.transform.DOScale(new Vector3(0,0,0),tipShowTime).SetEase(Ease.InBack).OnComplete(() =>
-                    {
-                        if (tweenerTip!=null)
-                        {
-                            tweenerTip.Kill();
-                            tweenerTip = null;
-                        }
-                        tip.SetActive(false);
-                    });
-                    tweenerTip.Play();
+                    tip.SetActive(false);
+                    return;
                 }
+                tipText.text = info;
+            }
+            tip.SetActive(true);
+            tip.transform.localScale = Vector3.zero;
+            tip.transform.DOScale(new Vector3(1,1,1),tipShowTime).SetEase(Ease.OutBack).OnComplete(() =>
+            {
+                new DelayAction(tipIdleTime,null,() =>
+                {
+                    if (tip!=null)
+                    {
+                        tweenerTip = tip.transform.DOScale(new Vector3(0,0,0),tipShowTime).SetEase(Ease.InBack).OnComplete(() =>
+                        {
+                            if (tweenerTip!=null)
+                            {
+                                tweenerTip.Kill();
+                                tweenerTip = null;
+                            }
+                            tip.SetActive(false);
+                        });
+                        tweenerTip.Play();
+                    }
+                }).Play();
             }).Play();
         }).Play();
     }

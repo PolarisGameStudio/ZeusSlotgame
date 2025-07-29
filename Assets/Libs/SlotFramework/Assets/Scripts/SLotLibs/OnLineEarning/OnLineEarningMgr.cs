@@ -224,7 +224,6 @@ public class OnLineEarningMgr
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"Cash",cash.ToString());
         SharedPlayerPrefs.SetPlayerPrefsIntValue(CASH,cash); 
     }
-   
     
     public virtual void IncreaseCash(int newCash)
     {

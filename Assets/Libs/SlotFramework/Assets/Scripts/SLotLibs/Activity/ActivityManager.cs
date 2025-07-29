@@ -26,7 +26,13 @@ namespace Activity
             {
                 string name = item.Key;
                 Dictionary<string, object> data = item.Value as Dictionary<string, object>;
-                BaseActivity baseActivity = CreateActivity(name,data);
+                int activityType = Utils.Utilities.GetInt(data, ActivityConstants.TYPE, -1);
+                if (activityType<0)
+                {
+                    Debug.LogError("[ActivityManager][OnInit] Activity Type is Error");
+                    continue;
+                }
+                BaseActivity baseActivity = CreateActivity(activityType,data);
                 if (!baseActivity.IsOpen())
                 {
                     continue;
@@ -42,30 +48,29 @@ namespace Activity
             }
         }
 
-        BaseActivity CreateActivity(string key,Dictionary<string,object> data)
+        BaseActivity CreateActivity(int type,Dictionary<string,object> data)
         {
             BaseActivity activity = null;
-            switch (key)
+            switch (type)
             {
-                case ActivityConstants.SPINWITHDRAW:
+                case (int)ActivityType.SpinWithDraw:
                     activity = new SpinWithDrawActivity(data);
                     break;
-                case ActivityConstants.CARDLOTTERY:
+                case (int)ActivityType.CardLottery:
                     activity = new CardLotteryActivity(data);
                     break;
-                case ActivityConstants.CARDPACK:
+                case (int)ActivityType.CardPack:
                     activity = new CardPackActivity(data);
                     break;
-                case ActivityConstants.WITHDRAWTASK:
+                case (int)ActivityType.WithDrawTask:
                     activity = new WithDrawTaskActivity(data);
                     break;
-                case ActivityConstants.H5RewardActivity:
+                case (int)ActivityType.H5RewardActivity:
                     activity = new H5RewardActivity(data);
                     break;
-                case ActivityConstants.CONTINUESPINTASK:
+                case (int)ActivityType.ContinueSpin:
                     activity = new ContinueSpinActivity(data);
                     break;
-                
             }
 
             return activity;
@@ -73,8 +78,8 @@ namespace Activity
 
         public BaseActivity RegisterActivity(Dictionary<string,object> data)
         {
-            string name = Utils.Utilities.GetString(data, ActivityConstants.NAME, null);
-            BaseActivity baseActivity = CreateActivity(name,data);
+            int activityType = Utils.Utilities.GetInt(data, ActivityConstants.TYPE, -1);
+            BaseActivity baseActivity = CreateActivity(activityType,data);
             if (!baseActivity.IsOpen())
             {
                 return null;

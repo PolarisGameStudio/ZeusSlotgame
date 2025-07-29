@@ -286,7 +286,16 @@ namespace Activity
         {
             string info = GetTaskInfoDesc();
             info = info.Replace("FFFD3A", "FFFF00");
-            string progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",Task.HasCollectNum,Task.TargetNum);
+            string progressInfo = "";
+            if (Task is CollectCashFromZeroTask)
+            {
+                progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",OnLineEarningMgr.Instance.GetMoneyStr((int)Task.HasCollectNum,0,false,true),
+                    OnLineEarningMgr.Instance.GetMoneyStr((int)Task.TargetNum,0,false,true));
+            }
+            else
+            {
+                progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",Task.HasCollectNum,Task.TargetNum);
+            }
             return info+". "+progressInfo;
         }
 

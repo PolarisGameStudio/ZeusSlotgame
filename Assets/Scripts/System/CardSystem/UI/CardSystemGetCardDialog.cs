@@ -63,14 +63,14 @@ namespace CardSystem
                 GameObject img_cardbg = Util.FindObject<GameObject>(item.transform, "img_bg/" + level);
                 img_cardbg.SetActive(true);
                
-                int cardCount = CardSystemManager.Instance.GetCardCount(CardId);
-                if (cardCount > 1)
-                {
-                    Transform img_redPoint = Util.FindObject<Transform>(item.transform, "img_redPoint");
-                    TextMeshProUGUI text_count = Util.FindObject<TextMeshProUGUI>(item.transform, "img_redPoint/tmp_count");
-                    img_redPoint.gameObject.SetActive(true);
-                    text_count.text = cardCount.ToString();
-                }
+                // int cardCount = CardSystemManager.Instance.GetCardCount(CardId);
+                // if (cardCount > 1)
+                // {
+                //     Transform img_redPoint = Util.FindObject<Transform>(item.transform, "img_redPoint");
+                //     TextMeshProUGUI text_count = Util.FindObject<TextMeshProUGUI>(item.transform, "img_redPoint/tmp_count");
+                //     img_redPoint.gameObject.SetActive(true);
+                //     text_count.text = cardCount.ToString();
+                // }
                 //加载卡牌图标
                 Transform img_card = Util.FindObject<Transform>(item.transform, "img_card");
                 img_card.gameObject.SetActive(false);
@@ -133,12 +133,12 @@ namespace CardSystem
             {
                 item.SetParent(parentPrefab.transform, true);
                 item.gameObject.SetActive(true);
-                item.transform.DOLocalMove(Vector3.zero,0.5f).SetEase(Ease.Linear).SetUpdate(true);
+                item.transform.DOLocalMove(Vector3.zero,0.5f).SetEase(Ease.Linear);
                 item.transform.DOScale(Vector3.zero,0.5f).SetEase(Ease.InQuart).OnComplete(() =>
                 {
                     item.gameObject.SetActive(false);
                     Messenger.Broadcast(CardSystemConstants.RefreshLotteryMsg);
-                }).SetUpdate(true);
+                });
             }
         }
         

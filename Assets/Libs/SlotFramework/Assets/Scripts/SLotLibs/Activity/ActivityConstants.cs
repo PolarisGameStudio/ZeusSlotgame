@@ -16,6 +16,7 @@ namespace Activity
         public const string WITHDRAWTASK = "WithDrawTask";
         public const string H5RewardActivity = "H5RewardActivity";
         public const string CONTINUESPINTASK = "ContinueSpinTask";
+        public const string UniversalH5Activity = "UniversalH5Activity";
 
         public const string IconResource = "resource";
         

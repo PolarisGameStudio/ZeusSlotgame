@@ -49,6 +49,7 @@ namespace Activity
             {
                 showInterval = h5RewardActivity.TimeInterval;
                 isNormal = showInterval < 0;
+                if (isNormal) curShowIndex = 1;
                 UpdateIcon(h5RewardActivity.CheckCanShow());
             }
         }

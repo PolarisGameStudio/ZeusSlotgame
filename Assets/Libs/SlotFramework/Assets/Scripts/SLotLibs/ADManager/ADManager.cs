@@ -115,6 +115,7 @@ public class ADManager
         this.requestEntranceName = entranceName;
 #if UNITY_EDITOR
         HandlePlayVideoResult(1);
+        adCB?.Invoke(true);
 #else
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.ShowVideo,1);
 #endif

@@ -127,6 +127,7 @@ public class FreeGameEndDialog : UIDialog
             }
             else
             {
+                EndBtn.interactable = true;
                 this.Close();
             }
            
@@ -150,7 +151,8 @@ public class FreeGameEndDialog : UIDialog
             else
             {
                 //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
+               
+                ADManager.Instance.PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART,DoneADCallBack);
             }
             OnLineEarningMgr.Instance.ResetSpinTime();
         }
@@ -158,6 +160,11 @@ public class FreeGameEndDialog : UIDialog
         {
             this.DoneADCallBack();
         }
+    }
+
+    private void DoneADCallBack(bool res)
+    {
+        DoneADCallBack();
     }
     
    private void OnWatchADButtonClick(GameObject go)
@@ -219,6 +226,7 @@ public class FreeGameEndDialog : UIDialog
     //加钱动画
     private void DoneADCallBack()
     {
+        EndBtn.interactable = true;
         bool needFly = true;
         if (!PlatformManager.Instance.IsWhiteBao())
         {

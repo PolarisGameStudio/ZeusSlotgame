@@ -141,7 +141,7 @@ public class FreeGameEndDialog : UIDialog
         if (OnLineEarningMgr.Instance.CheckCanPopAD(1))
         {
             OnLineEarningMgr.Instance.ResetADNum(1);
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
+            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND);
             //广告未加载好
             if (!interstitialADIsReady)
             {
@@ -152,7 +152,7 @@ public class FreeGameEndDialog : UIDialog
             {
                 //播放广告
                
-                ADManager.Instance.PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART,DoneADCallBack);
+                ADManager.Instance.PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND,DoneADCallBack);
             }
             OnLineEarningMgr.Instance.ResetSpinTime();
         }

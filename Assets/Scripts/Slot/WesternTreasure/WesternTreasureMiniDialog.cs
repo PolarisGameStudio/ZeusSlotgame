@@ -252,7 +252,7 @@ public class WesternTreasureMiniDialog : UIDialog
         {
             OnLineEarningMgr.Instance.ResetADNum(2);
             OnLineEarningMgr.Instance.ResetSpinTime();
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
+            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEBONUSGAMEEND);
             //广告未加载好
             if (!interstitialADIsReady)
             {
@@ -262,7 +262,7 @@ public class WesternTreasureMiniDialog : UIDialog
             else
             {
                 //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
+                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSEBONUSGAMEEND);
             }
         }
     }

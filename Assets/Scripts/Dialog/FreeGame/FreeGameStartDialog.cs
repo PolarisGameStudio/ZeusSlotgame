@@ -144,7 +144,7 @@ public class FreeGameStartDialog : UIDialog
         }
         hasClicked = true;
         OnLineEarningMgr.Instance.FreeSpinCount++;
-        //ADDoneCallBack();
+        ADDoneCallBack();
     }
 
     public void ADDoneCallBack()

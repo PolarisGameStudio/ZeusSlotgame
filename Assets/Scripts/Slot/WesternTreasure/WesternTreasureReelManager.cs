@@ -253,35 +253,8 @@ public class WesternTreasureReelManager : GoldsReelManager
         }
         //展示一次广告
         OnLineEarningMgr.Instance.JackpotCount++;
-        if (OnLineEarningMgr.Instance.CheckCanShowJackpotStartAD())
-        {
-            Debug.Log("[WesternTreasureReelManager] [OpenJackpotGame] [ShowAD]");
-            ShowAD();
-        }
     }
     
-    void ShowAD()
-    {
-        Debug.Log("[WesternTreasureReelManager] [ShowAD]");
-        OnLineEarningMgr.Instance.AddADNum(2);
-        if (OnLineEarningMgr.Instance.CheckCanPopAD(2))
-        {
-            OnLineEarningMgr.Instance.ResetADNum(2);
-            OnLineEarningMgr.Instance.ResetSpinTime();
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
-            //广告未加载好
-            if (!interstitialADIsReady)
-            {
-                //展示未加载好广告的提示,直接给奖励
-                ADManager.Instance.ShowLoadingADsUI();
-            }
-            else
-            {
-                //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
-            }
-        }
-    }
     
     private void CloseJackpotGame()
     {

@@ -144,15 +144,6 @@ public class FreeGameStartDialog : UIDialog
         }
         hasClicked = true;
         OnLineEarningMgr.Instance.FreeSpinCount++;
-        if (OnLineEarningMgr.Instance.CheckCanShowFreeStartAD())
-        {
-            Debug.Log("FreeGameStartDialog OnStartButtonClick ShowAD");
-            ShowAD();
-        }
-        else
-        {
-            ADDoneCallBack();
-        }
         //ADDoneCallBack();
     }
 
@@ -168,30 +159,6 @@ public class FreeGameStartDialog : UIDialog
         this.Close();
     }
 
-    void ShowAD()
-    {
-        OnLineEarningMgr.Instance.AddADNum(1);
-        if (OnLineEarningMgr.Instance.CheckCanPopAD(1))
-        {
-            OnLineEarningMgr.Instance.ResetADNum(1);
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
-            //广告未加载好
-            if (!interstitialADIsReady)
-            {
-                //展示未加载好广告的提示,直接给奖励
-                ADManager.Instance.ShowLoadingADsUI(endCallBack:this.ADDoneCallBack);
-            }
-            else
-            {
-                //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
-            }
-            OnLineEarningMgr.Instance.ResetSpinTime();
-        }
-        else
-        {
-            this.ADDoneCallBack();
-        }
-    }
+    
 }
 

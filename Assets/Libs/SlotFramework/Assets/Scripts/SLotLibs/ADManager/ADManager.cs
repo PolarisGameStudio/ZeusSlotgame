@@ -107,10 +107,7 @@ public class ADManager
             return;
         }
 
-        if (callBack !=null)
-        {
-            adCB = callBack;
-        }
+        adCB = callBack;
       
         this.requestEntranceName = entranceName;
 #if UNITY_EDITOR

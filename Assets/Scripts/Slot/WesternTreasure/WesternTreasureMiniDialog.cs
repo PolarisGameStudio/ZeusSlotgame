@@ -229,6 +229,8 @@ public class WesternTreasureMiniDialog : UIDialog
         // }
         // else
         // {
+        
+            OnLineEarningMgr.Instance.JackpotCount++;
             //播广告后加钱
             if (OnLineEarningMgr.Instance.CheckCanShowJackpotStartAD())
             {

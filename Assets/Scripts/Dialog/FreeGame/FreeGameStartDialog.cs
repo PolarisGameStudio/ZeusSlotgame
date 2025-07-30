@@ -143,7 +143,6 @@ public class FreeGameStartDialog : UIDialog
             return;
         }
         hasClicked = true;
-        OnLineEarningMgr.Instance.FreeSpinCount++;
         AudioEntity.Instance.StopFreeGameStartDialogMusic();
         AudioEntity.Instance.PlayFeatureBtnEffect();
         Close();

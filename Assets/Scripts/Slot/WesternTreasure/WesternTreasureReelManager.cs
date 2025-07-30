@@ -251,8 +251,6 @@ public class WesternTreasureReelManager : GoldsReelManager
         {
             jackpotGameBack.SetActive(true);
         }
-        //展示一次广告
-        OnLineEarningMgr.Instance.JackpotCount++;
     }
     
     
@@ -277,8 +275,6 @@ public class WesternTreasureReelManager : GoldsReelManager
         {
             jackpotGameBack.SetActive(false);
         }
-
-       
     }
 
     public void OpenJackpotEndDialog(int jackpotType,double money)

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -111,40 +111,8 @@ public class FreeGameEndDialog : UIDialog
         // }
         SendMsg();
     }
-    
-    void ShowAD()
-    {
-        OnLineEarningMgr.Instance.AddADNum(1);
-        if (OnLineEarningMgr.Instance.CheckCanPopAD(1))
-        {
-            Debug.Log("FreeGameEndDialog ShowAD");
-            OnLineEarningMgr.Instance.ResetADNum(1);
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND);
-            //广告未加载好
-            if (!interstitialADIsReady)
-            {
-                //展示未加载好广告的提示,直接给奖励
-                ADManager.Instance.ShowLoadingADsUI(endCallBack:this.DoneADCallBack);
-            }
-            else
-            {
-                //播放广告
-                ADManager.Instance.PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND,DoneADCallBack);
-            }
-            OnLineEarningMgr.Instance.ResetSpinTime();
-        }
-        else
-        {
-            this.DoneADCallBack();
-        }
-    }
 
-    private void DoneADCallBack(bool res)
-    {
-        DoneADCallBack();
-    }
-    
-   private void OnWatchADButtonClick(GameObject go)
+    private void OnWatchADButtonClick(GameObject go)
     {
         if (!WatchADBtn.enabled)
         {

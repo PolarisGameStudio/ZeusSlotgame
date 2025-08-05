@@ -50,3 +50,7 @@ Logs/
 .install.sh
 .install.bat
 .pre-commit
+
+Assets/AddressableAssetsData/link.xml
+
+Assets/AddressableAssetsData/link.xml.meta

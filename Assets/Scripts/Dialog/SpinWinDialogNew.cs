@@ -172,26 +172,12 @@ public class SpinWinDialogNew : UIDialog
             }).Play();
         }
     }
-    void PlaySpineShowAni()
+    void PlaySpineShowAni(int id)
     {
         if (skeleton!=null)
         {
-            int id = 1;
             skeleton.Skeleton.SetToSetupPose();
             skeleton.AnimationState.ClearTracks();
-            switch (spinWinType)
-            {
-                case SpinWinType.EPIC:
-                    id = 5;
-                    break;
-                case SpinWinType.MEGA:
-                    id = 3;
-                    break;
-                case SpinWinType.BIG:
-                    id = 1;
-                    break;
-            }
-
             skeleton.AnimationState.Complete += OnComplete;
             skeleton.AnimationState.SetAnimation(0, GetAniName(id), false);
         }

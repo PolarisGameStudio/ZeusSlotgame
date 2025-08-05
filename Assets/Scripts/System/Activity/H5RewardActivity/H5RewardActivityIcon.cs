@@ -60,6 +60,7 @@ namespace Activity
             if (isShow)
             {
                 ChangeSkinByIndex(curShowIndex);
+                gameObject.SetActive(isShow);
                 skeletonGraphic.gameObject.SetActive(true);
                 //检查是否需要显示气泡，默认不显示
                 UpdateQiPao(PlatformManager.Instance.GetH5UserType() == 1);
@@ -68,6 +69,7 @@ namespace Activity
             }
             else
             {
+                gameObject.SetActive(false);
                 skeletonGraphic.gameObject.SetActive(false);
                 // saqian.gameObject.SetActive(false);
                 // DestroyShowQiPao();

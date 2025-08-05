@@ -25,7 +25,9 @@ namespace Activity
         
         private int _closeMinReward = 0;
         private int _closeMaxReward = 100;
-        
+        //网赚300模式点击 claim的奖励比率
+        private float _closeRewardRate = 0.1f;
+
         private static int _autoPopCount;
 
         private int _canOpenSpinCount = 0;//可以打开活动面板时，旋转的次数，需要自动打开
@@ -74,6 +76,7 @@ namespace Activity
             string[] closeRewards = closeRewardString.Split(",");
             _closeMinReward = int.Parse(closeRewards[0]);
             _closeMaxReward = int.Parse(closeRewards[1]);
+            _closeRewardRate = Utils.Utilities.GetFloat(Data,"CloseRewardRate", 0.1f);
         }
 
         public override void AddListener()
@@ -147,6 +150,8 @@ namespace Activity
 
             if (_canOpenSpinCount >= _autoPopCount)
             {
+                //停止自动spin
+                Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
                 ShowContinueSpinDialog();
             }
             
@@ -162,23 +167,44 @@ namespace Activity
         private void ShowContinueSpinDialog()
         {
             _canOpenSpinCount = 0;
+            UIDialog dialog = UIManager.Instance.GetActiveDialog<ContinueSpinDialog>();
+            if (dialog!=null)
+            {
+                return;
+            }
+            Debug.Log("ShowContinueSpinDialog");
             Messenger.Broadcast<int>(GameDialogManager.OpenContinueSpinDialogMsg,id);
         }
 
         public int GetReward()
         {
-            int randomReward;
-            if (IsCloseReward)
+            int randomReward = 0;
+            if (OnLineEarningMgr.Instance.isInfiniteOpen())
             {
-                randomReward = Random.Range(_closeMinReward,_closeMaxReward + 1);
+                if (IsCloseReward)
+                {
+                    _closeMinReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+                    _closeMaxReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+                    randomReward = Random.Range(_closeMinReward,_closeMaxReward + 1);
+                }
+                else
+                {
+                    _minReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+                    _maxReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+                    randomReward = Random.Range(_minReward,_maxReward + 1);
+                }
+                
             }
-            else
+            else if (OnLineEarningMgr.Instance.isThreeHundredOpen())
             {
-                randomReward = Random.Range(_minReward,_maxReward + 1);
+                //300模式走数组的奖励配置
+                randomReward = OnLineEarningMgr.Instance.GetRewardsByName(OnLineEarningConstants.REWARD_CONTINUESPIN);
+                if (IsCloseReward)
+                {
+                    randomReward = (int)(randomReward * _closeRewardRate);
+                }
             }
             return randomReward;
         }
-        
-
     }
 }

@@ -8,6 +8,7 @@ using Spine.Unity;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Ads;
 
 public class LuckyCashDialog : UIDialog
 {
@@ -37,7 +38,6 @@ public class LuckyCashDialog : UIDialog
         BtnNotWatch.onClick.AddListener(OnButtonCloseClick);
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"LuckyCash");
         base.Awake();
-        
     }
 
     protected override void Start()
@@ -68,10 +68,12 @@ public class LuckyCashDialog : UIDialog
     void OnEnable()
     {
         Messenger.AddListener<int>(ADConstants.PlayLuckyCashAD,AdIsPlaySuccessful);
+        Messenger.AddListener<int>(ADConstants.PlayLuckyCashADFailed,AdIsPlayFailed);
     }
     void OnDisable()
     {
         Messenger.RemoveListener<int>(ADConstants.PlayLuckyCashAD,AdIsPlaySuccessful);
+        Messenger.RemoveListener<int>(ADConstants.PlayLuckyCashADFailed,AdIsPlayFailed);
     }
     
     public void SetUIData(int money)
@@ -115,9 +117,21 @@ public class LuckyCashDialog : UIDialog
     void AdIsPlaySuccessful(int type)
     {
         Debug.Log("LuckyCashDialog  AdIsPlaySuccessful  type========="+type);
+        int multiple = 1;
+        if (type == (int)ADType.RewardAD)
+        {
+            multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_LUCKYCASH);
+        }else if (type == (int)ADType.InterstitialAD)
+        {
+            multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
+        }
+        totalCash *= multiple;
         SetCoins();
     }
-
+    void AdIsPlayFailed(int type)
+    {
+        AdIsPlaySuccessful(type);
+    }
     //激励广告
     public void OnWatchADButtonClick()
     {
@@ -137,18 +151,7 @@ public class LuckyCashDialog : UIDialog
         }
         isPlayAd = true;
         OnClickStopUpdate();
-        totalCash *= ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_LUCKYCASH);
-        bool rewardADIsReady = ADManager.Instance.RewardAdIsOk(ADEntrances.REWARD_VIDEO_ENTRANCE_LUCKYCASH);
-        //广告未加载好
-        if (!rewardADIsReady)
-        {
-            //展示未加载好广告的提示,直接给看广告成功的奖励
-            ADManager.Instance.ShowLoadingADsUI(endCallBack:this.SetCoins);
-        }
-        else
-        {
-            ADManager.Instance.PlayRewardVideo(ADEntrances.REWARD_VIDEO_ENTRANCE_LUCKYCASH);
-        }
+        Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_ENTRANCE_LUCKYCASH);
     }
 
     private void OnButtonCloseClick()
@@ -164,31 +167,7 @@ public class LuckyCashDialog : UIDialog
         }
         HasClicked = true;
         OnClickStopUpdate();
-        // totalCash = (int)(totalCash * 0.2f);
-        //只有通过 claimX20%点击关闭的弹窗才计入插屏广告的累计次数
-        // OnLineEarningMgr.Instance.AddLuckyADNum();
-        // if (OnLineEarningMgr.Instance.CheckCanPopLuckyAD())
-        // {
-        //     //加钱之后重置计数
-        //     OnLineEarningMgr.Instance.ResetLuckyADNum();
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
-            //广告未加载好
-            if (!interstitialADIsReady)
-            {
-                //展示未加载好广告的提示,直接给未看广告的奖励
-                ADManager.Instance.ShowLoadingADsUI(endCallBack:this.SetCoins);
-            }
-            else
-            {
-                //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
-            }
-        // }
-        // else
-        // {
-        //     //直接加 20% 的钱
-        //     SetCoins();
-        // }
+        Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
     }
     
     public void SetCoins()

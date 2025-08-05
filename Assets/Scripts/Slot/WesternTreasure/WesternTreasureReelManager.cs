@@ -1,10 +1,10 @@
-﻿using Libs;
+using Libs;
 using Classic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
+using Ads;
 using System;
 using UnityEngine.Serialization;
 //using NUnit.Framework;
@@ -29,10 +29,16 @@ public class WesternTreasureReelManager : GoldsReelManager
     {
         base.Awake();
         Messenger.AddListener<long>(SlotControllerConstants.OnBetChange, OnChangBet);
+        Messenger.AddListener<int>(ADConstants.PlayFreeSpinAD, this.OnAdIsPlaySuccessful);
+        Messenger.AddListener<int>(ADConstants.PlayFreeSpinADFailed, this.OnAdIsPlayFailed);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
     }
     protected override void OnDestroy()
     {
         Messenger.RemoveListener<long>(SlotControllerConstants.OnBetChange, OnChangBet);
+        Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinAD, this.OnAdIsPlaySuccessful);
+        Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinADFailed, this.OnAdIsPlayFailed);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
         base.OnDestroy();
     }
 
@@ -251,9 +257,32 @@ public class WesternTreasureReelManager : GoldsReelManager
         {
             jackpotGameBack.SetActive(true);
         }
+        
+        #region AD
+        // Messenger.Broadcast(ADConstants.JackpotGameStartMsg);
+        // Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.Interstitial_Entrance_JACKPOTSTART);
+        #endregion
+    }
+
+    #region AD
+    void OnAdIsPlaySuccessful(int type)
+    {
+        
     }
     
-    
+    void OnAdIsPlayFailed(int type)
+    {
+        
+    }
+
+    void HandleNotMeetConditionMsg(string msg)
+    {
+        if (msg == ADEntrances.Interstitial_Entrance_JACKPOTSTART)
+        {
+        }
+    }
+    #endregion
+
     private void CloseJackpotGame()
     {
         Messenger.Broadcast(WesternTreasureBonusGame.TreeBonusGameEnd);

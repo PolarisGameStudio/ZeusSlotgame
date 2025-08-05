@@ -8,7 +8,7 @@ using MiniJSON;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using Utils;
-
+using Ads;
 namespace Libs
 {
     public enum MessageType
@@ -290,7 +290,7 @@ namespace Libs
         }
         private void HandleShowVideoRef(Dictionary<string,object> data)
         {
-            Messenger.Broadcast(ADConstants.OnPlayVedioEnd);
+            Messenger.Broadcast(ADConstants.OnPlayVideoEnd);
         }
         private void HandleRequestIsWhiteBaoRef(Dictionary<string,object> data)
         {

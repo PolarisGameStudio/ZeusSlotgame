@@ -32,15 +32,12 @@ public enum CountryType
 public class OnLineEarningMgr
 {
     private const string OPEN_KEY = "OPEN";
-    private const string POP_PLAN_CONFIG_KEY = "PopPlanConfig";
-    private const string NEW_USER_KEY = "NewUser";
-    private const string Spin_KEY = "spin";
-    private const string RewardMin_KEY = "rewardmin";
-    private const string RewardMax_KEY = "rewardmax";
+    private const string POP_PLAN_CONFIG_KEY = "InfiniteModelConfig";
     private const string IsWhitePackage_KEY = "IsWhitePackage";
 
-    private const string THREE_HUNDRED_CONFIG_KEY = "ThreeHundredConfig";
+    private const string THREE_HUNDRED_CONFIG_KEY = "300ModelConfig";
     private const string ON_LINE_EARNING_MODEL_KEY = "OnLineEarningModel"; //网赚模式 0--》无限模式  1--》300模式
+    
     #region 单例
     protected static OnLineEarningMgr _Instance;
     private static object syncRoot = new object ();
@@ -59,10 +56,10 @@ public class OnLineEarningMgr
     #endregion
    
     private int OnLineEarningModel = 0;
-    private PopPlanConfig popPlanConfig;
-    private ThreeHundredConfig threeHundredConfig;
+    private InfiniteModel _infiniteModel;
+    private ThreeHundredModel _threeHundredModel;
 
-    private BaseRewardConfig baseRewardConfig;
+    private BaseOnlineEarningModel _baseOnlineEarningModel;
     //系统开启按钮
     private bool isOpen = true;
 
@@ -71,10 +68,23 @@ public class OnLineEarningMgr
     public bool ShowCashInFree = false;
     
     private int newUserSpinCount = 0; //新用户在spin几次后弹出一个奖励弹板
-    private int newUserCashMin = 0; //新用户首次弹板奖励金钱
-    private int newUserCashMax = 0; //新用户首次弹板奖励金钱
 
     private bool isWhitePackage = false; //白包用户
+    
+    
+    public const string PopSpinWinCountKey = "PopSpinWinCountKey";
+    public int PopSpinWinCount
+    {
+        set
+        {      
+            SharedPlayerPrefs.SetPlayerPrefsIntValue(PopSpinWinCountKey, value);
+        }
+        get
+        {
+            int value = SharedPlayerPrefs.GetPlayerPrefsIntValue(PopSpinWinCountKey, 0);
+            return value;
+        }
+    }
     public void ParseConfig(Dictionary<string,object> config)
     {
         isOpen = Utils.Utilities.GetBool(config,OPEN_KEY,true);
@@ -90,49 +100,45 @@ public class OnLineEarningMgr
             if(PopPlanConfigDict == null) 
                 throw new ArgumentNullException ("PopPlan dict not in big plist");
             //开启无限模式，解析无限模式配置
-            if (popPlanConfig == null)
+            if (_infiniteModel == null)
             {
-                popPlanConfig = new PopPlanConfig();
+                _infiniteModel = new InfiniteModel();
             }
-            popPlanConfig.ParseConfig(PopPlanConfigDict);
-            baseRewardConfig = popPlanConfig;
+            _infiniteModel.ParseConfig(PopPlanConfigDict);
+            _baseOnlineEarningModel = _infiniteModel;
         }else if (OnLineEarningModel == 1)
         {
             Dictionary<string,object> ThreeHundredConfigDict = Utils.Utilities.GetValue<Dictionary<string,object>>(config,THREE_HUNDRED_CONFIG_KEY,null);
             if(ThreeHundredConfigDict == null) 
                 throw new ArgumentNullException ("PopPlan dict not in big plist");
             //开启300模式，解析300模式配置
-            if (threeHundredConfig == null)
+            if (_threeHundredModel == null)
             {
-                threeHundredConfig = new ThreeHundredConfig();
+                _threeHundredModel = new ThreeHundredModel();
             }
-            threeHundredConfig.ParseConfig(ThreeHundredConfigDict);
-            baseRewardConfig = threeHundredConfig;
+            _threeHundredModel.ParseConfig(ThreeHundredConfigDict);
+            _baseOnlineEarningModel = _threeHundredModel;
         }
-        
+        newUserSpinCount = Utilities.GetInt(config,OnLineEarningConstants.NewUserLimitKey,0);
         //加载本地化数据
         LoadFromPlayerPrefs();
         
-        Dictionary<string,object> newUserConfig = Utils.Utilities.GetValue<Dictionary<string,object>>(config,NEW_USER_KEY,null);
-        if (newUserConfig!=null && newUserConfig.Count>0)
+        if (UserManager.GetInstance().UserProfile().GetTotalSpinCounter()<newUserSpinCount)
         {
-            newUserSpinCount = Utils.Utilities.GetInt(newUserConfig,Spin_KEY,0);
-            newUserCashMin = Utils.Utilities.GetInt(newUserConfig,RewardMin_KEY,0);
-            newUserCashMax = Utils.Utilities.GetInt(newUserConfig,RewardMax_KEY,0);
-            if (UserManager.GetInstance().UserProfile().GetTotalSpinCounter()<newUserSpinCount)
-            {
-                Messenger.AddListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
-            }
+            //添加新用户的监听
+            Messenger.AddListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
         }
     }
 
     OnLineEarningMgr()
     {
-        Messenger.AddListener<bool>(GameConstants.RefreshCashInFree,RefreshCashInFree);
+        Messenger.AddListener<bool>(GameConstants.RefreshCashInFree, RefreshCashInFree);
+        Messenger.AddListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
     }
     ~OnLineEarningMgr()
     {
         Messenger.RemoveListener<bool>(GameConstants.RefreshCashInFree,RefreshCashInFree);
+        Messenger.RemoveListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
     }
 
     void OnSpinEnd()
@@ -140,10 +146,11 @@ public class OnLineEarningMgr
         //奖励弹板只弹出一次
         if (UserManager.GetInstance().UserProfile().GetTotalSpinCounter()>=newUserSpinCount && !PlatformManager.Instance.IsWhiteBao())
         {
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
             new DelayAction(1.3f,null, () =>
             {
                 Messenger.RemoveListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
-                int newUserCash = UnityEngine.Random.Range(newUserCashMin,newUserCashMax);
+                int newUserCash = GetRewardsByName(OnLineEarningConstants.REWARD_NewUser);
                 //加钱动画播放完毕
                 IncreaseCash(newUserCash);
                 Messenger.Broadcast<int>(GameDialogManager.OpenRewardCashDialogMsg, newUserCash);
@@ -152,7 +159,6 @@ public class OnLineEarningMgr
     }
     public void SaveToPlayerPrefs()
     {
-        
         PlayerPrefs.SetInt(CASH, cash);
     }
     
@@ -165,29 +171,28 @@ public class OnLineEarningMgr
     {
         ShowCashInFree = show;
     }
-   
-    public bool ShowCashInFreeSpin()
-    {
-        return ShowCashInFree;
-    }
+    
     public bool isInfiniteOpen()
     {
-        return isOpen && popPlanConfig != null;
+        return isOpen && _infiniteModel != null;
     }
     
     public bool isThreeHundredOpen()
     {
-        return isOpen && threeHundredConfig != null;
+        return isOpen && _threeHundredModel != null;
     }
     
-    public PopPlanConfig GetPopPlanConfig()
+    public InfiniteModel GetPopPlanConfig()
     {
-        return popPlanConfig;
+        return _infiniteModel;
     }
-    public ThreeHundredConfig GetThreeHundredConfig()
+    public ThreeHundredModel GetThreeHundredConfig()
     {
-        return threeHundredConfig;
+        return _threeHundredModel;
     }
+
+    #region Cash
+
     private string language = "";
     private string country = "";
     private int numberGK = 0;
@@ -211,7 +216,7 @@ public class OnLineEarningMgr
     }
     public int GetCashTime()
     {
-        return baseRewardConfig.GetRewardCount;
+        return _baseOnlineEarningModel.GetRewardCount;
     }
     
     public void SetCash(int newCash)
@@ -225,8 +230,12 @@ public class OnLineEarningMgr
         SharedPlayerPrefs.SetPlayerPrefsIntValue(CASH,cash); 
     }
     
-    public virtual void IncreaseCash(int newCash)
+    public virtual void IncreaseCash(int newCash,bool needMultiple = false)
     {
+        if (needMultiple)
+        {
+            newCash = newCash * _baseOnlineEarningModel.CashMultiple();
+        }
         if (newCash>0)
         {
             Messenger.Broadcast<int>(OnLineEarningConstants.IncreaseCashMsg, newCash);
@@ -338,184 +347,104 @@ public class OnLineEarningMgr
             countryType = CountryType.EN;
         }
     }
+
+    #endregion
     public bool CanShowH5()
     {
         if (isThreeHundredOpen() )
         {
-            return PlatformManager.Instance.CheckCanShowH5() && threeHundredConfig.CanShowH5();
+            return PlatformManager.Instance.CheckCanShowH5() && _threeHundredModel.CanShowH5();
         }
 
         return PlatformManager.Instance.CheckCanShowH5();
     }
+    
+    
     public void AddSpinTime()
     {
-        if (baseRewardConfig!=null)
+        if (_baseOnlineEarningModel!=null)
         {
-            baseRewardConfig.AddSpinTime();
+            _baseOnlineEarningModel.AddSpinTime();
         }
     }
     
+    //重置奖励弹窗的弹出逻辑
     public void ResetSpinTime()
     {
-        if (baseRewardConfig!=null)
+        if (_baseOnlineEarningModel!=null)
         {
-            baseRewardConfig.ResetSpinTime();
+            _baseOnlineEarningModel.ResetSpinTime();
         }
     }
     public bool CheckCanShowBig()
     {
-        if (baseRewardConfig==null)
+        if (_baseOnlineEarningModel==null)
         {
             return false;
         }
-        return baseRewardConfig.CanShowBig();
+        return _baseOnlineEarningModel.CanShowBig();
     }
     
     public bool CheckCanPopReward()
     {
-        if (baseRewardConfig==null)
+        if (_baseOnlineEarningModel==null)
         {
             return false;
         }
-        return baseRewardConfig.CheckCanPopReward();
+        return _baseOnlineEarningModel.CheckCanPopReward();
     }
  
     public void AddGetRewardCount()
     {
-        baseRewardConfig?.AddGetRewardCount();
+        _baseOnlineEarningModel?.AddGetRewardCount();
     } 
     public void AddGetH5RewardCount()
     {
-        baseRewardConfig?.AddGetRewardCount();
+        _baseOnlineEarningModel?.AddGetRewardCount();
     } 
     public void PopSmallDialogEnd()
     {
-        baseRewardConfig?.PopSmallDialogEnd();
+        _baseOnlineEarningModel?.PopSmallDialogEnd();
     }
     public void PopBigDialogEnd()
     {
-        baseRewardConfig?.PopBigDialogEnd();
+        _baseOnlineEarningModel?.PopBigDialogEnd();
     }
     
-    
-    /// <summary>
-    /// 0表明是 bigwin 1-->freegame 2-->bonus
-    /// </summary>
-    /// <param name="type"></param>
-    public void AddADNum(int type = 0)
-    {
-        switch (type)
-        {
-            case 0:
-                baseRewardConfig?.AddADNum();
-                break;
-            case 1:
-                baseRewardConfig?.AddFreeInterstitialADNum();
-                break;
-            case 2:
-                baseRewardConfig?.AddBonusInterstitialADNum();
-                break;
-        }
-    }
-    public int GetAdNum(int type = 0)
-    {
-        int num = 0;
-        switch (type)
-        {
-            case 0:
-                num = baseRewardConfig.GetADNum();
-                break;
-            case 1:
-                num = baseRewardConfig.GetFreeInterstitialADNum();
-                break;
-            case 2:
-                num = baseRewardConfig.GetBonusInterstitialADNum();
-                break;
-        }
-        return num;
-    }
-  
     public int AddPopSpinWinCount()
     {
-        if (baseRewardConfig==null)
-        {
-            return 0;
-        }
-        return baseRewardConfig.AddPopSpinWinCount();
+        PopSpinWinCount++;
+        return PopSpinWinCount;
     }
-    
-    public void ResetADNum(int type = 0)
-    {
-        switch (type)
-        {
-            case 0:
-                baseRewardConfig?.ResetADNum();
-                break;
-            case 1:
-                baseRewardConfig?.ResetFreeInterstitialADNum();
-                break;
-            case 2:
-                baseRewardConfig?.ResetBonusInterstitialADNum();
-                break;
-        }
-       
-    }
-    
-    public bool CheckCanPopAD(int type=0)
-    {
-        bool canshow = false;
-        switch (type)
-        {
-            case 0:
-                canshow = baseRewardConfig.CheckCanPopAD();
-                break;
-            case 1:
-                canshow = baseRewardConfig.CheckCanPopFreeInterstitialAD();
-                break;
-            case 2:
-                canshow = baseRewardConfig.CheckCanPopBonusInterstitialAD();
-                break;
-        }
-
-        return canshow;
-    }
-    public int GetBigRewardMultiple()
-    {
-        if (baseRewardConfig==null)
-        {
-            return 0;
-        }
-        return baseRewardConfig.GetBigRewardMultiple();
-    }
-
-    public int GetH5Reward()
-    {
-        if (baseRewardConfig==null)
-        {
-            return 0;
-        }
-        return baseRewardConfig.GetH5Reward();
-    }
-
     public void HandleH5Event(float addCash)
     {
         //广播H5加钱
         int amount = Utilities.CastValueInt(addCash * GetCashMultiple());
-        baseRewardConfig.HandleH5Event(amount);
+        _baseOnlineEarningModel.HandleH5Event(amount);
     }
     
     public int GetCashMultiple()
     {
-        return baseRewardConfig.CashMultiple();
+        return _baseOnlineEarningModel.CashMultiple();
     }
     public int GetLevel()
     {
-        return baseRewardConfig.Level();
+        return _baseOnlineEarningModel.Level();
+    }
+    public string GetLevelDesc()
+    {
+        string prekey = "Level.";
+        if (isThreeHundredOpen())
+        {
+            prekey = "Lv.";
+        }
+        return prekey+ _baseOnlineEarningModel.Level();
     }
     //由于cash根据不同的模式扩大的倍数不同，需要金钱文案显示时，通过此方法转换
     public double ConvertMoneyToDouble(int amount,int decimalPlaces=2,bool needExchange = true)
     {
-        int multiple = baseRewardConfig.CashMultiple();
+        int multiple = _baseOnlineEarningModel.CashMultiple();
+        
         double number = 0;
         if (needExchange)
         {
@@ -535,6 +464,10 @@ public class OnLineEarningMgr
     {
         string str = "";
         double money = ConvertMoneyToDouble(amount, decimalPlace);
+        if (money<0.01)
+        {
+            money = 0.01;
+        }
         string decimalFormat = "F" + decimalPlace+"}";
         //需要针对金钱进行大数处理
         if (needBigNum)
@@ -585,29 +518,23 @@ public class OnLineEarningMgr
 
         return symbol;
     }
-    
-    public List<PopPlanDiscountItem> GetDiscountItem()
-    {
-        return baseRewardConfig.GetDiscountItem();
-    }
 
-    public int GetCurLevelDiscount()
+    private int GetReward()
     {
-        return baseRewardConfig.GetCurLevelDiscount();
+        return _baseOnlineEarningModel.GetReward();
     }
-    public double GetWithDrawMoney()
+    public int GetRewardsByName(string key,int level = 0)
     {
-        return ConvertMoneyToDouble(baseRewardConfig.withDrawMoney);
-    }
-
-    private int GetRewardsByName(string key,int level = 0)
-    {
-        return baseRewardConfig.GetRewardsByName(key,level);
+        return _baseOnlineEarningModel.GetRewardsByName(key,level);
     }
 
     public int GetLuckyCashReward()
     {
         return GetRewardsByName(OnLineEarningConstants.REWARD_LUCKYCASH);
+    }
+    public int GetH5Reward()
+    {
+        return GetRewardsByName(OnLineEarningConstants.REWARD_H5Reward);
     }
     //freespin时从此处获取金钱
     public int GetFreeSpinReward(bool needMultiple)
@@ -633,52 +560,19 @@ public class OnLineEarningMgr
         return GetRewardsByName(OnLineEarningConstants.REWARD_SPIN);
     }
 
+    public int GetMaxValue()
+    {
+        if (isThreeHundredOpen())
+        {
+            return (_baseOnlineEarningModel as ThreeHundredModel).GetMaxValue();
+        }
+
+        return 1;
+    }
+    
     public bool IsWhiteBao()
     {
         return isWhitePackage;
-    }
-    
-    /// <summary>
-    /// 作用于触发 freespin和 jackpot的次数统计
-    /// 第一次触发 freespin和 jackpot时，不播放广告
-    /// </summary>
-    public const string FreeSpinCountKey = "OnLineFreeSpinCountKey";
-    public const string JackpotCountKey = "OnLineJackpotCountKey";
-    //触发 freespin的次数
-    public int FreeSpinCount
-    {
-        set
-        {      
-            SharedPlayerPrefs.SetPlayerPrefsIntValue(FreeSpinCountKey, value);
-        }
-        get
-        {
-            int value = SharedPlayerPrefs.GetPlayerPrefsIntValue(FreeSpinCountKey, 0);
-            return value;
-        }
-    }
-    //触发 jackpot的次数
-    public int JackpotCount {
-        set
-        {      
-            SharedPlayerPrefs.SetPlayerPrefsIntValue(JackpotCountKey, value);
-        }
-        get
-        {
-            int value = SharedPlayerPrefs.GetPlayerPrefsIntValue(JackpotCountKey, 0);
-            return value;
-        }
-    }
-
-    public int FreeSpinCountLimit = 1;
-    public int JackpotCountLimit = 1;
-    public bool CheckCanShowFreeStartAD()
-    {
-       return FreeSpinCount>FreeSpinCountLimit;
-    }
-    public bool CheckCanShowJackpotStartAD()
-    {
-        return JackpotCount>JackpotCountLimit;
     }
 }
 

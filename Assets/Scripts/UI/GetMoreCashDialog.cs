@@ -3,7 +3,7 @@ using Libs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Ads;
 namespace Classic
 {
     public class GetMoreCashDialog:UIDialog

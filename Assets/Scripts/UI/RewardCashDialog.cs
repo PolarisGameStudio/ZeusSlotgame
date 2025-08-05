@@ -87,6 +87,12 @@ namespace Classic
             SetCoins();
         }
 
+        public override void Close()
+        {
+            base.Close();
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
+        }
+
         public void SetCoins()
         {
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,
@@ -98,7 +104,7 @@ namespace Classic
             Libs.AudioEntity.Instance.StopAllEffect();
             Libs.AudioEntity.Instance.PlayCoinCollectionEffect();
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
-            new DelayAction(0.8f, null, () => { this.Close(); }).Play();
+            new DelayAction(1f, null, () => { this.Close(); }).Play();
         }
     }
 }

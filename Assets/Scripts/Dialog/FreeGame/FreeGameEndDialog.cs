@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using Classic;
 using Libs;
 using TMPro;
 using DG.Tweening;
-
+using Ads;
 public class FreeGameEndDialog : UIDialog 
 {
     [Header("FreeGame结束按钮")]
@@ -46,10 +46,16 @@ public class FreeGameEndDialog : UIDialog
     void OnEnable()
     {
         Messenger.AddListener<int>(ADConstants.PlayFreeSpinEndAD,AdIsPlaySuccessful);
+        Messenger.AddListener<int>(ADConstants.PlayFreeSpinEndADFailed,AdIsPlayFailed);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+
     }
     void OnDisable()
     {
         Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinEndAD,AdIsPlaySuccessful);
+        Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinEndADFailed,AdIsPlayFailed);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+
     }
     
     protected override void Start()
@@ -89,47 +95,18 @@ public class FreeGameEndDialog : UIDialog
         }
         HasClicked = true;
         OnClickStopUpdate();
-        //
-        // //只有通过 claim点击关闭的弹窗才计入插屏广告的累计次数
-        // OnLineEarningMgr.Instance.AddADNum();
-        // if (OnLineEarningMgr.Instance.CheckCanPopAD())
-        // {
-        //     //加钱之后重置计数
-        //     OnLineEarningMgr.Instance.ResetADNum();
-        //     bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND);
-        //     //广告未加载好
-        //     if (!interstitialADIsReady)
-        //     {
-        //         //展示未加载好广告的提示,直接给奖励
-        //         ADManager.Instance.ShowLoadingADsUI(endCallBack:this.DoneADCallBack);
-        //     }
-        //     else
-        //     {
-        //         //播放广告
-        //         Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND);
-        //     }
-        // }
-        // else
-        // {
-            //不播广告直接加钱
-            if (totalCash>0)
-            {
-                OnLineEarningMgr.Instance.FreeSpinCount++;
-                if (OnLineEarningMgr.Instance.CheckCanShowFreeStartAD())
-                {
-                    Debug.Log("FreeGameStartDialog OnStartButtonClick ShowAD");
-                    ShowAD();
-                }
-                else
-                {
-                    DoneADCallBack();
-                }
-            }
-            else
-            {
-                EndBtn.interactable = true;
-                this.Close();
-            }
+        //不播广告直接加钱
+        if (totalCash>0)
+        {
+            //广播条件累计
+            Messenger.Broadcast(ADConstants.CloseFreeGameEndMsg);
+            //通知播放广告
+            Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND);
+        }
+        else
+        {
+            this.Close();
+        }
            
         // }
         SendMsg();
@@ -184,20 +161,7 @@ public class FreeGameEndDialog : UIDialog
             return;
         }
         isPlayAd = true;
-        
-        //看广告跟弹窗关闭解绑，弹窗关闭不影响广告播放，只负责加钱操作。无论成功与失败都加钱
-        bool rewardADIsReady = ADManager.Instance.RewardAdIsOk(ADEntrances.REWARD_VIDEO_ENTRANCE_FREESPINEND);
-        //广告未加载好
-        if (!rewardADIsReady)
-        {
-            //展示未加载好广告的提示，直接给看广告成功的奖励
-            ADManager.Instance.ShowLoadingADsUI(endCallBack:this.RewardADIsPlaySuccess);
-        }
-        else
-        {
-            ADManager.Instance.PlayRewardVideo(ADEntrances.REWARD_VIDEO_ENTRANCE_FREESPINEND);
-        }
-        OnLineEarningMgr.Instance.ResetSpinTime();
+        Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.REWARD_VIDEO_ENTRANCE_FREESPINEND);
         SendMsg(2);
     }
     void AdIsPlaySuccessful(int type)
@@ -213,7 +177,20 @@ public class FreeGameEndDialog : UIDialog
             DoneADCallBack();
         }
     }
+    
+    void AdIsPlayFailed(int type)
+    {
+        AdIsPlaySuccessful(type);
+    }
 
+    void HandleNotMeetConditionMsg(string msg)
+    {
+        if (msg == ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND)
+        {
+            this.DoneADCallBack();
+        }
+    }
+    
     void RewardADIsPlaySuccess()
     {
         int multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
@@ -283,7 +260,7 @@ public class FreeGameEndDialog : UIDialog
     public void OnStart(long coins, int count,int cash)
     {
         totalCoins = coins;
-        totalCash = cash;
+        totalCash = OnLineEarningMgr.Instance.isThreeHundredOpen()?OnLineEarningMgr.Instance.GetRewardsByName(OnLineEarningConstants.REWARD_FREEGAMEEND):cash;
         if(FreeGameCount != null) 
             FreeGameCount.SetText(count.ToString());
         if (FreeGameWinCash!=null)

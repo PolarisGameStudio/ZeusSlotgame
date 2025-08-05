@@ -7,6 +7,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
+using Ads;
+
 namespace Activity
 {
     public class ContinueSpinDialog:UIDialog
@@ -79,12 +81,16 @@ namespace Activity
         {
             base.OnEnable();
             Messenger.AddListener<int>(ADConstants.PlayContinueSpinAD, ShowVideoCallBack);
+            Messenger.AddListener<int>(ADConstants.PlayContinueSpinADFailed, ShowVideoCallBack);
+            Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             Messenger.RemoveListener<int>(ADConstants.PlayContinueSpinAD, ShowVideoCallBack);
+            Messenger.RemoveListener<int>(ADConstants.PlayContinueSpinADFailed, ShowVideoCallBack);
+            Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
         }
 
         private void ShowVideoCallBack(int res)
@@ -110,7 +116,20 @@ namespace Activity
             _closeButton.gameObject.SetActive(false);
             _activity.ResetTask();
         }
+        void AdIsPlayFailed(int type)
+        {
+            ShowVideoCallBack(type);
+        }
 
+        void HandleNotMeetConditionMsg(string msg)
+        {
+            if (msg == ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND)
+            {
+                _cashCount.gameObject.SetActive(false);
+                _cashCount.text = "0";
+                Close();
+            }
+        }
         private void SetCoins()
         {
             var randomReward = _activity.GetReward();
@@ -137,21 +156,8 @@ namespace Activity
         }
         private void OnClickCloseBtn()
         {
-            bool rewardADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.REWARD_VIDEO_CONTINUE_SPIN);
-              
-            if (rewardADIsReady)
-            {
-                ContinueSpinActivity.IsCloseReward = true;
-                ADManager.Instance.PlayInterstitialAd(ADEntrances.REWARD_VIDEO_CONTINUE_SPIN);
-            }
-            else
-            {
-                //广告未加载好
-                //展示未加载好广告的提示,直接给看广告成功的奖励
-                _cashCount.gameObject.SetActive(false);
-                _cashCount.text = "0";
-                Close();
-            }
+            ContinueSpinActivity.IsCloseReward = true;
+            Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_CLOSECONTINUESPIN);
         }
         private TrackEntry _trackEntry = null;
 
@@ -159,19 +165,8 @@ namespace Activity
 
         private void OnClickAdBtn()
         {
-            bool rewardADIsReady = ADManager.Instance.RewardAdIsOk(ADEntrances.REWARD_VIDEO_CONTINUE_SPIN);
-              
-            if (rewardADIsReady)
-            {
-                ContinueSpinActivity.IsCloseReward = false;
-                ADManager.Instance.PlayRewardVideo(ADEntrances.REWARD_VIDEO_CONTINUE_SPIN);
-            }
-            else
-            {
-                //广告未加载好
-                //展示未加载好广告的提示,直接给看广告成功的奖励
-                ADManager.Instance.ShowLoadingADsUI();
-            }
+            ContinueSpinActivity.IsCloseReward = false;
+            Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_CONTINUE_SPIN);
         }
 
         private void PlayAnim()
@@ -217,11 +212,17 @@ namespace Activity
             }
 
             _tweener = DOTween.To(() => _initNum, x =>_initNum = x, number, AnimTime)
-                .OnUpdate(CalculateTxt);
+                .OnUpdate(CalculateTxt).SetUpdate(true);
         }
         private void CalculateTxt()
         {
             _cashCount.text = OnLineEarningMgr.Instance.GetMoneyStr(_initNum,needIcon:false);
+        }
+
+        public override void Close()
+        {
+            base.Close();
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
         }
     }
 }

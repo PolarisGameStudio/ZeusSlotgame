@@ -164,7 +164,7 @@ public class LocalizationManager: MonoSingleton<LocalizationManager>
                 index= new List<int>(){44};
                 break;
             default:
-                index= new List<int>(){2,7,8};
+                index= new List<int>(){5,7,8};
                 break;
         }
 

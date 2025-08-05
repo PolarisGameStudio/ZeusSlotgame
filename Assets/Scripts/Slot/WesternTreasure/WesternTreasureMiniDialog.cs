@@ -1,11 +1,11 @@
-﻿using Libs;
+using Libs;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Classic;
-
+using Ads;
 public class WesternTreasureMiniDialog : UIDialog
 {
 
@@ -104,10 +104,15 @@ public class WesternTreasureMiniDialog : UIDialog
     void OnEnable()
     {
         Messenger.AddListener<int>(ADConstants.PlayJackPotGameAD,AdIsPlaySuccessful);
+        Messenger.AddListener<int>(ADConstants.PlayJackPotGameADFailed,AdIsPlayFailed);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
     }
     void OnDisable()
     {
         Messenger.RemoveListener<int>(ADConstants.PlayJackPotGameAD,AdIsPlaySuccessful);
+        Messenger.RemoveListener<int>(ADConstants.PlayJackPotGameADFailed,AdIsPlayFailed);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+
     }
     void AdIsPlaySuccessful(int type)
     {
@@ -122,10 +127,22 @@ public class WesternTreasureMiniDialog : UIDialog
             DoneADCallBack();
         }
     }
-    
+
+    void AdIsPlayFailed(int type)
+    {
+        AdIsPlaySuccessful(type);
+    }
+    void HandleNotMeetConditionMsg(string msg)
+    {
+        if (msg == ADEntrances.Interstitial_Entrance_JACKPOTEND)
+        {
+            //插屏广告未满足条件，直接关闭
+            DoneADCallBack();
+        }
+    }
     void RewardADIsPlaySuccess()
     {
-        int multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_BONUSGAMEWIN);
+        int multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_JACKPOT);
         totalCash *= multiple;
         //钱已经加过一次了，所以需要倍数减1
         totalCoins *= (multiple-1);
@@ -180,18 +197,18 @@ public class WesternTreasureMiniDialog : UIDialog
         }
         isPlayAd = true;
         this.OnClickStopUpdate();
-        bool rewardADIsReady = ADManager.Instance.RewardAdIsOk(ADEntrances.REWARD_VIDEO_ENTRANCE_BONUSGAMEWIN);
-        //广告未加载好
-        if (!rewardADIsReady)
-        {
-            //展示未加载好广告的提示,给看过广告成功的奖励
-            ADManager.Instance.ShowLoadingADsUI(endCallBack:this.RewardADIsPlaySuccess);
-        }
-        else
-        {
-            ADManager.Instance.PlayRewardVideo(ADEntrances.REWARD_VIDEO_ENTRANCE_BONUSGAMEWIN);
-        }
-        OnLineEarningMgr.Instance.ResetSpinTime();
+        Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.REWARD_VIDEO_ENTRANCE_JACKPOT);
+        // bool rewardADIsReady = ADManager.Instance.RewardAdIsOk(ADEntrances.REWARD_VIDEO_ENTRANCE_BONUSGAMEWIN);
+        // //广告未加载好
+        // if (!rewardADIsReady)
+        // {
+        //     //展示未加载好广告的提示,给看过广告成功的奖励
+        //     ADManager.Instance.ShowLoadingADsUI(endCallBack:this.RewardADIsPlaySuccess);
+        // }
+        // else
+        // {
+        //     ADManager.Instance.PlayRewardVideo(ADEntrances.REWARD_VIDEO_ENTRANCE_BONUSGAMEWIN);
+        // }
         SendMsg(2);
     }
 
@@ -208,41 +225,9 @@ public class WesternTreasureMiniDialog : UIDialog
         }
         HasClicked = true;
         this.OnClickStopUpdate();
-        //只有通过 claim点击关闭的弹窗才计入插屏广告的累计次数
-        // OnLineEarningMgr.Instance.AddADNum();
-        // if (OnLineEarningMgr.Instance.CheckCanPopAD())
-        // {
-        //     //加钱之后重置计数
-        //     OnLineEarningMgr.Instance.ResetADNum();
-        //     bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEBONUSGAMEEND);
-        //     //广告未加载好
-        //     if (!interstitialADIsReady)
-        //     {
-        //         //展示未加载好广告的提示,直接给奖励
-        //         ADManager.Instance.ShowLoadingADsUI(endCallBack:this.DoneADCallBack);
-        //     }
-        //     else
-        //     {
-        //         //播放广告
-        //         Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSEBONUSGAMEEND);
-        //     }
-        // }
-        // else
-        // {
-        
-            OnLineEarningMgr.Instance.JackpotCount++;
-            //播广告后加钱
-            if (OnLineEarningMgr.Instance.CheckCanShowJackpotStartAD())
-            {
-                Debug.Log("[WesternTreasureReelManager] [OpenJackpotGame] [ShowAD]");
-                ShowAD();
-            }
-            else
-            {
-                DoneADCallBack();
-            }
-        
-        // }
+        //不看广告
+        Messenger.Broadcast(ADConstants.JackpotGameEndMsg);
+        Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.Interstitial_Entrance_JACKPOTEND);
         SendMsg();
     }
     

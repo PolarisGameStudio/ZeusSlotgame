@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Classic;
 using DG.Tweening;
@@ -8,7 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
-
+using Ads;
 
 public class SpinWinDialogNew : UIDialog
 {
@@ -59,10 +60,14 @@ public class SpinWinDialogNew : UIDialog
     void OnEnable()
     {
         Messenger.AddListener<int>(ADConstants.PlaySpinWinAD,AdIsPlaySuccessful);
+        Messenger.AddListener<int>(ADConstants.PlaySpinWinADFailed,AdIsPlayFailed);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
     }
     void OnDisable()
     {
         Messenger.RemoveListener<int>(ADConstants.PlaySpinWinAD,AdIsPlaySuccessful);
+        Messenger.RemoveListener<int>(ADConstants.PlaySpinWinADFailed,AdIsPlayFailed);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
     }
 
     public void OnStart(long coins, SpinWinType type)
@@ -83,10 +88,8 @@ public class SpinWinDialogNew : UIDialog
         // winImage[0].sprite = winType[(int)type];
         // foreach (var item in winImage) item.SetNativeSize();
         //播放spine动画
-        PlaySpineShowAni();
         this.PlayWinTypeEffect();
         AudioEntity.Instance.PlayRollUpEffect(0.7f);
-        time *= ((int)spinWinType+1);
         //bool haveAd = false;
         //金币滚动
         new DelayAction(0.4f, null,() =>
@@ -203,6 +206,7 @@ public class SpinWinDialogNew : UIDialog
             else if ((int)spinWinType == 1)
             {
                 skeleton.AnimationState.SetAnimation(0, GetAniName(4), true);
+               
             }
             else if ((int)spinWinType == 2)
             {
@@ -259,23 +263,11 @@ public class SpinWinDialogNew : UIDialog
         isPlayAd = true;
         OnClickStopUpdate();
         //看广告跟弹窗关闭解绑，弹窗关闭不影响广告播放，只负责加钱操作。无论成功与失败都加钱
-        // AdIsPlaySuccessful(0);
-        bool rewardADIsReady = ADManager.Instance.RewardAdIsOk(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-        //广告未加载好
-        if (!rewardADIsReady)
-        {
-            //展示未加载好广告的提示，直接给看广告成功的奖励
-            ADManager.Instance.ShowLoadingADsUI(endCallBack:this.RewardADIsPlaySuccess);
-        }
-        else
-        {
-            //观看激励视频后，累计插屏的计数进度重置
-            OnLineEarningMgr.Instance.ResetADNum();
-            OnLineEarningMgr.Instance.ResetSpinTime();
-            ADManager.Instance.PlayRewardVideo(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-        }
+        Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
         SendMsg(spinWinType,2);
     }
+    
+    //广告播放成功
     void AdIsPlaySuccessful(int type)
     {
         //激励广告
@@ -290,6 +282,12 @@ public class SpinWinDialogNew : UIDialog
         }
     }
 
+    //广告播放失败
+    void AdIsPlayFailed(int type)
+    {
+        AdIsPlaySuccessful(type);
+    }
+    
     void RewardADIsPlaySuccess()
     {
         int multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
@@ -298,6 +296,15 @@ public class SpinWinDialogNew : UIDialog
         totalCoins *= (multiple-1);
         DoneADCallBack();
     }
+
+    void HandleNotMeetConditionMsg(string msg)
+    {
+        if (msg == ADEntrances.Interstitial_Entrance_CLOSESPINWIN)
+        {
+            this.DoneADCallBack();
+        }
+    }
+    
     
     //加钱动画
     private void DoneADCallBack()
@@ -365,32 +372,10 @@ public class SpinWinDialogNew : UIDialog
         }
         HasClicked = true;
         OnClickStopUpdate();
-        // DoneADCallBack();
-        //只有通过 claim点击关闭的弹窗才计入插屏广告的累计次数
-        OnLineEarningMgr.Instance.AddADNum();
-        if (OnLineEarningMgr.Instance.CheckCanPopAD())
-        {
-            //加钱之后重置计数
-            OnLineEarningMgr.Instance.ResetADNum();
-            OnLineEarningMgr.Instance.ResetSpinTime();
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSESPINWIN);
-            //广告未加载好
-            if (!interstitialADIsReady)
-            {
-                //展示未加载好广告的提示,直接给奖励
-                ADManager.Instance.ShowLoadingADsUI(endCallBack:this.DoneADCallBack);
-            }
-            else
-            {
-                //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSESPINWIN);
-            }
-        }
-        else
-        {
-            //不播广告直接加钱
-            DoneADCallBack();
-        }
+        //广告时机
+        Messenger.Broadcast(ADConstants.CloseSpinWinMsg);
+        //检查是否可以播放广告
+        Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_CLOSESPINWIN);
         SendMsg(spinWinType);
     }
 
@@ -408,7 +393,7 @@ public class SpinWinDialogNew : UIDialog
         HasClicked = true;
         OnClickStopUpdate();
         //增加插屏广告的检测条件
-        OnLineEarningMgr.Instance.AddADNum();
+        Messenger.Broadcast(ADConstants.CloseSpinWinMsg);
         if (isSecondTime)
         {
             //奖励乘以倍数
@@ -441,16 +426,19 @@ public class SpinWinDialogNew : UIDialog
     
     private void PlayWinTypeEffect()
     {
-        // AudioEntity.Instance.PlayEffect("big_win");
+        AudioEntity.Instance.PlayEffect("big_win");
         switch (spinWinType)
         {
             case SpinWinType.EPIC:
+                PlaySpineShowAni(5);
                 AudioEntity.Instance.PlayEffect("epic_win");
                 break;
             case SpinWinType.MEGA:
+                PlaySpineShowAni(3);
                 AudioEntity.Instance.PlayEffect("mega_win");
                 break;
             case SpinWinType.BIG:
+                PlaySpineShowAni(1);
                 AudioEntity.Instance.PlayEffect("big_win");
                 break;
         }

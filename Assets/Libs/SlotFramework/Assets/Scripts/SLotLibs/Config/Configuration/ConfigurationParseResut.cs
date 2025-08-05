@@ -38,12 +38,12 @@ namespace Plugins
 		public void SetOnLineEarningConfig(Dictionary<string,object> config)
 		{
 			OnLineEarningMgr.Instance.ParseConfig(config);
-			popPlanConfig = OnLineEarningMgr.Instance.GetPopPlanConfig();
+			_infiniteModel = OnLineEarningMgr.Instance.GetPopPlanConfig();
 		}
 		
-		public PopPlanConfig PopPlanConfig()
+		public InfiniteModel PopPlanConfig()
 		{
-			return popPlanConfig;
+			return _infiniteModel;
 		}
 		
 		public List<SlotMachineConfig> SlotMachineConfigs ()
@@ -115,7 +115,7 @@ namespace Plugins
 		
 		
         private ApplicationConfig appConfig;
-        private PopPlanConfig popPlanConfig;
+        private InfiniteModel _infiniteModel;
 
 		private List<SlotMachineConfig> slotMachineConfigs;
 

@@ -13,12 +13,15 @@ namespace Classic
         public CoinsPanel coinsPanel;
         public LevelPanel levelPanel;
         public WithDrawPanel withDrawPanel;
+        public LevelPanel levelPanel_300;
+        public WithDrawPanel300 withDrawPanel_300;
         public MenuPanel menuPanel;
         private long lastBalance;
         private int lastCash;
         private GameObject root;
         public static string CLICK_SETTING_OPEN = "CLICK_SETTING_OPEN";
         public static string CLICK_SETTING_CLOSE = "CLICK_SETTING_CLOSE";
+        public Sprite image_300bg;
         private bool FlyCoinsPanelCanShow
         {
             get { return gameObject.activeInHierarchy; }
@@ -73,23 +76,49 @@ namespace Classic
         public void Init()
         {
             initOver = false;
-            if ( BaseGameConsole.singletonInstance.IsInSlotMachine())
+            if (BaseGameConsole.singletonInstance.IsInSlotMachine())
             {
                 BaseGameConsole.singletonInstance.SlotMachineController.MenuTransform = menuPanel.m_MenuBtn.transform;
-                BaseGameConsole.singletonInstance.SlotMachineController.CoinsTransform = coinsPanel.coinTarget;
-                BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel.cashTarget;
+                if (OnLineEarningMgr.Instance.isInfiniteOpen())
+                {
+                    BaseGameConsole.singletonInstance.SlotMachineController.CoinsTransform = coinsPanel.coinTarget;
+                    BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel.cashTarget;
+                }
+                else if (OnLineEarningMgr.Instance.isThreeHundredOpen())
+                {
+                    BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel_300.cashTarget;
+                }
             }
+            
             menuPanel.ResetMenuButton();
             lastBalance = -1;
-            levelPanel.SetLevel(OnLineEarningMgr.Instance.GetLevel());
-            withDrawPanel.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
-            withDrawPanel.InitMoney(OnLineEarningMgr.Instance.Cash());
+            UpdateUI();
+            OnPopLevelChange();
             this.BalanceChange();
             FlyCoinsPanel.Instance.InitNum(lastBalance);
             initOver = true;
         }
 
-       
+        void UpdateUI()
+        {
+            if (OnLineEarningMgr.Instance.isThreeHundredOpen()&& image_300bg!=null)
+            {
+                GetComponent<Image>().sprite = image_300bg;
+            }
+            coinsPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
+            withDrawPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen()&!PlatformManager.Instance.IsWhiteBao());
+            withDrawPanel.InitMoney(OnLineEarningMgr.Instance.Cash());
+            if (withDrawPanel_300!=null)
+            {
+                withDrawPanel_300.gameObject.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen()&!PlatformManager.Instance.IsWhiteBao());
+                withDrawPanel_300.InitMoney(OnLineEarningMgr.Instance.Cash());
+            }
+            levelPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
+            if (levelPanel_300!=null)
+            {
+                levelPanel_300.gameObject.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen());
+            }
+        }
         
         void OpenSettingPanel()
         {
@@ -100,7 +129,15 @@ namespace Classic
         }
         void OnPopLevelChange()
         {
-            levelPanel.SetLevel(OnLineEarningMgr.Instance.GetLevel());
+            if (levelPanel.gameObject.activeInHierarchy)
+            {
+                levelPanel.SetLevel(OnLineEarningMgr.Instance.GetLevelDesc());
+            }
+
+            if (levelPanel_300.gameObject.activeInHierarchy)
+            {
+                levelPanel_300.SetLevel(OnLineEarningMgr.Instance.GetLevelDesc());
+            }
         }
 
         private void RefreshBalance(long addCoins)
@@ -117,7 +154,15 @@ namespace Classic
         private void CashChange()
         {
             lastCash = OnLineEarningMgr.Instance.Cash();
-            withDrawPanel.ShowWithCoinsFly(lastCash);
+            if (withDrawPanel!=null&& withDrawPanel.gameObject.activeInHierarchy)
+            {
+                withDrawPanel.ShowWithCoinsFly(lastCash);
+            }
+
+            if (withDrawPanel_300!=null&& withDrawPanel_300.gameObject.activeInHierarchy)
+            {
+                withDrawPanel_300.ShowWithCoinsFly(lastCash);
+            }
         }
         private float lastValue = -1f;
 

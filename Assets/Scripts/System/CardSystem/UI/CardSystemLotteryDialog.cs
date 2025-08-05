@@ -7,9 +7,7 @@ using Libs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
-using UnityEngine.Localization.Components;
-using UnityEngine.Localization.Settings;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using Ads;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -100,6 +98,7 @@ namespace CardSystem
             base.OnEnable();
             Messenger.AddListener(CardSystemConstants.RefreshLotteryMsg, Refresh);
             Messenger.AddListener<int>(ADConstants.PlayCardLotteryAD, PlayCardLotteryAD);
+            Messenger.AddListener<int>(ADConstants.PlayCardLotteryADFailed, PlayCardLotteryAD);
         }
 
         protected override void OnDisable()
@@ -107,6 +106,7 @@ namespace CardSystem
             base.OnDisable();
             Messenger.RemoveListener(CardSystemConstants.RefreshLotteryMsg, Refresh);
             Messenger.RemoveListener<int>(ADConstants.PlayCardLotteryAD, PlayCardLotteryAD);
+            Messenger.RemoveListener<int>(ADConstants.PlayCardLotteryADFailed, PlayCardLotteryAD);
         }
 
         // 例如，处理抽奖逻辑、更新UI等

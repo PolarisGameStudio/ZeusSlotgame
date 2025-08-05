@@ -47,7 +47,7 @@ namespace CardSystem
                 return b.Level.CompareTo(a.Level);
             });
 
-            string info = OnLineEarningMgr.Instance.GetMoneyStr(CardSystemManager.Instance.GetCurCollectionCoins()*OnLineEarningMgr.Instance.GetCashMultiple(),0);
+            string info = OnLineEarningMgr.Instance.GetMoneyStr(CardSystemManager.Instance.GetCurCollectionCoins(),0);
             tmp_coin.text = info;
             PoolResourceManager.Instance.InitPool(poolName,itemPrefab,14);
             loopScrollRect.prefabSource = this;

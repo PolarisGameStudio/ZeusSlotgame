@@ -464,7 +464,7 @@ public class OnLineEarningMgr
     {
         string str = "";
         double money = ConvertMoneyToDouble(amount, decimalPlace);
-        if (money<0.01)
+        if (money<0.01&& money>0&&isThreeHundredOpen())
         {
             money = 0.01;
         }

@@ -30,7 +30,7 @@ namespace Activity
 
         void UpdateH5(bool isOpen)
         {
-            if (!IsOpen())
+            if (!PlatformManager.Instance.CheckCanShowH5())
             {
                 return;
             }
@@ -38,11 +38,6 @@ namespace Activity
             {
                 h5RewardIcon.UpdateIcon(isOpen);
             }
-        }
-
-        public override bool IsOpen()
-        {
-            return base.IsOpen()&&PlatformManager.Instance.CheckCanShowH5();
         }
 
         /// <summary>

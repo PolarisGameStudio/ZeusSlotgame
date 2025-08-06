@@ -81,6 +81,8 @@ namespace Activity
             {
                 _closeMinReward *= OnLineEarningMgr.Instance.GetCashMultiple();
                 _closeMaxReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+                _minReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+                _maxReward *= OnLineEarningMgr.Instance.GetCashMultiple();
             }
             _closeRewardRate = Utils.Utilities.GetFloat(Data,"CloseRewardRate", 0.1f);
         }

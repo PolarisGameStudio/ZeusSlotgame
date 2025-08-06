@@ -517,6 +517,26 @@ namespace Libs
                 SkySreenUtils.CurrentOrientation = ScreenOrientation.Portrait;
             }
         }
+
+        public bool HaveNotifyReward()
+        {
+            return notifyReward> 0;
+        }
+        
+        public void PushNotifyReward()
+        {
+            notifyReward--;
+        }
+        
+        /// <summary>
+        /// 是否有通知奖励
+        /// </summary>
+        private int notifyReward = 0;
+        public void NotifyReward()
+        {
+            Debug.Log("Notify Reward");
+            notifyReward++;
+        }
         #endregion
         
          public string SwitchLanguage()

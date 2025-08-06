@@ -134,13 +134,17 @@ public class OnLineEarningMgr
     {
         Messenger.AddListener<bool>(GameConstants.RefreshCashInFree, RefreshCashInFree);
         Messenger.AddListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
+        Messenger.AddListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
+        // Messenger.AddListener(GameConstants.IntervalBackToApp, IntervalBackToApp);
     }
     ~OnLineEarningMgr()
     {
         Messenger.RemoveListener<bool>(GameConstants.RefreshCashInFree,RefreshCashInFree);
         Messenger.RemoveListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
+        Messenger.RemoveListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
+        // Messenger.RemoveListener(GameConstants.IntervalBackToApp, IntervalBackToApp);
     }
-
+    
     void OnSpinEnd()
     {
         //奖励弹板只弹出一次
@@ -153,10 +157,17 @@ public class OnLineEarningMgr
                 int newUserCash = GetRewardsByName(OnLineEarningConstants.REWARD_NewUser);
                 //加钱动画播放完毕
                 IncreaseCash(newUserCash);
-                Messenger.Broadcast<int>(GameDialogManager.OpenRewardCashDialogMsg, newUserCash);
+                ShowRewardCashDialog(newUserCash);
             }).Play();
         }
     }
+    
+    void ShowRewardCashDialog(int cash)
+    {
+        //弹出奖励现金的弹板
+        Messenger.Broadcast<int>(GameDialogManager.OpenRewardCashDialogMsg, cash);
+    }
+    
     public void SaveToPlayerPrefs()
     {
         PlayerPrefs.SetInt(CASH, cash);
@@ -374,6 +385,30 @@ public class OnLineEarningMgr
         if (_baseOnlineEarningModel!=null)
         {
             _baseOnlineEarningModel.ResetSpinTime();
+        }
+    }
+
+    void OnSlotMachineSceneInit()
+    {
+        Debug.Log("OnlineEarning OnSlotMachineSceneInit");
+        HandleNotifyReward();
+    }
+
+    void IntervalBackToApp()
+    {
+        Debug.Log("OnlineEarning IntervalBackToApp");
+        HandleNotifyReward();
+    }
+
+    public float notifyReward = 30.88f;
+    void HandleNotifyReward()
+    {
+        if (PlatformManager.Instance.HaveNotifyReward())
+        {
+            PlatformManager.Instance.PushNotifyReward();
+            int reward = (int)Math.Round(notifyReward * GetCashMultiple());
+            IncreaseCash(reward);
+            ShowRewardCashDialog(reward);
         }
     }
     public bool CheckCanShowBig()

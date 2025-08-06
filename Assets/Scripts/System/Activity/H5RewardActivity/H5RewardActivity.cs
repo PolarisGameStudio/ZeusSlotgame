@@ -30,10 +30,19 @@ namespace Activity
 
         void UpdateH5(bool isOpen)
         {
+            if (!IsOpen())
+            {
+                return;
+            }
             if (icon!=null && icon is H5RewardActivityIcon h5RewardIcon)
             {
                 h5RewardIcon.UpdateIcon(isOpen);
             }
+        }
+
+        public override bool IsOpen()
+        {
+            return base.IsOpen()&&PlatformManager.Instance.CheckCanShowH5();
         }
 
         /// <summary>

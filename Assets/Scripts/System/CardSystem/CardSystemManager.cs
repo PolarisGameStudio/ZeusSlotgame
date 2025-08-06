@@ -611,7 +611,7 @@ namespace CardSystem
             BaseCardCollect curCollection = GetCurCollection();
             if (curCollection != null)
             {
-                return curCollection.Cash*OnLineEarningMgr.Instance.GetCashMultiple();
+                return curCollection.Cash;
             }
             Debug.LogError("GetCurCollectionCoins curCollection is null");
             return 0;

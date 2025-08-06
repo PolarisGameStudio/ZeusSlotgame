@@ -6,6 +6,7 @@ using Utils;
 
 namespace System
 {
+    [Obsolete("no use")]
     public class RecordItemData
     {
         public RecordItem itemUI;

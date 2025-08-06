@@ -76,6 +76,12 @@ namespace Activity
             string[] closeRewards = closeRewardString.Split(",");
             _closeMinReward = int.Parse(closeRewards[0]);
             _closeMaxReward = int.Parse(closeRewards[1]);
+            //无限模式需要放大倍数，300模式走数组
+            if (OnLineEarningMgr.Instance.isInfiniteOpen())
+            {
+                _closeMinReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+                _closeMaxReward *= OnLineEarningMgr.Instance.GetCashMultiple();
+            }
             _closeRewardRate = Utils.Utilities.GetFloat(Data,"CloseRewardRate", 0.1f);
         }
 
@@ -183,14 +189,10 @@ namespace Activity
             {
                 if (IsCloseReward)
                 {
-                    _closeMinReward *= OnLineEarningMgr.Instance.GetCashMultiple();
-                    _closeMaxReward *= OnLineEarningMgr.Instance.GetCashMultiple();
                     randomReward = Random.Range(_closeMinReward,_closeMaxReward + 1);
                 }
                 else
                 {
-                    _minReward *= OnLineEarningMgr.Instance.GetCashMultiple();
-                    _maxReward *= OnLineEarningMgr.Instance.GetCashMultiple();
                     randomReward = Random.Range(_minReward,_maxReward + 1);
                 }
                 

@@ -160,7 +160,6 @@ namespace Activity
                 return;
             }
             isClicked = true;
-            clickButton.enabled = false;
             activity.OnClickIcon();
         }
     }

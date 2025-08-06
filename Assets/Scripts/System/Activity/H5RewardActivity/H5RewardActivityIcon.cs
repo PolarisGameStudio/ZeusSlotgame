@@ -45,7 +45,6 @@ namespace Activity
                 Destroy(this.gameObject);
                 return;
             }
-
             if (activity is H5RewardActivity h5RewardActivity)
             {
                 showInterval = h5RewardActivity.TimeInterval;
@@ -60,7 +59,7 @@ namespace Activity
             if (isShow)
             {
                 ChangeSkinByIndex(curShowIndex);
-                gameObject.SetActive(isShow);
+                clickButton.enabled = true;
                 skeletonGraphic.gameObject.SetActive(true);
                 //检查是否需要显示气泡，默认不显示
                 UpdateQiPao(PlatformManager.Instance.GetH5UserType() == 1);
@@ -69,7 +68,7 @@ namespace Activity
             }
             else
             {
-                gameObject.SetActive(false);
+                clickButton.enabled = false;
                 skeletonGraphic.gameObject.SetActive(false);
                 // saqian.gameObject.SetActive(false);
                 // DestroyShowQiPao();
@@ -172,6 +171,7 @@ namespace Activity
                 return;
             }
             isClicked = true;
+            clickButton.enabled = false;
             activity.OnClickIcon();
         }
     }

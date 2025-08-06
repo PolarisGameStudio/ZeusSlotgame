@@ -88,7 +88,7 @@ namespace CardSystem
                 GameObject go = wheelItems[i];
                 ShowItem(config[i], go);
             }
-            string cashInfo = OnLineEarningMgr.Instance.GetMoneyStr(CardSystemManager.Instance.GetCurCollectionCoins(),needIcon:false);
+            string cashInfo = OnLineEarningMgr.Instance.GetCashStr(CardSystemManager.Instance.GetCurCollectionCoins(),needIcon:false);
             bottomString.Arguments = new object[] { string.Format("<color=#FFFF00>{0}</color>",cashInfo) };
             tmp_bottom.text = bottomString.GetLocalizedString();
         }

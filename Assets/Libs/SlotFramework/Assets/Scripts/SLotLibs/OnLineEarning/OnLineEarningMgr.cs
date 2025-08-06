@@ -458,7 +458,18 @@ public class OnLineEarningMgr
         }
         return number;
     }
-
+    
+    
+    //获取现金的字符串.针对plist配置 activity 和 reward 配置的相关奖励，不需要图标显示内容
+    public string GetCashStr(int amount,int decimalPlace = 2,bool needIcon = false, bool needBigNum = false)
+    {
+        //amount走的是 plist的配置数量，需要乘以不同网赚模式倍数变为存储值
+        amount *= _baseOnlineEarningModel.CashMultiple();
+        //获取金钱的字符串
+        return GetMoneyStr(amount,decimalPlace,needIcon,needBigNum);
+    }
+    
+    //用于现金任务的显示,无需放大倍数的
     //钱的图标 + 钱的符号 + 保留两位小数的钱的数量
     public string GetMoneyStr(int amount,int decimalPlace = 2,bool needIcon = true,bool needBigNum =false)
     {

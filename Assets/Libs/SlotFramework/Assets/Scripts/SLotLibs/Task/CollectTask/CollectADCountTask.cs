@@ -20,13 +20,13 @@ namespace Libs
 
         void UpdateAdCount()
         {
-            if (IsTaskConditionOK)
+            if (IsConditionOK())
             {
                 return;
             }
-            HasCollectNum++;
+            MultipleAddNum();
+            DoCollectAction();
             UpdateTaskStatus();
-            Messenger.Broadcast(UpdateTaskDataMsg);
         }
         public override string GetDesc()
         {

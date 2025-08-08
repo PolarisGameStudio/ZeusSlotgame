@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CardSystem;
 using Libs;
@@ -88,9 +89,16 @@ public class RedeemItem : MonoBehaviour
                 }
             }
         });
-        
-        int TargetNum = (int)itemData.task.TargetNum;
-        cashTMP.text = OnLineEarningMgr.Instance.GetMoneyStr(TargetNum, needIcon: false);
+        if (!string.IsNullOrEmpty(itemData.task.RewardList))
+        {
+            List<BaseAwardItem> awardItems =  RewardManager.Instance.CreateRewardByStr(itemData.task.RewardList);
+            if (awardItems.Count > 0)
+            {
+                //只显示第一个奖励
+                BaseAwardItem awardItem = awardItems[0];
+                cashTMP.text = awardItem.GetAwardCountDesc();
+            }
+        }
     }
 
     private RedeemItemState curState;
@@ -127,6 +135,53 @@ public class RedeemItem : MonoBehaviour
         }
     }
 
+    void ShowTaskIcon(bool inProgress)
+    {
+        Transform cardIcon = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/cardImg");
+        Transform cashIcon = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/moneyImg");
+        Transform freeImg = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/freeImg");
+        Transform jackpotImg = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/jackpotImg");
+        Transform winImg = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/winImg");
+        Transform wildImg = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/wildImg");
+        int type = itemData.task.TaskType;
+        cardIcon.gameObject.SetActive(!inProgress);
+        if (!inProgress)
+        {
+            cashIcon.gameObject.SetActive(false);
+            freeImg.gameObject.SetActive(false);
+            jackpotImg.gameObject.SetActive(false);
+            winImg.gameObject.SetActive(false);
+            wildImg.gameObject.SetActive(false);
+        }
+        else
+        {
+            cashIcon.gameObject.SetActive(type == TaskConstants.AccumulateCashTask_Key);
+            freeImg.gameObject.SetActive(type == TaskConstants.CollectFreeGameTriggerCountTask_Key);
+            jackpotImg.gameObject.SetActive(type == TaskConstants.CollectJackpotGameCountTask_Key);
+            winImg.gameObject.SetActive(type == TaskConstants.CollectTriggerSpinWinCountTask_Key);
+            wildImg.gameObject.SetActive(type == TaskConstants.CollectFreeSpinSymbolCountTask_Key);
+        }
+    }
+
+    void SetProgressText()
+    {
+        int type = itemData.task.TaskType;
+        int HasCollectNum = (int)itemData.task.HasCollectNum;
+        int TargetNum = (int)itemData.task.TargetNum;
+        if (type == TaskConstants.AccumulateCashTask_Key)
+        {
+            progressTMP.text = string.Format("{0}/{1}",
+                OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.HasCollectNum, needIcon: false),
+                OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.TargetNum, needIcon: false));
+        }
+        else
+        {
+            progressTMP.text = string.Format("{0}/{1}",HasCollectNum,TargetNum);
+        }
+        progressBar.fillAmount = HasCollectNum >= TargetNum ? 1.0f : HasCollectNum / (TargetNum * 1.0f);
+
+    }
+    
     private void ShowInProgressUI()
     {
         redeemBtn.gameObject.SetActive(false);
@@ -135,19 +190,8 @@ public class RedeemItem : MonoBehaviour
         withDraw.gameObject.SetActive(false);
         condition.gameObject.SetActive(false);
         FaildText.gameObject.SetActive(false);
-        Transform cardIcon = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/cardIMG");
-        Transform cashIcon = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/moneyIMG");
-        if (cardIcon!=null)
-        {
-            cardIcon.gameObject.SetActive(false);
-            cashIcon.gameObject.SetActive(true);
-        }
-        int HasCollectNum = (int)itemData.task.HasCollectNum;
-        int TargetNum = (int)itemData.task.TargetNum;
-        progressTMP.text = string.Format("{0}/{1}",
-            OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.HasCollectNum, needIcon: false),
-            OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.TargetNum, needIcon: false));
-        progressBar.fillAmount = HasCollectNum >= TargetNum ? 1.0f : HasCollectNum / (TargetNum * 1.0f);
+        ShowTaskIcon(true);
+        SetProgressText();
     }
 
     private void ShowCompleteUI()
@@ -158,6 +202,7 @@ public class RedeemItem : MonoBehaviour
         withDraw.gameObject.SetActive(true);
         condition.gameObject.SetActive(false);
         FaildText.gameObject.SetActive(false);
+        ShowTaskIcon(false);
         //钱的图标换成了卡牌图标
         int HasCollectNum = CardSystemManager.Instance.GetHaveCardTypeCount();
         int TargetNum = CardSystemManager.Instance.GetTotalCardTypeCount();

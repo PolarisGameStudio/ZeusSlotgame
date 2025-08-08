@@ -85,6 +85,23 @@ namespace Libs
             taskDict[task.TaskId] = task;
             return task;
         }
+
+        /// <summary>
+        /// 为了特定业务新增的接口，使用慎重，违反了以 taskid为唯一标识的原则
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public BaseTask GetTaskByType(int type)
+        {
+            foreach (var taskItem in taskDict)
+            {
+                if (taskItem.Value.TaskType == type)
+                {
+                    return taskItem.Value;
+                }
+            }
+            return null;
+        }
         
         private void CreatePlistTask()
         {

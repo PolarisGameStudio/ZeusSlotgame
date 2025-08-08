@@ -24,7 +24,7 @@ namespace Libs
         void UpdateCard()
         {
             HasCollectNum = CardSystemManager.Instance.GetHaveCardTypeCount();
-            Messenger.Broadcast(UpdateTaskDataMsg);
+            UpdateTaskStatus();
         }
         public override string GetDesc()
         {

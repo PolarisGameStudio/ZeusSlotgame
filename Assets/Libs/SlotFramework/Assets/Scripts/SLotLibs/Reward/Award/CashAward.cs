@@ -5,7 +5,7 @@ namespace Libs
         public override string GetAwardCountDesc()
         {
             //配置金钱时使用的时原值，需要放大到网赚模块的倍数
-            return OnLineEarningMgr.Instance.GetCashStr(count, 0, false, true);
+            return OnLineEarningMgr.Instance.GetCashStr(count, 0, false, false);
         }
     }
 }

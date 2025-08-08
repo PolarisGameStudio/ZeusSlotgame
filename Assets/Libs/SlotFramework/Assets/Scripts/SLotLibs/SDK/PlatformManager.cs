@@ -433,12 +433,12 @@ namespace Libs
             Messenger.Broadcast<bool>(GameConstants.OnH5InitSuccess,_h5InitResult);
         }
 
-        private int H5UserType = 1;
+        private int H5UserType = 0;
         public int GetH5UserType()
         {
             return H5UserType;
         }
-        
+
         public bool CheckCanShowH5()
         {
 #if UNITY_EDITOR

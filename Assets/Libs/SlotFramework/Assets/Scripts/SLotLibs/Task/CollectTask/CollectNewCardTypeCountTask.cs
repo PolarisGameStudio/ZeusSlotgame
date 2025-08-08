@@ -22,13 +22,6 @@ namespace Libs
         {
             HasCollectNum++;
             UpdateTaskStatus();
-            Messenger.Broadcast(UpdateTaskDataMsg);
-        }
-
-        public override void Clone(BaseTask task)
-        {
-            base.Clone(task);
-            UpdateTaskStatus();
         }
 
         public override string GetDesc()

@@ -40,6 +40,18 @@ namespace Libs
                 case TaskConstants.CollectNewCardTypeCountTask_Key:
                     task = new CollectNewCardTypeCountTask(taskInfoDict, parentTask);
                     break;
+                case TaskConstants.CollectFreeGameTriggerCountTask_Key:
+                    task = new CollectFreeGameTriggerCountTask(taskInfoDict, parentTask);
+                    break;
+                case TaskConstants.CollectTriggerSpinWinCountTask_Key:
+                    task = new CollectTriggerBigWinCountTask(taskInfoDict, parentTask);
+                    break;
+                case TaskConstants.CollectJackpotGameCountTask_Key:
+                    task = new CollectBonusGameCountTask(taskInfoDict, parentTask);
+                    break;
+                case TaskConstants.CollectFreeSpinSymbolCountTask_Key:
+                    task = new CollectFreeSpinSymbolCountTask(taskInfoDict, parentTask);
+                    break;
             }
             return task;
         }

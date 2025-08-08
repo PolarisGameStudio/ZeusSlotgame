@@ -21,7 +21,7 @@ namespace Libs
             TargetNum *= OnLineEarningMgr.Instance.GetCashMultiple();
             //hasCollectNum 因为存储的本来就是扩大的倍数所以无需特殊处理
             HasCollectNum = OnLineEarningMgr.Instance.Cash();
-            UpdateTaskStatus();
+            IsTaskConditionOK = HasCollectNum >= TargetNum;
         }
 
         ~AccumulateTotalCashTask()
@@ -33,8 +33,6 @@ namespace Libs
             // Debug.Log($"[AccumulateTotalCashTask][UpdateTaskStatus]  taskId:{TaskId}");
             HasCollectNum = OnLineEarningMgr.Instance.Cash();
             base.UpdateTaskStatus();
-            //广播刷新任务
-            Messenger.Broadcast(UpdateTaskDataMsg);
         }
 
         public override void Clone(BaseTask task)

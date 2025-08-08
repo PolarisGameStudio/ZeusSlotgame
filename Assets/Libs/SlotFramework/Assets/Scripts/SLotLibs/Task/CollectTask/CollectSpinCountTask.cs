@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Classic;
 
 namespace Libs
 {
@@ -6,23 +7,19 @@ namespace Libs
     {
         public CollectSpinCountTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask) : base(taskInfoDict, parentTask)
         {
-            Messenger.AddListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
+            Messenger.AddListener<ReelManager, long> (GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
         }
 
         ~CollectSpinCountTask()
         {
-            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
+            Messenger.RemoveListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
         }
 
-        void UpdateSpinCount()
-        {
-            if (IsTaskConditionOK)
-            {
-                return;
-            }
-            HasCollectNum++;
-            UpdateTaskStatus();
-            Messenger.Broadcast(UpdateTaskDataMsg);
+        protected override bool IsCollectConditionOk(ReelManager reelManager,long totalWin){
+            if (!reelManager.IsSpinCostCoins) return false;
+            //只收集付钱的 Spin 次数
+            AddNumber = 1;
+            return true;
         }
 
         public override string GetDesc()

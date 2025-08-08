@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Classic;
+using Libs;
 using UnityEngine;
 using Utils;
 
@@ -230,6 +231,22 @@ namespace System
         public void CloseWithDrawDialog()
         {
             Messenger.Broadcast(GameDialogManager.CloseWithDrawDialog);
+        }
+        
+        /// <summary>
+        /// 用于弹窗任务进度显示新增的接口
+        /// </summary>
+        /// <param name="taskType"></param>
+        /// <returns></returns>
+        public BaseTask GetTaskByType(int taskType)
+        {
+            BaseTask task = TaskManager.Instance.GetTaskByType(taskType);
+            if (task == null)
+            {
+                Debug.LogError($"[WithDrawManager][GetTaskByType] task is null, taskType:{taskType}");
+                return null;
+            }
+            return task;
         }
     }
 }

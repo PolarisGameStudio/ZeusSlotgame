@@ -2293,7 +2293,7 @@ public class BaseSlotMachineController : MonoBehaviour
 		SetBigWinType(spinTotalAward);
 
         //当次Spin计算完奖励之后的广播事件
-		// Messenger.Broadcast<ReelManager,long>(GameConstants.SpinAwardEndMsg,reelManager,Utils.Utilities.CastValueLong(Math.Round(spinTotalAward)));
+		Messenger.Broadcast<ReelManager,long>(GameConstants.SpinAwardEndMsg,reelManager,Utils.Utilities.CastValueLong(Math.Round(spinTotalAward)));
 		
 #if DEBUG || UNITY_EDITOR
 		// Debug环境机器触发Feature时，上报ES，方便测试

@@ -32,12 +32,6 @@ namespace Libs
             //广播刷新任务
             Messenger.Broadcast(UpdateTaskDataMsg);
         }
-        
-        public override void Clone(BaseTask task)
-        {
-            base.Clone(task);
-            UpdateTaskStatus();
-        }
         public override string GetProgressDesc()
         {
             return string.Format("{0}/{1}",OnLineEarningMgr.Instance.GetMoneyStr((int)HasCollectNum,0,false,true),

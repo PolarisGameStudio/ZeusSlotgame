@@ -36,6 +36,8 @@ namespace System
         private WithDrawSystemProgressData progressData = new WithDrawSystemProgressData();
         
         public int FreeSymbolNum = 0;
+        public int S01SymbolNum = 0;
+
         private WithDrawManager() { }
         
         //初始化
@@ -65,10 +67,16 @@ namespace System
 
         void OnSpinAwardEnd(ReelManager reelManager,long totalWinCoins)
         {
-            BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectFreeSpinSymbolCountTask_Key);
+            CheckShowW01TaskTip(reelManager, totalWinCoins);
+            CheckShowS01TaskTip(reelManager, totalWinCoins);
+        }
+
+        void CheckShowW01TaskTip(ReelManager reelManager,long totalWinCoins)
+        {
+            BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectWildSymbolCountTask_Key);
             if (task==null)
             {
-                Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectFreeSpinSymbolCountTask_Key);
+                Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectWildSymbolCountTask_Key);
                 return;
             }
             if (FreeSymbolNum>=task.TargetNum)
@@ -83,7 +91,39 @@ namespace System
             {
                 return;
             }
-            Messenger.Broadcast(GameDialogManager.OpenTaskTipsDialogMsg);
+
+            int symbolIndex = reelManager.symbolMap.getSymbolIndex("W01");
+            Sprite symbolSprite = reelManager.gameConfigs.elementResources[symbolIndex].staticSprite;
+            Messenger.Broadcast<Sprite,int>(GameDialogManager.OpenTaskTipsDialogMsg,symbolSprite,TaskConstants.CollectWildSymbolCountTask_Key);
+            //更新进度数据
+            SaveProgressData();
+        }
+        
+        void CheckShowS01TaskTip(ReelManager reelManager,long totalWinCoins)
+        {
+            BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectSymbolCountTask_Key);
+            if (task==null)
+            {
+                Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectSymbolCountTask_Key);
+                return;
+            }
+            if (S01SymbolNum>=task.TargetNum)
+            {
+                return;
+            }
+            CollectSymbolCountTask collectSymbolCountTask = task as CollectSymbolCountTask;
+            Debug.Log($"[WithDrawManager][OnSpinAwardEnd] S01SymbolNum:{S01SymbolNum}");
+            List<BaseElementPanel> elementList = reelManager.GetElementsWithSymbolName(collectSymbolCountTask.symbolName);
+            int AddNumber = (elementList == null || elementList.Count == 0) ? 0 : elementList.Count;
+            long remin = S01SymbolNum % 10;
+            S01SymbolNum += AddNumber;
+            if (remin+AddNumber<10)
+            {
+                return;
+            }
+            int symbolIndex = reelManager.symbolMap.getSymbolIndex(collectSymbolCountTask.symbolName);
+            Sprite symbolSprite = reelManager.gameConfigs.elementResources[symbolIndex].staticSprite;
+            Messenger.Broadcast<Sprite,int>(GameDialogManager.OpenTaskTipsDialogMsg,symbolSprite,TaskConstants.CollectSymbolCountTask_Key);
             //更新进度数据
             SaveProgressData();
         }
@@ -98,6 +138,7 @@ namespace System
                 {
                     progressData.LoadData(data);
                     FreeSymbolNum = data.FreeSymbolNum;
+                    S01SymbolNum = data.S01SymbolNum;
                 }
             }
             catch (Exception e)

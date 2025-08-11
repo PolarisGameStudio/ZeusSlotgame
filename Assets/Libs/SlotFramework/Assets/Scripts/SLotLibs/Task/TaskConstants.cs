@@ -9,6 +9,8 @@ namespace Libs
         public const string SpinTotalNum_Key = "spinTotalNum";
         public const string TaskLocalizeDesc_Key = "localizeDesc";
         public const string TaskState_Key = "taskState";
+        public const string TaskExtras_Key = "extras";
+
         public const string TaskMark_Key = "mark";
 
         public const string ProgressNum_Key = "progressNum";
@@ -33,7 +35,8 @@ namespace Libs
         public const int CollectNewCardTypeCountTask_Key = 18; //从0开始收集卡牌类型数量任务
         public const int CollectFreeGameTriggerCountTask_Key = 19; //收集免费游戏触发次数
         public const int CollectJackpotGameCountTask_Key = 20; //收集出发 jackpot的次数
-        public const int CollectFreeSpinSymbolCountTask_Key = 21; //收集指定 symbol的任务
+        public const int CollectWildSymbolCountTask_Key = 21; //收集freespin symbol的任务
         public const int CollectTriggerSpinWinCountTask_Key = 22; //收集触发奖励弹窗的次数
+        public const int CollectSymbolCountTask_Key = 23; //收集指定一种symbol的任务
     }
 }

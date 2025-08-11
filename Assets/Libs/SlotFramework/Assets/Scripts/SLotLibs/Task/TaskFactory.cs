@@ -49,8 +49,11 @@ namespace Libs
                 case TaskConstants.CollectJackpotGameCountTask_Key:
                     task = new CollectBonusGameCountTask(taskInfoDict, parentTask);
                     break;
-                case TaskConstants.CollectFreeSpinSymbolCountTask_Key:
-                    task = new CollectFreeSpinSymbolCountTask(taskInfoDict, parentTask);
+                case TaskConstants.CollectWildSymbolCountTask_Key:
+                    task = new CollectWildSymbolCountTask(taskInfoDict, parentTask);
+                    break;
+                case TaskConstants.CollectSymbolCountTask_Key:
+                    task = new CollectSymbolCountTask(taskInfoDict, parentTask);
                     break;
             }
             return task;

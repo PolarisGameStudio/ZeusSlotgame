@@ -7,6 +7,8 @@ using Libs;
 using TMPro;
 using DG.Tweening;
 using Ads;
+using Utils;
+
 public class FreeGameEndDialog : UIDialog 
 {
     [Header("FreeGame结束按钮")]
@@ -29,7 +31,7 @@ public class FreeGameEndDialog : UIDialog
     private bool isStop = false;
     private bool HasClicked = false;
     private bool isPlayAd = false;
-    
+    private TaskTipPanel _taskTipPanel;
     protected override void Awake()
     {
         base.Awake ();
@@ -37,7 +39,11 @@ public class FreeGameEndDialog : UIDialog
         AudioEntity.Instance.PlayFreeGameEndDialogMusic();
         if(EndBtn != null) {UGUIEventListener.Get(this.EndBtn.gameObject).onClick = this.OnButtonClickHandler;}
         if(WatchADBtn != null) {UGUIEventListener.Get(this.WatchADBtn.gameObject).onClick = this.OnWatchADButtonClick;}
-
+        _taskTipPanel = Utilities.RealFindObj<TaskTipPanel>(transform,"Animation/TaskTipsPanel");
+        if (_taskTipPanel!=null)
+        {
+            _taskTipPanel.RefreshInfo(TaskConstants.CollectFreeGameTriggerCountTask_Key);
+        }
         // this.bResponseBackButton = false;
         // this.AutoQuit = true;
         // this.DisplayTime = 4; 

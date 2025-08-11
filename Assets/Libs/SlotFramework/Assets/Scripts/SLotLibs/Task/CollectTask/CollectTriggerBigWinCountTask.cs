@@ -33,5 +33,10 @@ namespace Libs
             else if (totalWin >= BaseSlotMachineController.Instance.reelManager.gameConfigs.BigWinTag * BaseSlotMachineController.Instance.currentBetting) return true;
             return false;
         }
+
+        public override string GetDesc()
+        {
+            return "CollectBigWin";
+        }
     }
 }

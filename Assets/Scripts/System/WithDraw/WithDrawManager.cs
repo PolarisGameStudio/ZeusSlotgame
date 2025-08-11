@@ -32,15 +32,87 @@ namespace System
         // private List<RedeemItemData> redeemItemList = new List<RedeemItemData>();
         private bool isConfigReady = false;
         private int PlatFormIndex = -1;
-      
+
+        private WithDrawSystemProgressData progressData = new WithDrawSystemProgressData();
+        
+        public int FreeSymbolNum = 0;
         private WithDrawManager() { }
         
         //初始化
         public void OnInit()
         {
             ParseConfig();
+            LoadProgressData();
+            if (!isConfigReady)
+            {
+                Debug.LogError("WithDrawManager OnInit isConfigReady is false");
+                return;
+            }
+            //注册监听
+            AddListener();
         }
 
+        void AddListener()
+        {
+            Messenger.AddListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+        }
+        
+        ~WithDrawManager()
+        {
+            //清理监听
+            Messenger.RemoveListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+        }
+
+        void OnSpinAwardEnd(ReelManager reelManager,long totalWinCoins)
+        {
+            BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectFreeSpinSymbolCountTask_Key);
+            if (task==null)
+            {
+                Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectFreeSpinSymbolCountTask_Key);
+                return;
+            }
+            if (FreeSymbolNum>=task.TargetNum)
+            {
+                return;
+            }
+            Debug.Log($"[WithDrawManager][OnSpinAwardEnd] FreeSymbolNum:{FreeSymbolNum}");
+            int AddNumber = reelManager.GetSpecialCount(SymbolMap.IS_FREESPIN);
+            long remin = FreeSymbolNum % 10;
+            FreeSymbolNum += AddNumber;
+            if (remin+AddNumber<10)
+            {
+                return;
+            }
+            Messenger.Broadcast(GameDialogManager.OpenTaskTipsDialogMsg);
+            //更新进度数据
+            SaveProgressData();
+        }
+        
+        #region LoadAndSaveData
+        private void LoadProgressData()
+        {
+            try
+            {
+                WithDrawSystemProgressData data = StoreManager.Instance.LoadDataJson<WithDrawSystemProgressData>(progressData.fileName);
+                if (data!=null)
+                {
+                    progressData.LoadData(data);
+                    FreeSymbolNum = data.FreeSymbolNum;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public void SaveProgressData()
+        {
+            progressData.SaveData();
+        }
+        #endregion
+        
         public void ParseConfig()
         {
             Dictionary<string,object> config = Plugins.Configuration.GetInstance().GetValue<Dictionary<string,object>>(ConfigKey,null);
@@ -247,6 +319,12 @@ namespace System
                 return null;
             }
             return task;
+        }
+        
+        public void ShowTip(string msg)
+        {
+            Debug.Log($"[WithDrawManager][ShowTip] msg:{msg}");
+            Messenger.Broadcast(GameDialogManager.OpenTaskTipsDialogMsg);
         }
     }
 }

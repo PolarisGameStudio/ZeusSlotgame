@@ -49,6 +49,7 @@ public class SpinWinDialogNew : UIDialog
     public Transform coinFlyPosition;
     private bool isFirstTime = true;
     private bool isSecondTime = false;
+    private TaskTipPanel _taskTipPanel;
     protected override void Awake()
     {
         base.Awake();
@@ -56,6 +57,11 @@ public class SpinWinDialogNew : UIDialog
         UGUIEventListener.Get(this.WatchAdBtn.gameObject).onClick = this.OnWatchADButtonClick;
         UGUIEventListener.Get(this.StopBtn.gameObject).onClick = this.OnButtonClickHandler;
         UGUIEventListener.Get(this.CollectBtn.gameObject).onClick = this.OnCollectBtnClick;
+        _taskTipPanel = Utilities.RealFindObj<TaskTipPanel>(transform,"Anchor/Animation/TaskTipsPanel");
+        if (_taskTipPanel!=null)
+        {
+            _taskTipPanel.RefreshInfo(TaskConstants.CollectTriggerSpinWinCountTask_Key);
+        }
     }
     void OnEnable()
     {

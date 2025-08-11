@@ -89,8 +89,8 @@ MonoBehaviour:
     m_Address: Prefabs/Dialog/Paytable/PayLineSymbol.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: eca406020ed7e6948b65a8daaf651cb9
-    m_Address: Prefab/UI/AccountLoginTipsDialog.prefab
+  - m_GUID: f94ad8aa86a1d4f87b69d41fff56a40e
+    m_Address: Prefab/UI/TaskTipDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

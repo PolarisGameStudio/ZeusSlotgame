@@ -92,6 +92,7 @@ public class GameDialogManager : MonoBehaviour
 	
 	//Tips
 	public const string OpenTipsDialogMsg = "OpenTipsDialogMsg";
+	public const string OpenTaskTipsDialogMsg = "OpenTaskTipsDialogMsg";
 
 	public static bool QuestDialogShowed { get; set; }
 
@@ -200,6 +201,8 @@ public class GameDialogManager : MonoBehaviour
 			
 			#region tips
 			Messenger.AddListener<string>(OpenTipsDialogMsg, OpenTipsDialog);
+			Messenger.AddListener(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
+
             #endregion
             
         }
@@ -291,6 +294,7 @@ public class GameDialogManager : MonoBehaviour
 			
 			#region tips
 			Messenger.RemoveListener<string>(OpenTipsDialogMsg, OpenTipsDialog);
+			Messenger.RemoveListener(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
 			#endregion
 		}
 	}
@@ -635,7 +639,8 @@ public class GameDialogManager : MonoBehaviour
 	{
 		
 	}
-	protected virtual void OpenAccountLoginTipsDialog(int cash)
+	
+	protected virtual void OpenTaskTipsDialog()
 	{
 		
 	}

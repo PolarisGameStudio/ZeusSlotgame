@@ -48,6 +48,7 @@ namespace Libs
 
             try
             {
+                Debug.Log($"StoreManager SaveDataJson Json:{json}");
                 File.WriteAllText(path, json);
             }
             catch (Exception e)
@@ -96,9 +97,9 @@ namespace Libs
             return "";
         }
 
-        public void DeleteProgress(string fileName, ReelManager reelManager)
+        public void DeleteProgress(string fileName)
         {
-            if (string.IsNullOrEmpty(fileName) || reelManager == null)
+            if (string.IsNullOrEmpty(fileName))
                 return;
 
             string localPath = Path.Combine(DataFolderName, fileName + ".json");
@@ -108,16 +109,6 @@ namespace Libs
                 try
                 {
                     FileUtils.DeleteFile(path);
-                    // 恢复时，如果有feature，将json内容上报ES, 便于查询卡死
-                    if (reelManager.IsInBonusGame || reelManager.isFreespinBonus || reelManager.FreespinCount > 0
-                        || BaseSlotMachineController.Instance.onceMore)
-                    {
-                        Dictionary<string, object> para = new Dictionary<string, object>();
-                        para.Add("JsonData", JsonData);
-                        para.Add("Exception", HasRestoreException);
-                        JsonData = "";
-                        BaseGameConsole.ActiveGameConsole().LogBaseEvent(Analytics.RestoreLocalProgress, para);
-                    }
                 }
                 catch (Exception e)
                 {

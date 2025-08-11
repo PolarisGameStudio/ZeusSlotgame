@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Ads;
+using Utils;
 
 public class LuckyCashDialog : UIDialog
 {
@@ -28,6 +29,7 @@ public class LuckyCashDialog : UIDialog
     //是否选择过按钮，要么点击关闭看全屏广告，要么点击看激励广告
     private bool HasClicked = false;
     private bool closeShowAd = false;
+    private TaskTipPanel _taskTipPanel;
     protected override void Awake()
     {
         AudioManager.Instance.AsyncPlayEffectAudio("Bonus_win");
@@ -37,6 +39,11 @@ public class LuckyCashDialog : UIDialog
         BtnWatch.onClick.AddListener(OnWatchADButtonClick);
         BtnNotWatch.onClick.AddListener(OnButtonCloseClick);
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"LuckyCash");
+        _taskTipPanel = Utilities.RealFindObj<TaskTipPanel>(transform,"Anchor/Animation/TaskTipsPanel");
+        if (_taskTipPanel!=null)
+        {
+            _taskTipPanel.RefreshInfo(TaskConstants.CollectTriggerSpinWinCountTask_Key);
+        }
         base.Awake();
     }
 

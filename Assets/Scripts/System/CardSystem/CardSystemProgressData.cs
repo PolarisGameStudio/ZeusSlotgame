@@ -40,10 +40,7 @@ namespace CardSystem
 
         public override void ClearData()
         {
-            currentSpinIndex = 0;
-            currentCards.Clear();
-            isFirstShow = false;
-            SaveData();
+            StoreManager.Instance.DeleteProgress(fileName);
         }
         
         public bool HasCard(int cardId)

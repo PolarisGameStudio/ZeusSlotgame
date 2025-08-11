@@ -241,7 +241,10 @@ namespace Libs
 		{
 			return activeList.Find(dlg => dlg is T); ;
 		}
-		
+		public UIDialog GetActiveTipDialog<T>() where T : UIDialog
+		{
+			return activeTipsList.Find(dlg => dlg is T); ;
+		}
 		public UIDialog GetNowActiveDialog()
 		{
 			if (activeList == null || activeList.Count == 0) return null;

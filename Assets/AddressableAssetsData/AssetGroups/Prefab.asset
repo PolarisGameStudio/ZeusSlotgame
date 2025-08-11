@@ -89,6 +89,10 @@ MonoBehaviour:
     m_Address: Prefabs/Dialog/Paytable/PayLineSymbol.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: f94ad8aa86a1d4f87b69d41fff56a40e
+    m_Address: Prefab/UI/TaskTipDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

@@ -36,7 +36,8 @@ public class GoldsReelManager : ReelManager
 			base.PlayAwardSymbolAnimation ();
 		}
 
-		this.ShowKindOfSymbol();
+		//去掉 kindofsymboldialog
+		// this.ShowKindOfSymbol();
 	}
 
 	//symbol的动画都要播放，方框粒子循环播放

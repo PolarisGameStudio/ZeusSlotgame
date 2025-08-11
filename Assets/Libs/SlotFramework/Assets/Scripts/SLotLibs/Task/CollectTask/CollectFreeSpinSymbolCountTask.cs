@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Classic;
+using UnityEngine;
 
 namespace Libs
 {
@@ -20,6 +22,11 @@ namespace Libs
             int scatterNum = reelManager.GetSpecialCount(SymbolMap.IS_FREESPIN);
             AddNumber = scatterNum;
             return true;
+        }
+        
+        public override string GetDesc()
+        {
+            return "CollectToWin";
         }
     }
 }

@@ -22,5 +22,10 @@ namespace Libs
             AddNumber = 1;
             return true;
         }
+        
+        public override string GetDesc()
+        {
+            return "CollectJackpot";
+        }
     }
 }

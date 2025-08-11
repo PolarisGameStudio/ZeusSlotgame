@@ -422,6 +422,7 @@ public class BaseGameConsole :MonoBehaviour
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 		CardSystemManager.Instance.SaveProgressData();
+		WithDrawManager.Instance.SaveProgressData();
 		ADManager.Instance.SaveADProgressData();
 	}
 	

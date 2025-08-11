@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Classic;
 using Ads;
+using Utils;
+
 public class WesternTreasureMiniDialog : UIDialog
 {
 
@@ -24,7 +26,7 @@ public class WesternTreasureMiniDialog : UIDialog
     private int totalCash = 0;
     private Tween Cashtween = null;
     private int curCash = 0;
-
+    private TaskTipPanel _taskTipPanel;
     public Transform cashFlyPosition;
     public Transform coinFlyPosition;
     protected override void Awake()
@@ -39,6 +41,11 @@ public class WesternTreasureMiniDialog : UIDialog
         if (WatchADBtn!=null)
         {
             WatchADBtn.onClick.AddListener(OnWatchADButtonClick);
+        }
+        _taskTipPanel = Utilities.RealFindObj<TaskTipPanel>(transform,"Animation/TaskTipsPanel");
+        if (_taskTipPanel!=null)
+        {
+            _taskTipPanel.RefreshInfo(TaskConstants.CollectJackpotGameCountTask_Key);
         }
     }
 

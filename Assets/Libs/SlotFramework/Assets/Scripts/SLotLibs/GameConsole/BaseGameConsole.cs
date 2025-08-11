@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 using System.Globalization;
 using Activity;
 using CardSystem;
-
+using Ads;
 
 public class BaseGameConsole :MonoBehaviour
 {
@@ -422,6 +422,7 @@ public class BaseGameConsole :MonoBehaviour
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 		CardSystemManager.Instance.SaveProgressData();
+		ADManager.Instance.SaveADProgressData();
 	}
 	
 	void Update()

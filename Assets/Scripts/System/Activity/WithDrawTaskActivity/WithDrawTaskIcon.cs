@@ -176,7 +176,7 @@ namespace Activity
         {
             if (baseAwardItem is CashAwardItem cashAwardItem)
             {
-                OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count);
+                OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
                 Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action, CoinsBezier.BezierObjectType>(
                     GameConstants.CollectBonusWithType, rewardCount.transform.parent, Libs.CoinsBezier.BezierType.DailyBonus, null,
                     CoinsBezier.BezierObjectType.Cash);

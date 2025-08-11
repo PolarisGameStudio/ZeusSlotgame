@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using Ads;
 namespace Libs
 {
     /// <summary>
@@ -9,13 +9,13 @@ namespace Libs
     {
         public CollectADCountTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask) : base(taskInfoDict, parentTask)
         {
-            Messenger.AddListener(ADConstants.OnPlayVedioEnd,UpdateAdCount);
+            Messenger.AddListener(ADConstants.OnPlayVideoEnd,UpdateAdCount);
         }
         
         ~CollectADCountTask()
         {
             // 这里可以添加清理逻辑，如果有需要的话
-            Messenger.RemoveListener(ADConstants.OnPlayVedioEnd,UpdateAdCount);
+            Messenger.RemoveListener(ADConstants.OnPlayVideoEnd,UpdateAdCount);
         }
 
         void UpdateAdCount()

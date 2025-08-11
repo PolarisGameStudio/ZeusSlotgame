@@ -59,12 +59,14 @@ namespace Activity
             if (isShow)
             {
                 ChangeSkinByIndex(curShowIndex);
+                gameObject.SetActive(isShow);
                 skeletonGraphic.gameObject.SetActive(true);
                 // saqian.gameObject.SetActive(true);
                 // NeedShowQiPao();
             }
             else
             {
+                gameObject.SetActive(false);
                 skeletonGraphic.gameObject.SetActive(false);
                 // saqian.gameObject.SetActive(false);
                 // DestroyShowQiPao();

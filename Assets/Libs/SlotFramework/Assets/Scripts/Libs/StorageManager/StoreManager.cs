@@ -38,7 +38,8 @@ namespace Libs
 
             string path = Path.Combine(folderPath, fileName + ".json");
 
-            string json = JsonConvert.SerializeObject(progressData);
+            string json = JsonConvert.SerializeObject(progressData,new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.All});
 
             if (Debug.isDebugBuild)
             {
@@ -67,7 +68,8 @@ namespace Libs
                 T result = null;
                 try
                 {
-                    result = JsonConvert.DeserializeObject<T>(JsonData);
+                    result = JsonConvert.DeserializeObject<T>(JsonData,new JsonSerializerSettings {
+                        TypeNameHandling = TypeNameHandling.All});
                     HasRestoreException = false;
                 }
                 catch (Exception e)

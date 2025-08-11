@@ -150,7 +150,7 @@ namespace Classic
 		{
 			return Plugins.Configuration.GetInstance ().ConfigurationParseResult ().ApplicationConfig ();
 		}
-		public Core.PopPlanConfig PopPlanConfig ()
+		public Core.InfiniteModel PopPlanConfig ()
 		{
 			return Plugins.Configuration.GetInstance ().ConfigurationParseResult ().PopPlanConfig();
 		}

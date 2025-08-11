@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
+using Ads;
 using System;
 using UnityEngine.Serialization;
 //using NUnit.Framework;
@@ -29,10 +29,16 @@ public class WesternTreasureReelManager : GoldsReelManager
     {
         base.Awake();
         Messenger.AddListener<long>(SlotControllerConstants.OnBetChange, OnChangBet);
+        Messenger.AddListener<int>(ADConstants.PlayFreeSpinAD, this.OnAdIsPlaySuccessful);
+        Messenger.AddListener<int>(ADConstants.PlayFreeSpinADFailed, this.OnAdIsPlayFailed);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
     }
     protected override void OnDestroy()
     {
         Messenger.RemoveListener<long>(SlotControllerConstants.OnBetChange, OnChangBet);
+        Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinAD, this.OnAdIsPlaySuccessful);
+        Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinADFailed, this.OnAdIsPlayFailed);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
         base.OnDestroy();
     }
 
@@ -251,38 +257,32 @@ public class WesternTreasureReelManager : GoldsReelManager
         {
             jackpotGameBack.SetActive(true);
         }
-        //展示一次广告
-        OnLineEarningMgr.Instance.JackpotCount++;
-        if (OnLineEarningMgr.Instance.CheckCanShowJackpotStartAD())
-        {
-            Debug.Log("[WesternTreasureReelManager] [OpenJackpotGame] [ShowAD]");
-            ShowAD();
-        }
+        
+        #region AD
+        // Messenger.Broadcast(ADConstants.JackpotGameStartMsg);
+        // Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.Interstitial_Entrance_JACKPOTSTART);
+        #endregion
     }
-    
-    void ShowAD()
+
+    #region AD
+    void OnAdIsPlaySuccessful(int type)
     {
-        Debug.Log("[WesternTreasureReelManager] [ShowAD]");
-        OnLineEarningMgr.Instance.AddADNum(2);
-        if (OnLineEarningMgr.Instance.CheckCanPopAD(2))
-        {
-            OnLineEarningMgr.Instance.ResetADNum(2);
-            OnLineEarningMgr.Instance.ResetSpinTime();
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
-            //广告未加载好
-            if (!interstitialADIsReady)
-            {
-                //展示未加载好广告的提示,直接给奖励
-                ADManager.Instance.ShowLoadingADsUI();
-            }
-            else
-            {
-                //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
-            }
-        }
+        
     }
     
+    void OnAdIsPlayFailed(int type)
+    {
+        
+    }
+
+    void HandleNotMeetConditionMsg(string msg)
+    {
+        if (msg == ADEntrances.Interstitial_Entrance_JACKPOTSTART)
+        {
+        }
+    }
+    #endregion
+
     private void CloseJackpotGame()
     {
         Messenger.Broadcast(WesternTreasureBonusGame.TreeBonusGameEnd);

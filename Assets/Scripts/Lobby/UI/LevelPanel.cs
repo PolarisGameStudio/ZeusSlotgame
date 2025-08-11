@@ -11,11 +11,10 @@ namespace Classic
     public class LevelPanel : MonoBehaviour
     {
         public TextMeshProUGUI LevelTest;
-        public const string LevelKey = "Level.";
 
-        public void SetLevel(int level)
+        public void SetLevel(string info)
         {
-            LevelTest.text = LevelKey + level;
+            LevelTest.text = info;
         }
     }
 }

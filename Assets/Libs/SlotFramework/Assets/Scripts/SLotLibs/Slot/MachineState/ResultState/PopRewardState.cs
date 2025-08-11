@@ -21,11 +21,6 @@ namespace Classic
         {
             base.Run();
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
-            OnLineEarningMgr.Instance.AddGetRewardCount();
-            // bool canShowBig = OnLineEarningMgr.Instance.CheckCanShowBig();
-            // //满足弹出大弹窗条件时，弹出大弹窗，不弹小弹窗
-            // if (canShowBig)
-            // {
             if (!PlatformManager.Instance.IsWhiteBao())
             {
                 //获取大弹窗的奖励金钱
@@ -37,8 +32,6 @@ namespace Classic
                 }
                 Messenger.Broadcast<int,Action>(SlotGameDialogManager.OpenPopRewardBigDialog,rewardCash,PopBigRewardQuit);
             }
-               
-            // }
         }
 
         private void PopSmallRewardQuit()

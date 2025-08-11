@@ -14,12 +14,18 @@ namespace Classic
  		public Transform coinTarget;
 		public TextMeshProUGUI coinText;
 
-        private float tweenerDelay = 0f;
-        private float tweenerDuration = 3f;
-		private long initNum = 0;
-        private Libs.DelayAction tweenAction;
-		private Tweener tweener;
-        private long finalNum;
+		[HideInInspector]
+        public float tweenerDelay = 0f;
+        [HideInInspector]
+        public float tweenerDuration = 3f;
+        [HideInInspector]
+        public long initNum = 0;
+        [HideInInspector]
+        public Libs.DelayAction tweenAction;
+        
+        public Tweener tweener;
+        [HideInInspector]
+        public long finalNum;
 
         public long GetCurrentBalance()
         {
@@ -48,13 +54,13 @@ namespace Classic
             }
 		}
 
-        private void CompleteShow()
+		public void CompleteShow()
         {
             this.initNum = finalNum;
             this.CaculateTxt();
         }
 
-        private void CaculateTxt()
+        public virtual void CaculateTxt()
 		{
 			if (coinText == null) 
 			{

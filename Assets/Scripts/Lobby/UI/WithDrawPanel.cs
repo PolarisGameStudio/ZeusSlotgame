@@ -18,10 +18,11 @@ public class WithDrawPanel : MonoBehaviour
     public Transform cashTarget;
     public TextMeshProUGUI cashText;
     private DelayAction tweenAction; //动画事件
-    private Tweener tweener; //DOTween动画
+    public Tweener tweener; //DOTween动画
     private float tweenerDelay = 1f;
     private float tweenerDuration = 1.5f;
-    private int initNum = 0;
+    [HideInInspector]
+    public int initNum = 0;
     public GameObject Guide;
     public Image[] Images;
     public Button GuideBtn;
@@ -49,7 +50,7 @@ public class WithDrawPanel : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    public void OnEnable()
     {
         if (!PlatformManager.Instance.IsWhiteBao())
         {
@@ -58,22 +59,22 @@ public class WithDrawPanel : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    public void OnDisable()
     {
         Messenger.RemoveListener(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL, OnShowTip);
     }
 
-    void OnSpinEnd()
+    public void OnSpinEnd()
     {
         //首次登录
-        if (UserManager.GetInstance().UserProfile().IsFirstGameSession)
+        if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
         {
             showGuideCor = StartCoroutine(ShowGuide());
             Messenger.RemoveListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
         }
     }
 
-    void OnShowTip()
+    public void OnShowTip()
     {
         if (tweenerTip!=null && tip.activeInHierarchy)
         {
@@ -116,7 +117,7 @@ public class WithDrawPanel : MonoBehaviour
         }).Play();
     }
 
-    string GetTipTextInfo()
+    public string GetTipTextInfo()
     {
         // int nowCash = OnLineEarningMgr.Instance.Cash();
         // int leftCash = 0;
@@ -187,7 +188,7 @@ public class WithDrawPanel : MonoBehaviour
         Guide.SetActive(true);
     }
     //初始化设置钱数
-    public void InitMoney(int money)
+    public virtual void InitMoney(int money)
     {
         initNum = money;
         cashText.text = OnLineEarningMgr.Instance.GetMoneyStr(money,needIcon:false);
@@ -203,7 +204,7 @@ public class WithDrawPanel : MonoBehaviour
         WithDrawManager.Instance.ShowWithDrawDialog();
     }
 
-    public void ShowWithCoinsFly(int coinsNum)
+    public virtual void ShowWithCoinsFly(int coinsNum)
     {
         SetCoinsNum(coinsNum);
     }
@@ -224,7 +225,7 @@ public class WithDrawPanel : MonoBehaviour
             tweenAction = new DelayAction(tweenerDelay, null, () =>
             {
                 tweener = DOTween.To(() => this.initNum, x => this.initNum = x, number, tweenerDuration)
-                    .OnUpdate(()=>CaculateTxt(cashText))
+                    .OnUpdate(()=>CaculateTxt())
                     .OnComplete(() =>
                     {
                         tweenerDelay = 1f;
@@ -240,15 +241,15 @@ public class WithDrawPanel : MonoBehaviour
         }
     }
     
-    private void CompleteShow(int coins)
+    public virtual void CompleteShow(int coins)
     {
         this.initNum = coins;
-        this.CaculateTxt(cashText);
+        this.CaculateTxt();
     }
     
-    private void CaculateTxt(TextMeshProUGUI coinText)
+    public virtual void CaculateTxt()
     {
-        if (coinText == null)
+        if (cashText == null)
         {
             if (tweener != null)
             {
@@ -256,6 +257,11 @@ public class WithDrawPanel : MonoBehaviour
             }
             return;
         }
-        cashText.text = OnLineEarningMgr.Instance.GetMoneyStr(initNum,needIcon:false);
+        SetCashText();
     }
+
+    public virtual void SetCashText()
+    {
+        cashText.text = OnLineEarningMgr.Instance.GetMoneyStr(initNum,needIcon:false);
+    } 
 }

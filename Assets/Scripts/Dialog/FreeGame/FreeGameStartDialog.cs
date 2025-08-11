@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Libs;
-
+using Ads;
 public class FreeGameStartDialog : UIDialog
 {
     [Header("FreeGame开始按钮")]
@@ -69,11 +69,17 @@ public class FreeGameStartDialog : UIDialog
     protected override void OnEnable()
     {
         Messenger.AddListener<int>(ADConstants.PlayFreeSpinAD, this.OnAdIsPlaySuccessful);
+        Messenger.AddListener<int>(ADConstants.PlayFreeSpinADFailed, this.OnAdIsPlayFailed);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+
         base.OnEnable();
     }
     protected override void OnDisable()
     {
         Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinAD, this.OnAdIsPlaySuccessful);
+        Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinADFailed, this.OnAdIsPlayFailed);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+
         base.OnDisable();
     }
 
@@ -127,13 +133,26 @@ public class FreeGameStartDialog : UIDialog
         }
         OnLineEarningMgr.Instance.ResetSpinTime();
     }
-    protected bool adRewarded = false;
+    
     //广告播放成功，关闭弹板进入下一个操作
     public virtual void OnAdIsPlaySuccessful(int type)
     {
-        adRewarded = true;
         ADDoneCallBack();
     }
+
+    void OnAdIsPlayFailed(int type)
+    {
+        OnAdIsPlaySuccessful(type);
+    }
+    
+    void HandleNotMeetConditionMsg(string msg)
+    {
+        if (msg == ADEntrances.Interstitial_Entrance_FREEGAMESTART)
+        {
+            ADDoneCallBack();
+        }
+    }
+    
     private void OnStartButtonClick()
     {
         if (!StartBtn.interactable) return;
@@ -143,17 +162,11 @@ public class FreeGameStartDialog : UIDialog
             return;
         }
         hasClicked = true;
-        OnLineEarningMgr.Instance.FreeSpinCount++;
-        if (OnLineEarningMgr.Instance.CheckCanShowFreeStartAD())
-        {
-            Debug.Log("FreeGameStartDialog OnStartButtonClick ShowAD");
-            ShowAD();
-        }
-        else
-        {
-            ADDoneCallBack();
-        }
-        //ADDoneCallBack();
+        ADDoneCallBack();
+        // //广播条件累计
+        // Messenger.Broadcast(ADConstants.CloseFreeGameStartMsg);
+        // //通知播放广告
+        // Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.Interstitial_Entrance_FREEGAMESTART);
     }
 
     public void ADDoneCallBack()
@@ -166,32 +179,6 @@ public class FreeGameStartDialog : UIDialog
         AudioEntity.Instance.StopFreeGameStartDialogMusic();
         AudioEntity.Instance.PlayFeatureBtnEffect();
         this.Close();
-    }
-
-    void ShowAD()
-    {
-        OnLineEarningMgr.Instance.AddADNum(1);
-        if (OnLineEarningMgr.Instance.CheckCanPopAD(1))
-        {
-            OnLineEarningMgr.Instance.ResetADNum(1);
-            bool interstitialADIsReady = ADManager.Instance.InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
-            //广告未加载好
-            if (!interstitialADIsReady)
-            {
-                //展示未加载好广告的提示,直接给奖励
-                ADManager.Instance.ShowLoadingADsUI(endCallBack:this.ADDoneCallBack);
-            }
-            else
-            {
-                //播放广告
-                Messenger.Broadcast(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
-            }
-            OnLineEarningMgr.Instance.ResetSpinTime();
-        }
-        else
-        {
-            this.ADDoneCallBack();
-        }
     }
 }
 

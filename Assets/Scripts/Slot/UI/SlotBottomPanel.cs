@@ -20,7 +20,9 @@ public class SlotBottomPanel : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI bet;
-
+    [SerializeField]
+    private TextMeshProUGUI bet_300;
+   
     [SerializeField]
     private Button SubBetButton;
 
@@ -51,7 +53,10 @@ public class SlotBottomPanel : MonoBehaviour
     public GameObject disableSpin;
 
     public GameObject BetPanel;
+    public GameObject BetPanel_300;
 
+    public CoinsPanelBottom CoinsPanelBottom;
+    
     public GameObject AverageBet;
     public Animator spinNumPanel;
     public CanvasGroup RewardSpin;
@@ -136,6 +141,7 @@ public class SlotBottomPanel : MonoBehaviour
         Messenger.AddListener<float,int,int> (SlotControllerConstants.OnChangeCashText, OnWinCashAnimation);
         Messenger.AddListener<int>(SlotControllerConstants.OnChangeCashTextSilence, SetWinCashSilenceText);
 
+
         Messenger.AddListener (SlotControllerConstants.OnEnterFreespin, OnEnterFreespin);
 		Messenger.AddListener (SlotControllerConstants.OnQuitFreespin, OnQuitFreespin);
 		Messenger.AddListener<int,int,int> (SlotControllerConstants.OnFreespinTimesChanged,OnFreespinTimeChange);
@@ -147,7 +153,8 @@ public class SlotBottomPanel : MonoBehaviour
         
         Messenger.AddListener(SlotControllerConstants.DisableBetButtons,DisableBetBtns);
         Messenger.AddListener(SlotControllerConstants.EnableBetButtons,EnableBetBtns);
-        
+        Messenger.AddListener(SlotControllerConstants.OnBlanceChangeForDisPlay, BalanceChange);
+
 
         for (int i = 0; i < 7; i++)
         {
@@ -201,23 +208,47 @@ public class SlotBottomPanel : MonoBehaviour
 		
         Messenger.RemoveListener(SlotControllerConstants.DisableBetButtons,DisableBetBtns);
         Messenger.RemoveListener(SlotControllerConstants.EnableBetButtons,EnableBetBtns);
+        Messenger.RemoveListener(SlotControllerConstants.OnBlanceChangeForDisPlay, BalanceChange);
         
     }
 
     public void Init()
     {
 		bet.text = Utils.Utilities.ThousandSeparatorNumber (BaseSlotMachineController.Instance.currentBetting); 
+        bet_300.text = Utils.Utilities.ThousandSeparatorNumber (BaseSlotMachineController.Instance.currentBetting);
         win.SetText("0");
         RefreshCashState(false);
+        BetPanel.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
+        if (BetPanel_300!=null)
+        {
+            BetPanel_300.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen());
+        }
+        if (OnLineEarningMgr.Instance.isThreeHundredOpen())
+        {
+            if (CoinsPanelBottom!=null)
+            {
+                BaseGameConsole.singletonInstance.SlotMachineController.CoinsTransform = CoinsPanelBottom.coinTarget;
+                BalanceChange();
+            }
+        }
         // MaxBetShow();
     }
 
 	private void SetBetText(long value)
     {
 		bet.text = Utils.Utilities.ThousandSeparatorNumber (value);
+        if (bet_300!=null)
+        {
+            bet_300.text = Utils.Utilities.ThousandSeparatorNumber (value);
+        }
         MaxBetShow();
     }
 
+    void BalanceChange()
+    {
+        lastBalance = UserManager.GetInstance().UserProfile().Balance();
+        CoinsPanelBottom.SetCoinsNumber((lastBalance));
+    }
     private void RefreshBetUI()
     {
         MaxBetShow();

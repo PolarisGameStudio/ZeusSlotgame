@@ -199,7 +199,7 @@ public class GameDialogManager : MonoBehaviour
 			
 			#region tips
 			Messenger.AddListener<string>(OpenTipsDialogMsg, OpenTipsDialog);
-			Messenger.AddListener(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
+			Messenger.AddListener<Sprite,int>(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
 
             #endregion
             
@@ -291,7 +291,7 @@ public class GameDialogManager : MonoBehaviour
 			
 			#region tips
 			Messenger.RemoveListener<string>(OpenTipsDialogMsg, OpenTipsDialog);
-			Messenger.RemoveListener(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
+			Messenger.RemoveListener<Sprite,int>(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
 			#endregion
 		}
 	}
@@ -637,7 +637,7 @@ public class GameDialogManager : MonoBehaviour
 		
 	}
 	
-	protected virtual void OpenTaskTipsDialog()
+	protected virtual void OpenTaskTipsDialog(Sprite sprite,int taskType)
 	{
 		
 	}

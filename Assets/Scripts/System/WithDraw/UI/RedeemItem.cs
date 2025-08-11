@@ -143,6 +143,8 @@ public class RedeemItem : MonoBehaviour
         Transform jackpotImg = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/jackpotImg");
         Transform winImg = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/winImg");
         Transform wildImg = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/wildImg");
+        Transform s01Img = Utils.Utilities.RealFindObj<Transform>(transform, "inProgress/bottom/s01Img");
+
         int type = itemData.task.TaskType;
         cardIcon.gameObject.SetActive(!inProgress);
         if (!inProgress)
@@ -152,6 +154,7 @@ public class RedeemItem : MonoBehaviour
             jackpotImg.gameObject.SetActive(false);
             winImg.gameObject.SetActive(false);
             wildImg.gameObject.SetActive(false);
+            s01Img.gameObject.SetActive(false);
         }
         else
         {
@@ -159,7 +162,8 @@ public class RedeemItem : MonoBehaviour
             freeImg.gameObject.SetActive(type == TaskConstants.CollectFreeGameTriggerCountTask_Key);
             jackpotImg.gameObject.SetActive(type == TaskConstants.CollectJackpotGameCountTask_Key);
             winImg.gameObject.SetActive(type == TaskConstants.CollectTriggerSpinWinCountTask_Key);
-            wildImg.gameObject.SetActive(type == TaskConstants.CollectFreeSpinSymbolCountTask_Key);
+            wildImg.gameObject.SetActive(type == TaskConstants.CollectWildSymbolCountTask_Key);
+            s01Img.gameObject.SetActive(type == TaskConstants.CollectSymbolCountTask_Key);
         }
     }
 

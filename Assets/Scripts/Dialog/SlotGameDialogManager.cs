@@ -486,7 +486,7 @@ namespace Classic
                     dialog.SetUIData(text);
                 }));
         }
-        protected override void OpenTaskTipsDialog()
+        protected override void OpenTaskTipsDialog(Sprite sprite,int taskType)
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
                               SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
@@ -495,13 +495,9 @@ namespace Classic
             {
                 return;
             }
-            // UIManager.Instance.OpenTips(new OpenConfigParam<KindOfSymbolDialog>(isPortrait, 0, OpenType.Normal,
-            //     uiPopupStrategy: new MachineUIPopupStrategy(),
-            //     dialogInitCallBack: (dialog) => { dialog.KindInit(sprite, count); }, dialogCloseCallBack: onDialogClose,
-            //     animationIn: UIAnimation.NOAnimation, animationOut: UIAnimation.NOAnimation,
-            //     queueId: Constants.UI_TIPS_EVENT_KEY));
             UIManager.Instance.OpenTips(new OpenConfigParam<TaskTipDialog>(isPortrait, 0, OpenType.Normal,
-                uiPopupStrategy: new MachineUIPopupStrategy(), animationIn: UIAnimation.NOAnimation, animationOut: UIAnimation.NOAnimation,
+                uiPopupStrategy: new MachineUIPopupStrategy(),dialogInitCallBack: (dialog) => { dialog.RefreshInfo(sprite, taskType); },
+                animationIn: UIAnimation.NOAnimation, animationOut: UIAnimation.NOAnimation,
                 queueId: Constants.UI_TIPS_EVENT_KEY));
         }
     }

@@ -7,21 +7,30 @@ namespace Libs
     {
         public CollectBonusGameCountTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask) : base(taskInfoDict, parentTask)
         {
-            Messenger.AddListener<ReelManager, long> (GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+            Messenger.AddListener(GameConstants.TriggerBonusGame, TriggerBonusGame);
         }
         
         ~CollectBonusGameCountTask()
         {
             // 这里可以添加清理逻辑，如果有需要的话
-            Messenger.RemoveListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+            Messenger.RemoveListener(GameConstants.TriggerBonusGame, TriggerBonusGame);
         }
 
-        protected override bool IsCollectConditionOk(ReelManager reelManager, long totalWin)
+        private void TriggerBonusGame()
         {
-            if (!reelManager.HasBonusGame) return false;
+            if (IsTaskConditionOK)
+            {
+                return;
+            }
+
             AddNumber = 1;
-            return true;
+            //为了做machinequest 计费点临时加的 可以加快任务收集进度
+            MultipleAddNum();
+            DoCollectAction();
+            UpdateTaskStatus();
         }
+
+        
         
         public override string GetDesc()
         {

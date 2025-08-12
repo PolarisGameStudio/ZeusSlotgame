@@ -36,6 +36,10 @@ namespace Classic
                 {
                     SymbolImage.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
                 }
+                else
+                {
+                    SymbolImage.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+                }
             }
             string stringEntry = task.GetDesc();
             LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,stringEntry);

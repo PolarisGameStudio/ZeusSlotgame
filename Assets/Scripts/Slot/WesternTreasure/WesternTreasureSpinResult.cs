@@ -131,7 +131,8 @@ public class WesternTreasureSpinResult : SceneProgressDataBase
             {
                 winMoney=TreeManager.jackPotData.GetJackPotAward(winType);
             }
-        
+            
+            Messenger.Broadcast(GameConstants.TriggerBonusGame);
             clickIndexList.Clear();
             for (int i = 0; i < 12; i++)
             {

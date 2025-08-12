@@ -1368,5 +1368,6 @@ public static class GameConstants
 	public const string WinCash_key = "Wincashs";
 	public const string StartWithDraw = "StartWithDraw";
 	public const string SHOW_WITH_DRAW_TIPS_PANEL = "SHOW_WITH_DRAW_TIPS_PANEL";
-
+	
+	public const string TriggerBonusGame = "TriggerBonusGame";
 }

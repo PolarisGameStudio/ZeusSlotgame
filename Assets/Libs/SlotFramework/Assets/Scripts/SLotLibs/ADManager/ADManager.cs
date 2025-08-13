@@ -25,9 +25,11 @@ namespace Ads
         public IAcbAdsCallbackHandler adsCallbackHandler = null;
 
         public int RewardCount = 0;
-
+    
         public int InterstitialCount = 0;
-
+        
+        public int SpinCount = 0; //SpinCount
+        public int SpinInterval = 0;
         public Dictionary<string, BaseAdNode> AdNodes = new Dictionary<string, BaseAdNode>();
 
         public Dictionary<string, ADCondition> ADConditions = new Dictionary<string, ADCondition>(); //广告节点
@@ -40,7 +42,7 @@ namespace Ads
             LoadProgressData();
             ParseEntranceConfig();
         }
-
+        
         void LoadProgressData()
         {
             ADProgressData data = StoreManager.Instance.LoadDataJson<ADProgressData>(adProgressData.fileName);
@@ -78,6 +80,8 @@ namespace Ads
                 Debug.LogError("ADConfig is null, please check your configuration file.");
                 return;
             }
+            
+            SpinInterval = Utils.Utilities.GetInt(ADConfig, ADConstants.SpinInterval, 0);
 
             Dictionary<string, object> rewardConfig =
                 CSharpUtil.GetValue<Dictionary<string, object>>(ADConfig, ADConstants.RewardVideo, null);
@@ -232,14 +236,39 @@ namespace Ads
         ADManager()
         {
             Messenger.AddListener<string>(ADConstants.PlayAdByEntrance, PlayADByEntrance);
+            Messenger.AddListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
         }
 
         //析构函数
         ~ADManager()
         {
             Messenger.RemoveListener<string>(ADConstants.PlayAdByEntrance, PlayADByEntrance);
+            Messenger.RemoveListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
         }
-
+        
+        bool havePlayedAD = false; //是否已经播放过广告
+        void OnSpinEnd()
+        {
+            if (havePlayedAD)
+            {
+                SpinCount++;  
+                Debug.Log($"SpinCount: {SpinCount}, SpinInterval: {SpinInterval}");
+            }
+        }
+        
+        bool CheckSpinInterval()
+        {
+            if (!havePlayedAD)
+            {
+                return true;
+            }
+            if (SpinCount < SpinInterval)
+            {
+                return false;
+            }
+            SpinCount = 0; //重置SpinCount
+            return true;
+        }
         void PlayADByEntrance(string entranceName)
         {
             if (string.IsNullOrEmpty(entranceName))
@@ -273,6 +302,7 @@ namespace Ads
         public void StartPlayAD(string entranceName,int type)
         {
             this.requestEntranceName = entranceName;
+            havePlayedAD = true;
             //播放广告
             if (type == (int)ADType.RewardAD) //激励视频
             {
@@ -280,7 +310,11 @@ namespace Ads
             }
             else if (type == (int)ADType.InterstitialAD) //全屏广告
             {
-                PlayInterstitialAd(entranceName);
+                //在插屏广告处添加阻拦
+                if (CheckSpinInterval())
+                {
+                    PlayInterstitialAd(entranceName);
+                }
             }
         }
 

@@ -38,6 +38,8 @@ namespace Ads
         public const string Multiple ="multiple";
         public const string Target ="target";
         public const string Type ="type";
+        public const string SpinInterval ="SpinInterval";
+
 
         #region message
         public const string PlayAdByEntrance = "PlayAdByEntrance";

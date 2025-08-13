@@ -216,7 +216,7 @@ namespace Libs
             {
                 list.Insert(0,uiEvent);
                 if(!uiEvent.isRunning) list[0].Excute();
-               // Print(uiName,"InsertAtHead After 1");
+                Debug.Log("InsertAtHead After 1");
                 CheckPauseState(list);
                 return;
             }
@@ -227,7 +227,9 @@ namespace Libs
                 if(list[i] ==null) continue;//都是alert是必须往后放的
                 //1.插入时首个元素为默认类型，直接插入到头部即可
                 //2.插入时首个元素不是默认类型，插入到当前类型的后面
-                if(!string.IsNullOrEmpty(list[i].Type)&& GetTypePriority(type) <= GetTypePriority(list[i].Type) ) continue;
+                if(!string.IsNullOrEmpty(list[i].Type)&& GetTypePriority(type) <= GetTypePriority(list[i].Type) )
+                    Debug.Log("InsertAtHead not enQueue "+uiName+" type:"+type+" list[i].Type:"+list[i].Type);
+                    continue;
                 bool running = list[i].isRunning;
                 list.Insert(i,uiEvent);
                 enQueue = true;
@@ -238,6 +240,7 @@ namespace Libs
 
             if (!enQueue)
             {
+                Debug.Log("UIEventMgr InsertAtHead not enQueue");
                 list.Add(uiEvent);
             }
             CheckPauseState(list);
@@ -557,6 +560,7 @@ namespace Libs
         {
             try
             {
+                Debug.Log("Excute UIEvent:"+uiName+" queueId:"+queueId+" id:"+Id+" type:"+Type);
                 Action<int> finishedCB = (id) =>
                 {
                     if (removeCB != null) removeCB(queueId, id);

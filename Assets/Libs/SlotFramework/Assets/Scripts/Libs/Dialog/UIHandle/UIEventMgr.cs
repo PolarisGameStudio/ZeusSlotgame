@@ -205,6 +205,7 @@ namespace Libs
 
         private void InsertAtHead(Dictionary<string,object> dict)
         {
+            Debug.Log("ShowLoadingUI InsertAtHead");
             (string queueID,int id,string uiName, string type, int currentId, Action<Action<int>> openCB, bool pauseMachine,Action<bool> runEnd,bool skipClearAll,bool forceSkipClearAll)=ParseUIEventParams(dict);
             CreateUISequnce(queueID);
             UIEvent uiEvent = new UIEvent(queueID,id,type,uiName,openCB,RemoveUIEvent,pauseMachine,runEnd,skipClearAll,DoNext,forceSkipClearAll);

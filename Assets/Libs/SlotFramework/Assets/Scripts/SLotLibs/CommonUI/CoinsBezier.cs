@@ -555,8 +555,8 @@ namespace Libs
 
 			// 路径设定
 			bezierMiddlePoints.Add(new List<Vector3>());
-			bezierMiddlePoints[0].Add(new Vector3(-1.5f, 0.3177f, 0f));
-			bezierMiddlePoints[0].Add(new Vector3(1.1f, 0.5110f, 0f));
+			bezierMiddlePoints[0].Add(new Vector3(-5f, 0.4f, 0f));
+			bezierMiddlePoints[0].Add(new Vector3(5f, 0.7f, 0f));
 
 			bezierMiddlePoints.Add(new List<Vector3>());
 			bezierMiddlePoints[1].Add(new Vector3(-1.2f, 0.299487f, 0f));

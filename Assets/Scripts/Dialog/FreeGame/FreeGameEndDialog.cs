@@ -208,9 +208,8 @@ public class FreeGameEndDialog : UIDialog
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
         if (showAni)
         {
-            Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action, CoinsBezier.BezierObjectType>(
-                GameConstants.CollectBonusWithType, FreeGameWinCash.transform, Libs.CoinsBezier.BezierType.DailyBonus, null,
-                CoinsBezier.BezierObjectType.Cash);
+            Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+                GameConstants.CollectBonusWithType, FreeGameWinCash.transform, Libs.CoinsBezier.BezierType.DailyBonus, null);
         }
         Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
     }

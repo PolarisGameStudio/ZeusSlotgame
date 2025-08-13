@@ -177,9 +177,8 @@ namespace Activity
             if (baseAwardItem is CashAwardItem cashAwardItem)
             {
                 OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
-                Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action, CoinsBezier.BezierObjectType>(
-                    GameConstants.CollectBonusWithType, rewardCount.transform.parent, Libs.CoinsBezier.BezierType.DailyBonus, null,
-                    CoinsBezier.BezierObjectType.Cash);
+                Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+                    GameConstants.CollectBonusWithType, rewardCount.transform.parent, Libs.CoinsBezier.BezierType.DailyBonus, null);
                 Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
             }
             //领奖动画播放完毕

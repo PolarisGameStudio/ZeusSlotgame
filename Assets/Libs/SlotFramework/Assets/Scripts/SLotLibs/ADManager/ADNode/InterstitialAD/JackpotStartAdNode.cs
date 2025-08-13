@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Ads
 {
-    public class FreeGameStartAdNode: BaseAdNode
+    public class JackpotStartAdNode: BaseAdNode
     {
-        public FreeGameStartAdNode(string name, Dictionary<string, object> data, ADCondition adCondition) : base(name, data, adCondition)
+        public JackpotStartAdNode(string name, Dictionary<string, object> data, ADCondition adCondition) : base(name, data, adCondition)
         {
             AddListener();
         }
@@ -12,20 +12,24 @@ namespace Ads
         public override void AddListener()
         {
             base.AddListener();
-            Messenger.AddListener(ADConstants.CloseFreeGameStartMsg, UpdateCondition);
+            Messenger.AddListener(ADConstants.JackpotGameStartMsg, UpdateCondition);
         }
 
         public override void RemoveListener()
         {
             base.RemoveListener();
-            Messenger.RemoveListener(ADConstants.CloseFreeGameStartMsg, UpdateCondition);
+            Messenger.RemoveListener(ADConstants.JackpotGameStartMsg, UpdateCondition);
         }
+        
 
-        ~FreeGameStartAdNode()
+        ~JackpotStartAdNode()
         {
             RemoveListener();
         }
-
+        public override bool IsMeetCondition()
+        {
+            return base.IsMeetCondition() && ADManager.Instance.CheckSpinInterval();
+        }
         public override void DoAction()
         {
             base.DoAction();

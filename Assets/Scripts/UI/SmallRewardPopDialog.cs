@@ -53,8 +53,8 @@ public class SmallRewardPopDialog : UIDialog
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
             new DelayAction(0.5f, null, () =>
             {
-                Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action,Libs.CoinsBezier.BezierObjectType>(
-                    GameConstants.CollectBonusWithType, cashFlyPosition, Libs.CoinsBezier.BezierType.DailyBonus, null,CoinsBezier.BezierObjectType.Cash);
+                Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+                    GameConstants.CollectBonusWithType, cashFlyPosition, Libs.CoinsBezier.BezierType.DailyBonus, null);
                 Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
                 DelayAction ac = new DelayAction(2f, null,() =>
                 {

@@ -21,7 +21,7 @@ namespace Libs
         protected override bool IsCollectConditionOk(ReelManager reelManager, long totalWin)
         {
             List<BaseElementPanel> elementList = reelManager.GetElementsWithSymbolName(symbolName);
-           AddNumber = (elementList == null || elementList.Count == 0) ? 0 : elementList.Count;
+            AddNumber = (elementList == null || elementList.Count == 0) ? 0 : elementList.Count;
             return true;
         }
         

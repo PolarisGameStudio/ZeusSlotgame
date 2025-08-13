@@ -1,11 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using App;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Beebyte.Obfuscator;
-using GameObject = UnityEngine.GameObject;
 
 namespace Libs
 {
@@ -13,13 +12,10 @@ namespace Libs
 	public class CoinsBezier : MonoBehaviour
 	{
 		public GameObject BezierObject;
-		// public GameObject BezierCashObject;
 		public GameObject CoinEffect;
 		private GameObject _coinEffect;
-		private string PoolKey = "BezierCoins";
-		private string BezierObjectPath = "Prefab/Shared/CoinsImage";
-
-		private static string BezierPanelPath = "Prefab/Shared/CoinsBezierPanel";
+		private  string BezierObjectPath = "Prefab/Shared/CashImage";
+		private  string BezierPanelPath = "Prefab/Shared/CoinsBezierPanel";
 		public Transform targatTansform;
 		public Transform startTransform;
 		private static CoinsBezier _instance;
@@ -97,7 +93,7 @@ namespace Libs
 					_instance = GameObject.FindObjectOfType<CoinsBezier> ();
 					if (_instance == null) {
 						// 初始化
-						_instance = Instantiate(Libs.ResourceLoadManager.Instance.LoadResource<GameObject> (BezierPanelPath)).GetComponent<CoinsBezier> ();
+						_instance = Instantiate(ResourceLoadManager.Instance.LoadResource<GameObject> ("Prefab/Shared/CoinsBezierPanel")).GetComponent<CoinsBezier> ();
 						// 向场景中导入指定prefab，并从中获取对象
 						// 设置transform并移动至最上层
 						_instance.transform.SetParent (Libs.UIManager.Instance.Root.transform.parent);
@@ -107,8 +103,7 @@ namespace Libs
 					
 					}
 					// 导入指定的运动物体
-					_instance.BezierObject = Libs.ResourceLoadManager.Instance.LoadResource<GameObject> (_instance.BezierObjectPath);
-					// _instance.BezierCashObject = ResourceLoadManager.Instance.LoadResource<GameObject> (_instance.BezierObjectCashPath);
+					_instance.BezierObject = ResourceLoadManager.Instance.LoadResource<GameObject> (_instance.BezierObjectPath);
 					Canvas canvas = _instance.GetComponent<Canvas> ();
 					if (canvas != null) {
 						canvas.overrideSorting = true;
@@ -188,12 +183,14 @@ namespace Libs
 			}
 		}
 
-		public void Create (Vector3 fromPosition, Vector3 toPosition, int count = 10,BezierObjectType objectType =BezierObjectType.Coin)
+		public void Create (Vector3 fromPosition, Vector3 toPosition, int count = 10)
 		{
 			GetAnimator ();
+//			CreateSplash(fromPosition, toPosition, BezierType.Test, count); return;
 			for (int i=0; i<count; i++) {
+//				CoinBezierObject element = GameObject.Instantiate (skyBezierObject).GetComponent<CoinBezierObject> ();
 				// 从池中取物体，节省性能
-				CoinBezierObject element = CreateBezierObject();
+				CoinBezierObject element = (PoolMgr.DefaultPools.GetOrCreatePool("BezierCoins").CreateObject( BezierObject) as GameObject).GetComponent<CoinBezierObject>();
 				// 相关设置（位置、路径）
 				element.gameObject.SetActive (true);
 				element.skyBezierCurve = new SkyBezierCurve ();
@@ -237,16 +234,16 @@ namespace Libs
 		}
 
 		// 生成普通（一段曲线）的飞行金币，用于免费获取的场合，可配置参数增加
-        public void Create (Vector3 fromPosition, Vector3 toPosition, BezierType bezierType, System.Action lastCoinCallback = null, int count = 16,BezierObjectType objectType =BezierObjectType.Coin)
+        public void Create (Vector3 fromPosition, Vector3 toPosition, BezierType bezierType, System.Action lastCoinCallback = null, int count = 16)
 		{
 			new Libs.DelayAction(0.3f, null, () =>
 			{
 				PlayCoinEffect(fromPosition);
-				PlayCoinFly(fromPosition,toPosition,bezierType,lastCoinCallback,count,objectType);
+				PlayCoinFly(fromPosition,toPosition,bezierType,lastCoinCallback,count);
 			}).Play();
 		}
 
-		public void PlayCoinFly(Vector3 fromPosition, Vector3 toPosition, BezierType bezierType, System.Action lastCoinCallback = null, int count = 10,BezierObjectType objectType =BezierObjectType.Coin)
+		private void PlayCoinFly(Vector3 fromPosition, Vector3 toPosition, BezierType bezierType, System.Action lastCoinCallback = null, int count = 16)
 		{
 			System.Action callback = ()=>
 			{
@@ -270,7 +267,7 @@ namespace Libs
 			
 			for (int i = 0; i < count; i++) {
 				// 从池中取物体，节省性能
-				CoinBezierObject element = CreateBezierObject();
+				CoinBezierObject element = (PoolMgr.DefaultPools.GetOrCreatePool("BezierCoins").CreateObject( BezierObject) as GameObject).GetComponent<CoinBezierObject>();
 				// 相关设置（位置、路径）
 				element.gameObject.SetActive (true);
 //				element.gameObject.GetComponent<Animator>().enabled = false;
@@ -502,10 +499,6 @@ namespace Libs
 			Purchase1 = 101,
 			Purchase2 = 102,
 			Test = 999
-		}
-		public enum BezierObjectType {
-			Coin = 0,
-			Cash = 1
 		}
 
 		// 这两个方法会返回应该使用的参数的编号

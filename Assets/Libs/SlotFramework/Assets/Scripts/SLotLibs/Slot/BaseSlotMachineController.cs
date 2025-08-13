@@ -327,12 +327,9 @@ public class BaseSlotMachineController : MonoBehaviour
         addLastWinCoinsToDisplay = false;
         ResultStateManager.InitInstane (this);
 
-        Messenger.AddListener<Transform, Libs.CoinsBezier.BezierType, System.Action,CoinsBezier.BezierObjectType>(GameConstants.CollectBonusWithType, CreateCoinBezierFrom);
-		//飞金币
-        Messenger.AddListener<Transform,Transform,Libs.CoinsBezier.BezierType,System.Action>(GameConstants.CollectBonusWithTypeAndTarget, CreateCoinBezierFromTo);
-		Messenger.AddListener<CoinsBezier.BezierObjectType>(GameConstants.CollectBonusFromInputMouse, CreateCoinBezierFromInputMouse);
-		//飞钱
-		Messenger.AddListener<Transform,Transform,Libs.CoinsBezier.BezierType,System.Action>(GameConstants.CollectCashWithTypeAndTarget, CreateCashBezierFromTo);
+        Messenger.AddListener<Transform, Libs.CoinsBezier.BezierType, System.Action>(GameConstants.CollectBonusWithType, CreateCoinBezierFrom);
+        Messenger.AddListener<Transform, Transform, Libs.CoinsBezier.BezierType, System.Action> (GameConstants.CollectBonusWithTypeAndTarget, CreateCoinBezierFromTo);
+		Messenger.AddListener(GameConstants.CollectBonusFromInputMouse, CreateCoinBezierFromInputMouse);
 
 		InitAnimationActions ();
 		BeginStay ();
@@ -569,10 +566,9 @@ public class BaseSlotMachineController : MonoBehaviour
 		Messenger.RemoveListener(SlotControllerConstants.AUTO_SPIN_SUSPEND, AutoSpinSuspendHandle);
 		Messenger.RemoveListener (SlotControllerConstants.AUTO_SPIN_RESUME, AutoSpinResumeHandle);
 		Messenger.RemoveListener(SlotControllerConstants.HIGH_ROLLER_CHECK_KEY,CheckPopupHighRollerDialog);
-        Messenger.RemoveListener<Transform, Libs.CoinsBezier.BezierType, System.Action,Libs.CoinsBezier.BezierObjectType>(GameConstants.CollectBonusWithType, CreateCoinBezierFrom);
-		Messenger.RemoveListener<CoinsBezier.BezierObjectType>(GameConstants.CollectBonusFromInputMouse, CreateCoinBezierFromInputMouse);
-		Messenger.RemoveListener<Transform, Transform, Libs.CoinsBezier.BezierType,System.Action> (GameConstants.CollectBonusWithTypeAndTarget, CreateCoinBezierFromTo);
-		Messenger.RemoveListener<Transform, Transform, Libs.CoinsBezier.BezierType,System.Action> (GameConstants.CollectCashWithTypeAndTarget, CreateCashBezierFromTo);
+        Messenger.RemoveListener<Transform, Libs.CoinsBezier.BezierType, System.Action>(GameConstants.CollectBonusWithType, CreateCoinBezierFrom);
+		Messenger.RemoveListener(GameConstants.CollectBonusFromInputMouse, CreateCoinBezierFromInputMouse);
+		Messenger.RemoveListener<Transform, Transform, Libs.CoinsBezier.BezierType, System.Action> (GameConstants.CollectBonusWithTypeAndTarget, CreateCoinBezierFromTo);
 
         //UnregisterPaymentListeners ();
         Libs.AudioEntity.Instance.StopAllAudio();//LQ 清空所有的Audioclip
@@ -2052,52 +2048,31 @@ public class BaseSlotMachineController : MonoBehaviour
 		//	Messenger.Broadcast<int> (SlotControllerConstants.OnWinCoinsForDisplay, winCoinsForDisplay);
 		//}
 	}
-	public void CreateCoinBezierFrom (Transform dialogTransformVector,CoinsBezier.BezierObjectType objectType =CoinsBezier.BezierObjectType.Coin)
+	public void CreateCoinBezierFrom (Transform dialogTransformVector)
 	{
 		Transform targetTransformVector;
-	    if (objectType == CoinsBezier.BezierObjectType.Cash)
-	    {
-		     targetTransformVector = CashTransform;
-	    }
-	    else
-	    {
-		    targetTransformVector = this.CoinsTransform;
-	    }
-
+		targetTransformVector = CashTransform;
         if (ToCamera == null || targetTransformVector == null) {
             return;
         }
 
         Vector3 from = Libs.CoinsBezier.Instance.LocalPositionFromTransForm (Libs.UIManager.Instance.UICamera, dialogTransformVector);
         Vector2 to = Libs.CoinsBezier.Instance.LocalPositionFromTransForm (ToCamera, targetTransformVector);
-        Libs.CoinsBezier.Instance.Create (from, to,objectType:objectType);
+        Libs.CoinsBezier.Instance.Create (from, to);
 	}
 
-    public void CreateCoinBezierFrom(Transform dialogTransformVector, Libs.CoinsBezier.BezierType bezierType, System.Action callback = null,CoinsBezier.BezierObjectType objectType =CoinsBezier.BezierObjectType.Coin)
+    public void CreateCoinBezierFrom(Transform dialogTransformVector, Libs.CoinsBezier.BezierType bezierType, System.Action callback = null)
 	{
 		Transform targetTransformVector;
-		if (objectType == CoinsBezier.BezierObjectType.Cash)
-		{
-			targetTransformVector = CashTransform;
-		}
-		else  
-		{
-			targetTransformVector = this.CoinsTransform;
-		}
+		targetTransformVector = CashTransform;
+		
 		if (ToCamera == null || targetTransformVector == null) {
 			return;
 		}
 
 		Vector3 from = Libs.CoinsBezier.Instance.LocalPositionFromTransForm (Libs.UIManager.Instance.UICamera, dialogTransformVector);
 		Vector2 to = Libs.CoinsBezier.Instance.LocalPositionFromTransForm (ToCamera, targetTransformVector);
-		if (objectType == CoinsBezier.BezierObjectType.Cash)
-		{
-			Libs.CashBezier.Instance.Create (from, to, bezierType, callback,objectType:objectType);
-		}
-		else
-		{
-			CoinsBezier.Instance.Create (from, to, bezierType, callback,objectType:objectType);
-		}
+        Libs.CoinsBezier.Instance.Create (from, to, bezierType, callback);
 	}
     
     public void CreateCoinBezierFromTo(Transform dialogTransformVector, Transform target, Libs.CoinsBezier.BezierType bezierType, System.Action callback = null)
@@ -2142,20 +2117,7 @@ public class BaseSlotMachineController : MonoBehaviour
 	    }
     }
 
-	public void CreateCashBezierFromTo(Transform dialogTransformVector, Transform target, Libs.CoinsBezier.BezierType bezierType, System.Action callback = null)
-	{
-		Transform targetTransformVector = target;
-
-		if (targetTransformVector == null) {
-			return;
-		}
-		Messenger.Broadcast(GameConstants.SET_BALANCE_TARGET_POSITION,targetTransformVector);
-
-		Vector3 from = Libs.CoinsBezier.Instance.LocalPositionFromTransForm (Libs.UIManager.Instance.UICamera, dialogTransformVector);
-		Vector2 to = Libs.CoinsBezier.Instance.LocalPositionFromTransForm (Libs.UIManager.Instance.UICamera, targetTransformVector);
-	    
-		CashBezier.Instance.Create (from, to, bezierType, callback);
-	}
+	
 	
 	#region rateMachine
 	private long StayStartTime = 0;

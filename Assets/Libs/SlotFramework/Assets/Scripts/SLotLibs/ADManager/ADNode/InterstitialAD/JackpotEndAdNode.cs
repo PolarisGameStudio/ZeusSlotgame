@@ -22,7 +22,10 @@ namespace Ads
             Messenger.RemoveListener(ADConstants.JackpotGameEndMsg, UpdateCondition);
         }
         
-
+        public override bool IsMeetCondition()
+        {
+            return base.IsMeetCondition()&&ADManager.Instance.CheckSpinInterval();
+        }
         ~JackpotEndAdNode()
         {
             RemoveListener();

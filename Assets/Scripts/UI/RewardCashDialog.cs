@@ -97,9 +97,8 @@ namespace Classic
         {
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,
                 OnLineEarningMgr.Instance.GetCashTime());
-            Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action, CoinsBezier.BezierObjectType>(
-                GameConstants.CollectBonusWithType, BtnWatch.transform, Libs.CoinsBezier.BezierType.DailyBonus, null,
-                CoinsBezier.BezierObjectType.Cash);
+            Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+                GameConstants.CollectBonusWithType, BtnWatch.transform, Libs.CoinsBezier.BezierType.DailyBonus, null);
             Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
             Libs.AudioEntity.Instance.StopAllEffect();
             Libs.AudioEntity.Instance.PlayCoinCollectionEffect();

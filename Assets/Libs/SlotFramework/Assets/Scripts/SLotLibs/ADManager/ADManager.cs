@@ -306,6 +306,7 @@ namespace Ads
             //播放广告
             if (type == (int)ADType.RewardAD) //激励视频
             {
+                SpinCount = 0;
                 PlayRewardVideo(entranceName);
             }
             else if (type == (int)ADType.InterstitialAD) //全屏广告
@@ -456,99 +457,6 @@ namespace Ads
             adsCallbackHandler.OnVideoRewardError(requestEntranceName);
         }
 
-        #region TriggerEvent
-
-        private void OnCloseLuckyCash()
-        {
-            bool adIsReady = InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
-            //广告未加载好
-            if (!adIsReady)
-            {
-                ShowLoadingADsUI();
-                return;
-            }
-
-            PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
-        }
-
-        private void OnCloseSpinWin()
-        {
-            bool adIsReady = InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSESPINWIN);
-            //广告未加载好
-            if (!adIsReady)
-            {
-                ShowLoadingADsUI();
-                return;
-            }
-
-            PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSESPINWIN);
-        }
-
-        private void OnCloseFreeSpinEnd()
-        {
-            bool adIsReady = InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND);
-            //广告未加载好
-            if (!adIsReady)
-            {
-                ShowLoadingADsUI();
-                return;
-            }
-
-            PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND);
-        }
-
-        private void OnCloseBonusGameEnd()
-        {
-            bool adIsReady = InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEBONUSGAMEEND);
-            //广告未加载好
-            if (!adIsReady)
-            {
-                ShowLoadingADsUI();
-                return;
-            }
-
-            PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSEBONUSGAMEEND);
-        }
-
-        private void OnBonusGameStart()
-        {
-            bool adIsReady = InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
-            //广告未加载好
-            if (!adIsReady)
-            {
-                ShowLoadingADsUI();
-                return;
-            }
-
-            PlayInterstitialAd(ADEntrances.Interstitial_Entrance_BONUSGAMESTART);
-        }
-
-        private void OnCardLotteryWatchAD()
-        {
-            bool adIsReady = InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CARDLOTTERY);
-            //广告未加载好
-            if (!adIsReady)
-            {
-                ShowLoadingADsUI();
-                return;
-            }
-
-            PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CARDLOTTERY);
-        }
-
-        private void OnCloseFreeSpinStart()
-        {
-            bool adIsReady = InterstitialAdIsOk(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
-            //广告未加载好
-            if (!adIsReady)
-            {
-                ShowLoadingADsUI();
-                return;
-            }
-
-            PlayInterstitialAd(ADEntrances.Interstitial_Entrance_CLOSEFREESPINSTART);
-        }
-
         public void ShowLoadingADsUI(float duration = 1.5f, Action endCallBack = null,string msg="")
         {
             if (string.IsNullOrEmpty(msg))
@@ -558,6 +466,5 @@ namespace Ads
             }
             UIManager.ShowLoadingUI(duration, msg, endCB: endCallBack);
         }
-        #endregion
     }
 }

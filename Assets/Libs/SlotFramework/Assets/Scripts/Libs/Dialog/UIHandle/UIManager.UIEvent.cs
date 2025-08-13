@@ -331,6 +331,7 @@ namespace Libs
 		/// <param name="delayShow"></param>
 		private async void ShowLoading(float duratiion = 30f,string title = "",int lockId = 0,Action endCB = null,bool suspendDialog= true,float delayShow =0f)
 		{
+			Debug.Log("Show Loading UI");
 			if (loadingUI == null) return;
 			if (!showLoading)
 			{
@@ -338,6 +339,7 @@ namespace Libs
 				showLoading = true;
 				if (!loadingUI.activeSelf)
 				{
+					Debug.Log("Show Loading UI activeself");
 					loadingUI.SetActive(true);
 					enableUI = true;
 				}
@@ -352,6 +354,7 @@ namespace Libs
 							int eID = GetID();
 							Action<Action<int>> initCB = action => { loading.SetEventUICB(action,eID); };
 							Action<Action<int>> runCB = action => { };
+							Debug.Log("Show Loading UI CreateUIEvent");
 							CreateUIEvent(Constants.UI_DIALOG_EVENT_KEY,OpenType.AtOnce, eID, "Loading", Constants.LOADING, runCB, 0, false, null, false,initCB,false);
 						}
 

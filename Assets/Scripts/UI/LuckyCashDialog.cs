@@ -182,9 +182,8 @@ public class LuckyCashDialog : UIDialog
         //加钱动画播放完毕
         OnLineEarningMgr.Instance.IncreaseCash(totalCash);
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
-        Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action, CoinsBezier.BezierObjectType>(
-            GameConstants.CollectBonusWithType, cashFlyPosition, Libs.CoinsBezier.BezierType.DailyBonus, null,
-            CoinsBezier.BezierObjectType.Cash);
+        Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+            GameConstants.CollectBonusWithType, cashFlyPosition, Libs.CoinsBezier.BezierType.DailyBonus, null);
         Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
         Libs.AudioEntity.Instance.StopAllEffect();
         Libs.AudioEntity.Instance.PlayCoinCollectionEffect();

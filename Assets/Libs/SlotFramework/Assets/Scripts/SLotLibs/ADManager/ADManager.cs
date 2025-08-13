@@ -208,6 +208,9 @@ namespace Ads
                     adNode = new CloseContinueSpinNode(entranceName, data, adCondition);
                     break;
                 case ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH:
+                    adNode = new CloseLuckyCashAdNode(entranceName, data, adCondition);
+                    break;
+                default:
                     adNode = new BaseAdNode(entranceName, data, adCondition);
                     break;
             }
@@ -256,7 +259,7 @@ namespace Ads
             }
         }
         
-        bool CheckSpinInterval()
+        public  bool CheckSpinInterval()
         {
             if (!havePlayedAD)
             {
@@ -271,6 +274,7 @@ namespace Ads
         }
         void PlayADByEntrance(string entranceName)
         {
+            Debug.Log("ADManager PlayADByEntrance entranceName:" + entranceName);
             if (string.IsNullOrEmpty(entranceName))
             {
                 Debug.LogError("PlayADByEntrance entranceName is null or empty.");
@@ -282,6 +286,7 @@ namespace Ads
                 BaseAdNode adNode = AdNodes[entranceName];
                 if (adNode != null && adNode.IsMeetCondition())
                 {
+                    Debug.Log($"ADManager PlayADByEntrance entranceName:{entranceName}");
                     //播放广告的前置操作
                     adNode.DoAction();
                     adNode.PlayAd();
@@ -306,16 +311,14 @@ namespace Ads
             //播放广告
             if (type == (int)ADType.RewardAD) //激励视频
             {
+                //看激励视频也重置
                 SpinCount = 0;
                 PlayRewardVideo(entranceName);
             }
             else if (type == (int)ADType.InterstitialAD) //全屏广告
             {
-                //在插屏广告处添加阻拦
-                if (CheckSpinInterval())
-                {
-                    PlayInterstitialAd(entranceName);
-                }
+                Debug.Log($"ADManager StartPlayAD entranceName:{entranceName}.");
+                PlayInterstitialAd(entranceName);
             }
         }
 

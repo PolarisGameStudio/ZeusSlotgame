@@ -82,7 +82,7 @@ namespace System
             {
                 return;
             }
-            Debug.Log($"[WithDrawManager][OnSpinAwardEnd] FreeSymbolNum:{FreeSymbolNum}");
+            // Debug.Log($"[WithDrawManager][OnSpinAwardEnd] FreeSymbolNum:{FreeSymbolNum}");
             int AddNumber = reelManager.GetSpecialCount(SymbolMap.IS_WILD);
             long remin = FreeSymbolNum % 10;
             FreeSymbolNum += AddNumber;

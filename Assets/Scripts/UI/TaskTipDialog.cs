@@ -28,6 +28,10 @@ namespace Classic
                 Debug.LogError("TaskTipPanel task is null, taskType: " + taskType);
                 return;
             }
+            if (task.IsConditionOK())
+            {
+                return;
+            }
             if(SymbolImage != null)
             {
                 SymbolImage.sprite = sprite;

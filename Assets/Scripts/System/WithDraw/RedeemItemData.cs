@@ -104,7 +104,7 @@ namespace System
         //任务状态已刷新，根据当前的状态进行操作
         private void UpdateTaskData()
         {
-            Debug.Log($"[RedeemItemData][UpdateTaskData] [task.TaskId ==]:{task.TaskId}   [SelectId==]:{WithDrawManager.Instance.GetSelectId()}");
+            // Debug.Log($"[RedeemItemData][UpdateTaskData] [task.TaskId ==]:{task.TaskId}   [SelectId==]:{WithDrawManager.Instance.GetSelectId()}");
             bool isSelf = WithDrawManager.Instance.GetSelectId() == task.TaskId;
             if (isSelf)
             {

@@ -8,5 +8,9 @@ namespace Ads
         {
             
         }
+        public override bool IsMeetCondition()
+        {
+            return base.IsMeetCondition()&&ADManager.Instance.CheckSpinInterval();
+        }
     }
 }

@@ -25,6 +25,10 @@ namespace Ads
             RemoveListener();
         }
 
+        public override bool IsMeetCondition()
+        {
+            return base.IsMeetCondition()&&ADManager.Instance.CheckSpinInterval();
+        }
         public override void DoAction()
         {
             base.DoAction();

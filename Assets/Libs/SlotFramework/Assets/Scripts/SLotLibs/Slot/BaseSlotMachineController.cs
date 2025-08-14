@@ -840,6 +840,9 @@ public class BaseSlotMachineController : MonoBehaviour
 	private int OldUserLevel = 0;
 	
 	public void ChangeUserData(){
+		
+		UserManager.GetInstance().UserProfile ().IncreaseSpinCounter();
+		PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"Spin",UserManager.GetInstance().UserProfile().GetTotalSpinCounter());
 		if (!isFreeRun) {
 			UserManager.GetInstance ().IncreaseBalanceAndSendMessage (-(currentBetting));
 			reelManager.IsSpinCostCoins = true;
@@ -855,8 +858,6 @@ public class BaseSlotMachineController : MonoBehaviour
 			}
 			#endregion
 			Messenger.Broadcast<bool> (SlotControllerConstants.DisactiveButtons,reelManager.gameConfigs.EnableSpinBtnInFreeSpin);
-			OnLineEarningMgr.Instance.AddSpinTime();
-			//检测是否需要展示弹板
 			hasPopReward = OnLineEarningMgr.Instance.CheckCanPopReward();
 			currentBettingTemp = currentBetting;
         } 
@@ -1301,9 +1302,7 @@ public class BaseSlotMachineController : MonoBehaviour
 		long maxBalance = UserManager.GetInstance ().MaxBalance;
 		UserManager.GetInstance ().MaxBalance =currentBalance > maxBalance ? currentBalance : maxBalance;
 		
-		UserManager.GetInstance ().UserProfile ().IncreaseSpinCounter ();
 		Messenger.Broadcast(SlotControllerConstants.SendSpinEvent);
-		PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"Spin",UserManager.GetInstance().UserProfile().GetTotalSpinCounter());
 	}
 
 	public void AddExtraToSpinData(Dictionary<string, object> dict)

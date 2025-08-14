@@ -24,6 +24,7 @@ namespace Libs
             {
                 return;
             }
+            AddNumber = 1;
             MultipleAddNum();
             DoCollectAction();
             UpdateTaskStatus();

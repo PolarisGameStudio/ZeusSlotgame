@@ -123,15 +123,11 @@ public class OnLineEarningMgr
         //加载本地化数据
         LoadFromPlayerPrefs();
         
-        if (UserManager.GetInstance().UserProfile().GetTotalSpinCounter()<newUserSpinCount)
-        {
-            //添加新用户的监听
-            Messenger.AddListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
-        }
     }
 
     OnLineEarningMgr()
     {
+        Messenger.AddListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
         Messenger.AddListener<bool>(GameConstants.RefreshCashInFree, RefreshCashInFree);
         Messenger.AddListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
         Messenger.AddListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
@@ -139,6 +135,7 @@ public class OnLineEarningMgr
     }
     ~OnLineEarningMgr()
     {
+        Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
         Messenger.RemoveListener<bool>(GameConstants.RefreshCashInFree,RefreshCashInFree);
         Messenger.RemoveListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
         Messenger.RemoveListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
@@ -147,13 +144,13 @@ public class OnLineEarningMgr
     
     void OnSpinEnd()
     {
+        AddSpinTime();
         //奖励弹板只弹出一次
-        if (UserManager.GetInstance().UserProfile().GetTotalSpinCounter()>=newUserSpinCount && !PlatformManager.Instance.IsWhiteBao())
+        if (UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==newUserSpinCount && !PlatformManager.Instance.IsWhiteBao())
         {
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
             new DelayAction(1.3f,null, () =>
             {
-                Messenger.RemoveListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
                 int newUserCash = GetRewardsByName(OnLineEarningConstants.REWARD_NewUser);
                 //加钱动画播放完毕
                 IncreaseCash(newUserCash);

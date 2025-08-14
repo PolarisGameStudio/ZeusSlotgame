@@ -7,20 +7,32 @@ namespace Libs
     {
         public CollectSpinCountTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask) : base(taskInfoDict, parentTask)
         {
-            Messenger.AddListener<ReelManager, long> (GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
         }
 
         ~CollectSpinCountTask()
         {
-            Messenger.RemoveListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
         }
 
-        protected override bool IsCollectConditionOk(ReelManager reelManager,long totalWin){
-            if (!reelManager.IsSpinCostCoins) return false;
-            //只收集付钱的 Spin 次数
+        void OnSpinEnd()
+        {
+            if (IsConditionOK())
+            {
+                return;
+            }
+
             AddNumber = 1;
-            return true;
+            MultipleAddNum();
+            DoCollectAction();
+            UpdateTaskStatus();
         }
+        
+        // protected override bool IsCollectConditionOk(ReelManager reelManager,long totalWin){
+        //     //只收集付钱的 Spin 次数
+        //     AddNumber = 1;
+        //     return true;
+        // }
 
         public override string GetDesc()
         {

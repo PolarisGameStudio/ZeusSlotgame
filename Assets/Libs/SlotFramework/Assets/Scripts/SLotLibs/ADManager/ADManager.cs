@@ -239,14 +239,14 @@ namespace Ads
         ADManager()
         {
             Messenger.AddListener<string>(ADConstants.PlayAdByEntrance, PlayADByEntrance);
-            Messenger.AddListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd,OnSpinEnd);
         }
 
         //析构函数
         ~ADManager()
         {
             Messenger.RemoveListener<string>(ADConstants.PlayAdByEntrance, PlayADByEntrance);
-            Messenger.RemoveListener(SlotControllerConstants.SendSpinEvent,OnSpinEnd);
+            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd,OnSpinEnd);
         }
         
         bool havePlayedAD = false; //是否已经播放过广告

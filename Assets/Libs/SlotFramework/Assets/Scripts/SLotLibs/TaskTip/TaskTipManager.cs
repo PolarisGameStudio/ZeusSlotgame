@@ -237,8 +237,8 @@ namespace Libs
                 return string.Format("<color=#{0}>{1}</color>",
                     task is CollectSpinCountTask || task is CollectADCountTask ||
                     task is CollectCashFromZeroTask || task is CollectCardTypeCountTask
-                        ? "FDFF2F"
-                        : "FF0000",
+                        ? "FF0000"
+                        : "FDFF2F",
                     value);
             }
 
@@ -252,7 +252,7 @@ namespace Libs
                 task is CollectBonusGameCountTask)
             {
                 key = task.GetDesc();
-                arg1 = string.Format("<color=#118D1D>{0}</color>", task.TargetNum);
+                arg1 = string.Format("<color=#29f706>{0}</color>", task.TargetNum);
             }
             else
             {
@@ -265,8 +265,8 @@ namespace Libs
                     CollectCardTypeCountTask _ => "MoreCollectCards",
                     _ => string.Empty
                 };
-
-                arg1 = string.Format("<color=#29f706>{0}</color>",
+                
+                arg1 = string.Format("<color=#118D1D>{0}</color>",
                     task is CollectCashFromZeroTask
                         ? OnLineEarningMgr.Instance.GetMoneyStr(remaining, 2, false, true)
                         : remaining.ToString());

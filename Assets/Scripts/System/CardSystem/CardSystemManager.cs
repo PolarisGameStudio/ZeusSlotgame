@@ -294,13 +294,13 @@ namespace CardSystem
         {
             if (isFirstShow)
             {
-                Messenger.AddListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
+                Messenger.AddListener(GameConstants.DO_SPIN,UpdateSpinCount);
             }
         }
         
         void RemoveListener()
         {
-            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
+            Messenger.RemoveListener(GameConstants.DO_SPIN,UpdateSpinCount);
         }
         
         public bool IsOpen()
@@ -336,11 +336,11 @@ namespace CardSystem
         void UpdateSpinCount()
         {
             spinCount++;
-            Debug.Log("CardSystemManager UpdateSpinCount spinCount: " + spinCount);
+            // Debug.Log("CardSystemManager UpdateSpinCount spinCount: " + spinCount);
             if (spinCount >= spinLimit)
             {
                 // 达到转动次数限制，重置转动次数
-                Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd,UpdateSpinCount);
+                Messenger.RemoveListener(GameConstants.DO_SPIN,UpdateSpinCount);
                 // 这里可以添加其他逻辑，比如通知UI更新等
                 // if(CheckCurWeightCondition())
                 // {

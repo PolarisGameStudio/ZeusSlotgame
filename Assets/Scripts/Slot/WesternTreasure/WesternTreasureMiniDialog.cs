@@ -91,7 +91,7 @@ public class WesternTreasureMiniDialog : UIDialog
             EndBtn.enabled = false;
             EndBtn.gameObject.SetActive(false);
             // EndBtn.transform.localScale = Vector3.zero;
-            new DelayAction(1f, null, () =>
+            new DelayAction(0.7f, null, () =>
             {
                 EndBtn.gameObject.SetActive(true);
                 EndBtn.enabled = true;

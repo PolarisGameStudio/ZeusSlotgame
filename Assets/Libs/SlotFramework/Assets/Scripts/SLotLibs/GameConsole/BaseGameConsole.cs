@@ -283,9 +283,12 @@ public class BaseGameConsole :MonoBehaviour
 		CardSystemManager.Instance.OnInit();
 		//提现系统初始化
 		WithDrawManager.Instance.OnInit();
+		
 		yield return GameConstants.FrameTime;;
 		//活动系统初始化
 		ActivityManager.Instance.OnInit();
+		
+		TaskTipManager.Instance.Init();
 		IsConfigInit = true;
 	}
 	void OnApplicationPause(bool paused)
@@ -424,6 +427,8 @@ public class BaseGameConsole :MonoBehaviour
 		CardSystemManager.Instance.SaveProgressData();
 		WithDrawManager.Instance.SaveProgressData();
 		ADManager.Instance.SaveADProgressData();
+		TaskTipManager.Instance.SaveProgressData();
+
 	}
 	
 	void Update()

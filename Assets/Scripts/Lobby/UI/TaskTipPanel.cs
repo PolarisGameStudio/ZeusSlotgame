@@ -8,6 +8,11 @@ using UnityEngine.UI;
 
 public class TaskTipPanel : MonoBehaviour
 {
+    public Image background;
+    public Sprite[] sliderSprites = new Sprite[2];
+    public Sprite[] backgroundSprites = new Sprite[2];
+    public Image image_icon;
+    public List<Sprite> iconSprites = new List<Sprite>();
     private UIText txtInfo;
 
     private UIText progress;
@@ -19,6 +24,14 @@ public class TaskTipPanel : MonoBehaviour
     private ParticleSystem particle2;
     public float maxLifeTime = 4f;
     private Image image_head;
+    
+    private Dictionary<int, int> TaskToBGSpriteIndex = new Dictionary<int, int>
+    {
+        { TaskConstants.CollectCashFromZeroTask_Key, 1 },
+        { TaskConstants.CollectSpinCountTask_Key, 1 },
+        { TaskConstants.WatchADTimeTask_Key, 1 },
+        { TaskConstants.CollectCardTask_Key, 1 }
+    };
     // Start is called before the first frame update
     void Awake()
     {
@@ -32,7 +45,7 @@ public class TaskTipPanel : MonoBehaviour
     public void RefreshInfo(int taskType)
     {
         gameObject.SetActive(false);
-        BaseTask task = TaskManager.Instance.GetTaskByType(taskType);
+        BaseTask task = TaskTipManager.Instance.GetTask(taskType);
         if (task==null)
         {
             Debug.LogError("TaskTipPanel task is null, taskType: " + taskType);
@@ -44,38 +57,31 @@ public class TaskTipPanel : MonoBehaviour
             return;
         }
         
+        //设置背景
+        background.sprite = backgroundSprites[TaskToBGSpriteIndex.TryGetValue(task.TaskType, out int index) ? index : 0];
+        //设置图标
+        image_icon.sprite = GetSpriteByType(task.TaskType);
+        
         txtInfo = transform.Find("txt_info").GetComponent<UIText>();
         progress = transform.Find("slider_progress/txt_progress").GetComponent<UIText>();
         slider = transform.Find("slider_progress/img_bar").GetComponent<Image>();
         progressBar = slider.GetComponent<RectTransform>();
         slider.fillAmount = 0f;
+        slider.sprite = sliderSprites[index];
+        if (index>0)
+        {
+            txtInfo.gameObject.SetActive(false);
+            txtInfo = transform.Find("txt_info1").GetComponent<UIText>();
+            txtInfo.gameObject.SetActive(true);
+        }
         progress.SetText("");
         particlePar= transform.Find("slider_progress/img_bar/UIParticle");
         particle1= transform.Find("slider_progress/img_bar/UIParticle/lizi").GetComponent<ParticleSystem>();
         particle2= transform.Find("slider_progress/img_bar/UIParticle/lizi1").GetComponent<ParticleSystem>();
         image_head = transform.Find("slider_progress/img_bar/img_head").GetComponent<Image>();
 
-        string stringEntry = task.GetDesc();
-        LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,stringEntry);
-        if (localizedString!=null)
-        {
-            string agr1 = string.Format("<color=#118D1D>{0}</color>", task.TargetNum);
-            string agr2 = "";
-
-            if (!string.IsNullOrEmpty(task.RewardList))
-            {
-                List<BaseAwardItem> awardItems =  RewardManager.Instance.CreateRewardByStr(task.RewardList);
-                if (awardItems.Count > 0)
-                {
-                    //只显示第一个奖励
-                    BaseAwardItem awardItem = awardItems[0];
-                    agr2 = string.Format("<color=#FF0000>{0}</color>", awardItem.GetAwardCountDesc());
-                }
-            }
-            localizedString.Arguments = new object[] {agr1,agr2};
-            txtInfo.SetText(localizedString.GetLocalizedString());
-        }
-
+        //获取提示文本
+        txtInfo.SetText(TaskTipManager.Instance.GetTaskTipText(task));
         float f = task.HasCollectNum/(task.TargetNum * 1f);
         if (particlePar!=null)
         {
@@ -100,11 +106,54 @@ public class TaskTipPanel : MonoBehaviour
         progress.SetText(task.GetProgressDesc());
         DelayShowSelf();
     }
+    
+    Sprite GetSpriteByType(int taskType)
+    {
+        Sprite sp = null;
+        if (taskType < 0)
+        {
+            Debug.LogError("TaskTipPanel GetSpriteByType taskType out of range: " + taskType);
+            return sp;
+        }
 
+        switch (taskType)
+        {
+            case TaskConstants.CollectCashFromZeroTask_Key:
+                sp = iconSprites[0];
+                break;
+            case TaskConstants.CollectFreeGameTriggerCountTask_Key:
+                sp = iconSprites[1];
+                break;
+            case TaskConstants.CollectJackpotGameCountTask_Key:
+                sp = iconSprites[2];
+                break;
+            case TaskConstants.CollectSymbolCountTask_Key:
+                sp = iconSprites[3];
+                break;
+            case TaskConstants.CollectWildSymbolCountTask_Key:
+                sp = iconSprites[4];
+                break;
+            case TaskConstants.CollectTriggerSpinWinCountTask_Key:
+                sp = iconSprites[5];
+                break;
+            case TaskConstants.CollectSpinCountTask_Key:
+                sp = iconSprites[6];
+                break;
+            case TaskConstants.WatchADTimeTask_Key:
+                sp = iconSprites[7];
+                break;
+            case TaskConstants.CollectCardTask_Key:
+                sp = iconSprites[8];
+                break;
+        }
+
+        return sp;
+    }
+    
     private void DelayShowSelf()
     {
         transform.localScale = Vector3.zero;
-        new DelayAction(1f, null, () =>
+        new DelayAction(0.7f, null, () =>
         {
             gameObject.SetActive(true);
             transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack).SetUpdate(true);

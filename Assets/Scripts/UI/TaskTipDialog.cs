@@ -57,7 +57,15 @@ namespace Classic
                     {
                         //只显示第一个奖励
                         BaseAwardItem awardItem = awardItems[0];
-                        agr1 = string.Format("<color=#29F706>{0}</color>", awardItem.GetAwardCountDesc());
+                        int count = awardItem.count;
+                        if (awardItem.type == AwardType.Cash)
+                        {
+                            agr1 = string.Format("<color=#29F706>{0}</color>", OnLineEarningMgr.Instance.GetCashStr(count, 0, false, true));
+                        }
+                        else
+                        {
+                            agr1 = string.Format("<color=#29F706>{0}</color>", awardItem.GetAwardCountDesc());
+                        }
                     }
                 }
                 localizedString.Arguments = new object[] {agr1,task.HasCollectNum,task.TargetNum};

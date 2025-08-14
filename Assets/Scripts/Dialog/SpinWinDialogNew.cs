@@ -161,7 +161,7 @@ public class SpinWinDialogNew : UIDialog
             CloseBtnOnAd.enabled = false;
             CloseBtnOnAd.gameObject.SetActive(false);
             // CloseBtnOnAd.transform.localScale = Vector3.zero;
-            new DelayAction(1f, null, () =>
+            new DelayAction(0.7f, null, () =>
             {
                 CloseBtnOnAd.gameObject.SetActive(true); 
                 CloseBtnOnAd.enabled = true;

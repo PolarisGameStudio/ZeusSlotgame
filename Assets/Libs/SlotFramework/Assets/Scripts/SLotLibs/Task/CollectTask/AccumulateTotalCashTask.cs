@@ -13,7 +13,6 @@ namespace Libs
     {
         public AccumulateTotalCashTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask) : base(taskInfoDict, parentTask)
         {
-            Debug.Log($"[AccumulateTotalCashTask][AccumulateTotalCashTask]  taskId:{TaskId}");
             if (TaskId>0)
             {
                 Messenger.AddListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateTaskNum);

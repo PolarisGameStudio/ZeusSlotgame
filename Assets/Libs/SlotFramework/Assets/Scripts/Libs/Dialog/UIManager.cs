@@ -121,6 +121,7 @@ namespace Libs
     			}
 
     			if (isNeedScaleTime) {
+	                Debug.Log("Time.TimeScale = 0f");
     				//if (Time.timeScale != 0f) {
     					Time.timeScale = 0f;
     				//}
@@ -134,6 +135,7 @@ namespace Libs
 
 		public void Close (UIDialog ui)
 		{
+			Debug.Log("UIManager Close Dialog: " + ui.name);
 			if (ui == null) {
 				return;
 			}
@@ -197,6 +199,7 @@ namespace Libs
 
 		public void CloseAll (bool forceClear = false)
 		{
+			Debug.Log("UIManager CloseAll Dialogs");
 			#region POC
 			/*
 			 * 修改原因是reload过程中，dialog调用close方法会把下一个面板弹出来，导致只会在机器内弹出的弹版会在大厅弹出

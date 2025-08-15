@@ -34,9 +34,6 @@ namespace System
         private int PlatFormIndex = -1;
 
         private WithDrawSystemProgressData progressData = new WithDrawSystemProgressData();
-        
-        public int FreeSymbolNum = 0;
-        public int S01SymbolNum = 0;
 
         private WithDrawManager() { }
         
@@ -50,82 +47,6 @@ namespace System
                 Debug.LogError("WithDrawManager OnInit isConfigReady is false");
                 return;
             }
-            //注册监听
-            AddListener();
-        }
-
-        void AddListener()
-        {
-            Messenger.AddListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
-        }
-        
-        ~WithDrawManager()
-        {
-            //清理监听
-            Messenger.RemoveListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
-        }
-
-        void OnSpinAwardEnd(ReelManager reelManager,long totalWinCoins)
-        {
-            CheckShowW01TaskTip(reelManager, totalWinCoins);
-            CheckShowS01TaskTip(reelManager, totalWinCoins);
-        }
-
-        void CheckShowW01TaskTip(ReelManager reelManager,long totalWinCoins)
-        {
-            BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectWildSymbolCountTask_Key);
-            if (task==null)
-            {
-                Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectWildSymbolCountTask_Key);
-                return;
-            }
-            if (FreeSymbolNum>=task.TargetNum)
-            {
-                return;
-            }
-            // Debug.Log($"[WithDrawManager][OnSpinAwardEnd] FreeSymbolNum:{FreeSymbolNum}");
-            int AddNumber = reelManager.GetSpecialCount(SymbolMap.IS_WILD);
-            long remin = FreeSymbolNum % 10;
-            FreeSymbolNum += AddNumber;
-            if (remin+AddNumber<10)
-            {
-                return;
-            }
-
-            int symbolIndex = reelManager.symbolMap.getSymbolIndex("W01");
-            Sprite symbolSprite = reelManager.gameConfigs.elementResources[symbolIndex].staticSprite;
-            Messenger.Broadcast<Sprite,int>(GameDialogManager.OpenTaskTipsDialogMsg,symbolSprite,TaskConstants.CollectWildSymbolCountTask_Key);
-            //更新进度数据
-            SaveProgressData();
-        }
-        
-        void CheckShowS01TaskTip(ReelManager reelManager,long totalWinCoins)
-        {
-            BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectSymbolCountTask_Key);
-            if (task==null)
-            {
-                Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectSymbolCountTask_Key);
-                return;
-            }
-            if (S01SymbolNum>=task.TargetNum)
-            {
-                return;
-            }
-            CollectSymbolCountTask collectSymbolCountTask = task as CollectSymbolCountTask;
-            Debug.Log($"[WithDrawManager][OnSpinAwardEnd] S01SymbolNum:{S01SymbolNum}");
-            List<BaseElementPanel> elementList = reelManager.GetElementsWithSymbolName(collectSymbolCountTask.symbolName);
-            int AddNumber = (elementList == null || elementList.Count == 0) ? 0 : elementList.Count;
-            long remin = S01SymbolNum % 10;
-            S01SymbolNum += AddNumber;
-            if (remin+AddNumber<10)
-            {
-                return;
-            }
-            int symbolIndex = reelManager.symbolMap.getSymbolIndex(collectSymbolCountTask.symbolName);
-            Sprite symbolSprite = reelManager.gameConfigs.elementResources[symbolIndex].staticSprite;
-            Messenger.Broadcast<Sprite,int>(GameDialogManager.OpenTaskTipsDialogMsg,symbolSprite,TaskConstants.CollectSymbolCountTask_Key);
-            //更新进度数据
-            SaveProgressData();
         }
         
         #region LoadAndSaveData
@@ -137,8 +58,6 @@ namespace System
                 if (data!=null)
                 {
                     progressData.LoadData(data);
-                    FreeSymbolNum = data.FreeSymbolNum;
-                    S01SymbolNum = data.S01SymbolNum;
                 }
             }
             catch (Exception e)

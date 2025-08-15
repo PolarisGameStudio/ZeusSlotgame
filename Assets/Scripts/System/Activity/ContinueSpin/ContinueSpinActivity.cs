@@ -148,7 +148,7 @@ namespace Activity
         {
             base.RemoveListener();
             Messenger.RemoveListener(Task.UpdateTaskDataMsg,UpdateProgress);
-            Messenger.AddListener(GameConstants.DO_SPIN,UpdateSpinCount);
+            Messenger.RemoveListener(GameConstants.DO_SPIN,UpdateSpinCount);
         }
         private void UpdateSpinCount()
         {
@@ -158,11 +158,8 @@ namespace Activity
 
             if (_canOpenSpinCount >= _autoPopCount)
             {
-                //停止自动spin
-                Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
                 ShowContinueSpinDialog();
             }
-            
         }
 
         public override BaseIcon RegisterIcon(GameObject go)
@@ -174,6 +171,8 @@ namespace Activity
         
         private void ShowContinueSpinDialog()
         {
+            //停止自动spin
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
             _canOpenSpinCount = 0;
             UIDialog dialog = UIManager.Instance.GetActiveDialog<ContinueSpinDialog>();
             if (dialog!=null)

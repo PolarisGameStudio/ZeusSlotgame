@@ -18,8 +18,6 @@ namespace System
 
         public override void SaveData()
         {
-            FreeSymbolNum = WithDrawManager.Instance.FreeSymbolNum;
-            S01SymbolNum = WithDrawManager.Instance.S01SymbolNum;
             StoreManager.Instance.SaveDataJson(fileName,this);
         }
 

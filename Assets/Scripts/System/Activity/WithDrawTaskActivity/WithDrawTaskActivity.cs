@@ -116,7 +116,11 @@ namespace Activity
         
         void SendMsgToPlatform()
         {
-            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "TaskNum",CurrentTaskIndex);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("TaskIndex", CurrentTaskIndex);
+            data.Add("TaskId", Task.TaskId);
+            data.Add("HasCollectNum", Task.HasCollectNum);
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "TaskNum",data);
         }
         
         /// <summary>
@@ -144,6 +148,7 @@ namespace Activity
                     withDrawTaskIcon.RefreshProgress(GetProgress(),GetProgressText());
                 }
             }
+            SendMsgToPlatform();
         }
         
         /// <summary>

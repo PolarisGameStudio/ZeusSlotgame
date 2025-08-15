@@ -442,6 +442,8 @@ namespace CardSystem
             if (collectnew)
             {
                 Messenger.Broadcast(CardSystemConstants.GetCardNewTypeCountMsg);
+                //事件上报
+                PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"CardType",GetHaveCardTypeCount());
             }
             Messenger.Broadcast(CardSystemConstants.GetCardNewCountMsg);
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "CardsNum", GetCardsCount());

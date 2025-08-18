@@ -26,7 +26,7 @@ namespace Core
         static readonly string TodayGetRewardCountKey = "TodayGetRewardCountKey";
         static readonly string IsSecondKey = "IsSecondKey";
         static readonly string MaxValueKey = "MaxValue";
-        static readonly string CalculateCountKey = "CalculateCount";
+        static readonly string CalculateCountKey = "CalculateCountList";
 
         //此字段用来标志第二个数组的取值下标，满足走第二个数组条件时会一直累加
         private int GetRewardCountInToday
@@ -64,7 +64,7 @@ namespace Core
         private int[][] arrayTwo;
         private int maxValue = 300;
 
-        private int CalculateCount = 1;
+        private List<object> CalculateCountList = new List<object>();
         private long getFirstRewardTime
         {
             set
@@ -83,7 +83,7 @@ namespace Core
             CurSpinLimit = Utilities.GetInt(config, SpinInterval_Key, 1);
             RewardCountLimit = Utilities.GetInt(config, LimitCountKey, 1);
             maxValue = Utilities.GetInt(config, MaxValueKey, 1);
-            CalculateCount= Utilities.GetInt(config, CalculateCountKey, 1);
+            CalculateCountList = Utilities.GetValue<List<object>>(config, CalculateCountKey, null);
             List<object> array = Utilities.GetValue<List<object>>(config, LimitRewardKey, null);
             if (array.Count == 2)
             {
@@ -328,6 +328,25 @@ namespace Core
             }
         }
 
+        int SetCalculateCount()
+        {
+            if (CalculateCountList ==null || CalculateCountList.Count==0)
+            {
+                return 1;
+            }
+
+            foreach (var item in CalculateCountList)
+            {
+                Dictionary<string, object> itemdict = item as Dictionary<string, object>;
+                int limit = Utilities.GetInt(itemdict, "limit", 0);
+                int count =Utilities.GetInt(itemdict, "count", 0);
+                if (GetRewardCount<limit)
+                {
+                    return count;
+                }
+            }
+            return 1;
+        }
         #region Rewards
         public override int GetRewardsByName(string key,int level = 0)
         {
@@ -337,7 +356,7 @@ namespace Core
                 //普通spin不给钱
                 return 0;
             }
-
+            
             if (key == OnLineEarningConstants.REWARD_NewUser)
             {
                 //增加领奖次数
@@ -347,8 +366,9 @@ namespace Core
                 return reward;
             }
             
+            int count = SetCalculateCount();
             //每次计算CalculateCount次,等价爬几个数组
-            for (int i = 0; i < CalculateCount; i++)
+            for (int i = 0; i < count; i++)
             {
                 //增加领奖次数
                 AddGetRewardCount();

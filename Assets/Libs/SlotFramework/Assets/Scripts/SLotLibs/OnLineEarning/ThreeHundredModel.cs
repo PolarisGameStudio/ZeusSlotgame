@@ -26,6 +26,7 @@ namespace Core
         static readonly string TodayGetRewardCountKey = "TodayGetRewardCountKey";
         static readonly string IsSecondKey = "IsSecondKey";
         static readonly string MaxValueKey = "MaxValue";
+        static readonly string CalculateCountKey = "CalculateCount";
 
         //此字段用来标志第二个数组的取值下标，满足走第二个数组条件时会一直累加
         private int GetRewardCountInToday
@@ -63,6 +64,7 @@ namespace Core
         private int[][] arrayTwo;
         private int maxValue = 300;
 
+        private int CalculateCount = 1;
         private long getFirstRewardTime
         {
             set
@@ -81,6 +83,7 @@ namespace Core
             CurSpinLimit = Utilities.GetInt(config, SpinInterval_Key, 1);
             RewardCountLimit = Utilities.GetInt(config, LimitCountKey, 1);
             maxValue = Utilities.GetInt(config, MaxValueKey, 1);
+            CalculateCount= Utilities.GetInt(config, CalculateCountKey, 1);
             List<object> array = Utilities.GetValue<List<object>>(config, LimitRewardKey, null);
             if (array.Count == 2)
             {
@@ -214,7 +217,9 @@ namespace Core
             else
             {
                 int[] array = nextValue ? this.arrayOne[GetRewardCount + 1] : this.arrayOne[GetRewardCount];
-                rewardNum = GetRewardCount == 1 ? array[1] : random.Next(array[0], array[1]);
+                // rewardNum = GetRewardCount == 1 ? array[1] : random.Next(array[0], array[1]);
+                //第一个奖励随机，不再指定
+                rewardNum = random.Next(array[0], array[1]);
                 if (GetRewardCount ==1)
                 {
                     //存储第一次获奖时间
@@ -332,26 +337,39 @@ namespace Core
                 //普通spin不给钱
                 return 0;
             }
-            
-            //增加领奖次数
-            AddGetRewardCount();
-            BaseOnLineEarningTimer timer = GetTimerByName(key);
-            if (timer!=null)
+
+            if (key == OnLineEarningConstants.REWARD_NewUser)
             {
-                //不为空说明有特殊规则
-                reward = timer.GetReward();
+                //增加领奖次数
+                AddGetRewardCount();
+                reward = GetReward(false);
+
+                return reward;
             }
-            else
+            
+            //每次计算CalculateCount次,等价爬几个数组
+            for (int i = 0; i < CalculateCount; i++)
             {
-                //为空说明没有特殊规则，直接走列表
-                if (key == OnLineEarningConstants.REWARD_H5Reward)
+                //增加领奖次数
+                AddGetRewardCount();
+                BaseOnLineEarningTimer timer = GetTimerByName(key);
+                if (timer!=null)
                 {
-                    reward =  GetReward(true);
+                    //不为空说明有特殊规则
+                    reward += timer.GetReward();
                 }
-                else 
+                else
                 {
-                    reward =  GetReward(false);
-                } 
+                    //为空说明没有特殊规则，直接走列表
+                    if (key == OnLineEarningConstants.REWARD_H5Reward)
+                    {
+                        reward +=  GetReward(true);
+                    }
+                    else 
+                    {
+                        reward +=  GetReward(false);
+                    } 
+                }
             }
             return reward;
         }

@@ -17,7 +17,7 @@ namespace Libs
         public const string RewardList_Key = "rewardList";
         public const string SaveTaskDict_Key = "SaveTaskDict";
         public const string PlistTask_Key = "TaskTables";
-        public const string CollectNumber_Key = "sumNumber";
+        public const string CollectNumber_Key = "collectNumber";
         public const string TargetCashNum_Key = "targetCashNum";
         public const string CollectCashNum_Key = "collectCashNum";
         public const string StartTime_Key = "startTime";

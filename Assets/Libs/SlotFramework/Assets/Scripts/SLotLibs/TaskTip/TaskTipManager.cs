@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Activity;
 using Classic;
@@ -111,76 +112,112 @@ namespace Libs
             Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
         }
 
-        void OnSpinAwardEnd(ReelManager reelManager,long totalWinCoins)
+        void OnSpinAwardEnd(ReelManager reelManager, long totalWinCoins)
         {
             CheckShowW01TaskTip(reelManager, totalWinCoins);
             CheckShowS01TaskTip(reelManager, totalWinCoins);
         }
-          void CheckShowW01TaskTip(ReelManager reelManager,long totalWinCoins)
+
+        void CheckShowW01TaskTip(ReelManager reelManager, long totalWinCoins)
         {
             BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectWildSymbolCountTask_Key);
-            if (task==null)
+            if (task == null)
             {
                 Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectWildSymbolCountTask_Key);
                 return;
             }
-            if (FreeSymbolNum>=task.TargetNum)
+
+            if (FreeSymbolNum >= task.TargetNum)
             {
                 return;
             }
+
             // Debug.Log($"[WithDrawManager][OnSpinAwardEnd] FreeSymbolNum:{FreeSymbolNum}");
             int AddNumber = reelManager.GetSpecialCount(SymbolMap.IS_WILD);
-            long remin = FreeSymbolNum %10;
+            long remin = FreeSymbolNum % 10;
             FreeSymbolNum += AddNumber;
-            if (remin+AddNumber< 10)
+            if (remin + AddNumber < 10)
             {
                 return;
             }
 
             int symbolIndex = reelManager.symbolMap.getSymbolIndex("W01");
             Sprite symbolSprite = reelManager.gameConfigs.elementResources[symbolIndex].staticSprite;
-            Messenger.Broadcast<Sprite,int>(GameDialogManager.OpenTaskTipsDialogMsg,symbolSprite,TaskConstants.CollectWildSymbolCountTask_Key);
+            Messenger.Broadcast<Sprite, int>(GameDialogManager.OpenTaskTipsDialogMsg, symbolSprite,
+                TaskConstants.CollectWildSymbolCountTask_Key);
             //更新进度数据
             SaveProgressData();
         }
-        
-        void CheckShowS01TaskTip(ReelManager reelManager,long totalWinCoins)
+
+        void CheckShowS01TaskTip(ReelManager reelManager, long totalWinCoins)
         {
             BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectSymbolCountTask_Key);
-            if (task==null)
+            if (task == null)
             {
                 Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectSymbolCountTask_Key);
                 return;
             }
-            if (S01SymbolNum>=task.TargetNum)
+
+            if (S01SymbolNum >= task.TargetNum)
             {
                 return;
             }
+
             CollectSymbolCountTask collectSymbolCountTask = task as CollectSymbolCountTask;
             Debug.Log($"[WithDrawManager][OnSpinAwardEnd] S01SymbolNum:{S01SymbolNum}");
-            List<BaseElementPanel> elementList = reelManager.GetElementsWithSymbolName(collectSymbolCountTask.symbolName);
+            List<BaseElementPanel> elementList =
+                reelManager.GetElementsWithSymbolName(collectSymbolCountTask.symbolName);
             int AddNumber = (elementList == null || elementList.Count == 0) ? 0 : elementList.Count;
             long remin = S01SymbolNum % 10;
             S01SymbolNum += AddNumber;
-            if (remin+AddNumber < 10)
+            if (remin + AddNumber < 10)
             {
                 return;
             }
+
             int symbolIndex = reelManager.symbolMap.getSymbolIndex(collectSymbolCountTask.symbolName);
             Sprite symbolSprite = reelManager.gameConfigs.elementResources[symbolIndex].staticSprite;
-            Messenger.Broadcast<Sprite,int>(GameDialogManager.OpenTaskTipsDialogMsg,symbolSprite,TaskConstants.CollectSymbolCountTask_Key);
+            Messenger.Broadcast<Sprite, int>(GameDialogManager.OpenTaskTipsDialogMsg, symbolSprite,
+                TaskConstants.CollectSymbolCountTask_Key);
             //更新进度数据
             SaveProgressData();
         }
+
         void OnSpinEnd()
         {
             if (!isOpen)
             {
                 return;
             }
+
             CurrentSpinCount++;
         }
 
+        public bool CheckShow300CashTip()
+        {
+            if (!isOpen)
+            {
+                return false;
+            }
+
+            if (!OnLineEarningMgr.Instance.isThreeHundredOpen())
+            {
+                return false;
+            }
+
+            if (CurrentSpinCount < StartSpinLimit)
+            {
+                return true;
+            }
+
+            if (CurrentSpinCount >= EndSpinLimit)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        
         public bool CheckShowWithDrawTaskTip(int taskType)
         {
             if (!isOpen)
@@ -191,8 +228,8 @@ namespace Libs
             if (CurrentSpinCount < StartSpinLimit)
             {
                 return false;
-            } 
-            
+            }
+
             if (CurrentSpinCount > EndSpinLimit)
             {
                 return true;
@@ -212,9 +249,11 @@ namespace Libs
                 {
                     return false;
                 }
+
                 SetTaskTipStatus(taskType, true);
                 return true;
             }
+
             SetTaskTipStatus(taskType, false);
             return false;
         }
@@ -226,6 +265,11 @@ namespace Libs
                 return false;
             }
 
+            if (OnLineEarningMgr.Instance.isThreeHundredOpen())
+            {
+                return false;
+            }
+            
             if (CurrentSpinCount < StartSpinLimit)
             {
                 return true;
@@ -251,6 +295,7 @@ namespace Libs
         {
             isWithDrawDialogShow = false;
             isWithDrawActivityShow = false;
+            
             //withdrawdialog展示的任务
             if (CheckShowWithDrawTaskTip(taskType))
             {
@@ -259,6 +304,12 @@ namespace Libs
                 return TaskManager.Instance.GetTaskByType(taskType);
             }
 
+            //展示300模式的现金进度，跟CheckShowWithDrawActivityTip互斥
+            if (CheckShow300CashTip())
+            {
+                return CreateCashTask();
+            }
+            
             // withdrawtaskactivity展示的任务
             if (CheckShowWithDrawActivityTip())
             {
@@ -278,6 +329,16 @@ namespace Libs
             return null;
         }
 
+        public string Get300CashStr()
+        {
+            string key = "MoreWinCash";
+            string arg1 = string.Format("<color=#118D1D>{0}</color>", OnLineEarningMgr.Instance.GetMoneyStr(OnLineEarningMgr.Instance.Cash(), 0, false, true));
+            string arg2 = string.Format("<color=#FF0000>{0}</color>", OnLineEarningMgr.Instance.GetCashStr(OnLineEarningMgr.Instance.GetMaxValue(), 0, false, true));
+            var localizedString = new LocalizedString(LocalizationManager.Instance.tableName, key);
+            localizedString.Arguments = new object[] { arg1 };
+            return string.Format("{0} {1}.", localizedString.GetLocalizedString(), arg2);
+        }
+        
         public string GetTaskTipText(BaseTask task)
         {
             if (task == null)
@@ -332,7 +393,7 @@ namespace Libs
                     CollectCardTypeCountTask _ => "MoreCollectCards",
                     _ => string.Empty
                 };
-                
+
                 arg1 = string.Format("<color=#118D1D>{0}</color>",
                     task is CollectCashFromZeroTask
                         ? OnLineEarningMgr.Instance.GetMoneyStr(remaining, 2, false, true)
@@ -369,6 +430,25 @@ namespace Libs
             }
 
             SaveProgressData();
+        }
+        BaseTask cashTask = null;
+        private BaseTask CreateCashTask()
+        {
+            int maxValue = OnLineEarningMgr.Instance.GetMaxValue()*OnLineEarningMgr.Instance.GetCashMultiple();
+            Dictionary<string,object> data = new Dictionary<string, object>
+            {
+                { TaskConstants.TaskId_Key, 80001},
+                { TaskConstants.TargetNum_Key, OnLineEarningMgr.Instance.GetMaxValue()},
+                { TaskConstants.RewardList_Key, string.Format("10001,{0}",OnLineEarningMgr.Instance.GetMaxValue()) },
+                { TaskConstants.Type_Key, TaskConstants.CollectCashFromZeroTask_Key },
+                { TaskConstants.CollectNumber_Key, OnLineEarningMgr.Instance.Cash()},
+                { TaskConstants.TaskState_Key, (int)TaskState.ONGOING },
+            };
+            if (cashTask==null)
+            {
+                cashTask = new CollectCashFromZeroTask(data, null);
+            }
+            return cashTask;
         }
     }
 }

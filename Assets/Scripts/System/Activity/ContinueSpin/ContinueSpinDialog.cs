@@ -125,9 +125,7 @@ namespace Activity
         {
             if (msg == ADEntrances.Interstitial_Entrance_CLOSECONTINUESPIN)
             {
-                _cashCount.gameObject.SetActive(false);
-                _cashCount.text = "0";
-                Close();
+                ShowVideoCallBack(1);
             }
         }
         private void SetCoins()

@@ -72,13 +72,22 @@ public class LuckyCashDialog : UIDialog
     {
         Messenger.AddListener<int>(ADConstants.PlayLuckyCashAD,AdIsPlaySuccessful);
         Messenger.AddListener<int>(ADConstants.PlayLuckyCashADFailed,AdIsPlayFailed);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+
     }
     void OnDisable()
     {
         Messenger.RemoveListener<int>(ADConstants.PlayLuckyCashAD,AdIsPlaySuccessful);
         Messenger.RemoveListener<int>(ADConstants.PlayLuckyCashADFailed,AdIsPlayFailed);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
     }
-    
+    void HandleNotMeetConditionMsg(string msg)
+    {
+        if (msg == ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH)
+        {
+            SetCoins();
+        }
+    }
     public void SetUIData(int money)
     {
         this.totalCash = money;

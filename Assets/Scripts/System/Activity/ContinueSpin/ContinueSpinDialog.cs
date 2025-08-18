@@ -123,7 +123,7 @@ namespace Activity
 
         void HandleNotMeetConditionMsg(string msg)
         {
-            if (msg == ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND)
+            if (msg == ADEntrances.Interstitial_Entrance_CLOSECONTINUESPIN)
             {
                 _cashCount.gameObject.SetActive(false);
                 _cashCount.text = "0";

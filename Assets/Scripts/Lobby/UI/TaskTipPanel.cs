@@ -27,6 +27,7 @@ public class TaskTipPanel : MonoBehaviour
     
     private Dictionary<int, int> TaskToBGSpriteIndex = new Dictionary<int, int>
     {
+        { TaskConstants.AccumulateCashTask_Key, 1 },
         { TaskConstants.CollectCashFromZeroTask_Key, 1 },
         { TaskConstants.CollectSpinCountTask_Key, 1 },
         { TaskConstants.WatchADTimeTask_Key, 1 },
@@ -105,6 +106,7 @@ public class TaskTipPanel : MonoBehaviour
 
         switch (taskType)
         {
+            case TaskConstants.AccumulateCashTask_Key:
             case TaskConstants.CollectCashFromZeroTask_Key:
                 sp = iconSprites[0];
                 break;

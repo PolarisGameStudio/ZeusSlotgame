@@ -364,7 +364,7 @@ namespace Libs
                     : item.GetAwardCountDesc();
                 return string.Format("<color=#{0}>{1}</color>",
                     task is CollectSpinCountTask || task is CollectADCountTask ||
-                    task is CollectCashFromZeroTask || task is CollectCardTypeCountTask
+                    task is CollectCashFromZeroTask || task is CollectCardTypeCountTask|| task is AccumulateTotalCashTask
                         ? "FF0000"
                         : "FDFF2F",
                     value);
@@ -389,13 +389,14 @@ namespace Libs
                 {
                     CollectSpinCountTask _ => "MoreSpinTimes",
                     CollectADCountTask _ => "MoreVideoAds",
+                    AccumulateTotalCashTask _ => "MoreWinCash",
                     CollectCashFromZeroTask _ => "MoreWinCash",
                     CollectCardTypeCountTask _ => "MoreCollectCards",
                     _ => string.Empty
                 };
 
                 arg1 = string.Format("<color=#118D1D>{0}</color>",
-                    task is CollectCashFromZeroTask
+                    task is CollectCashFromZeroTask || task is AccumulateTotalCashTask
                         ? OnLineEarningMgr.Instance.GetMoneyStr(remaining, 2, false, true)
                         : remaining.ToString());
             }
@@ -407,12 +408,12 @@ namespace Libs
             if (localizedString == null) return string.Empty;
 
             localizedString.Arguments = task is CollectSpinCountTask || task is CollectADCountTask ||
-                                        task is CollectCashFromZeroTask || task is CollectCardTypeCountTask
+                                        task is CollectCashFromZeroTask || task is CollectCardTypeCountTask || task is AccumulateTotalCashTask
                 ? new object[] { arg1 }
                 : new object[] { arg1, arg2 };
 
             return task is CollectSpinCountTask || task is CollectADCountTask ||
-                   task is CollectCashFromZeroTask || task is CollectCardTypeCountTask
+                   task is CollectCashFromZeroTask || task is CollectCardTypeCountTask || task is AccumulateTotalCashTask
                 ? string.Format("{0} {1}.", localizedString.GetLocalizedString(), arg2)
                 : localizedString.GetLocalizedString();
         }

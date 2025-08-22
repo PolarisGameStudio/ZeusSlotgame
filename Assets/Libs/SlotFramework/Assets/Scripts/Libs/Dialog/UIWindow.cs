@@ -67,21 +67,28 @@ namespace Libs
 		{
 			base.OnDestroy();
 			EndCB();
-			if (inTweener != null) //防止当Start时调用了销毁，启动了In动画，且在执行中，销毁时，调用当前对象销毁
+			/*if (inTweener != null) //防止当Start时调用了销毁，启动了In动画，且在执行中，销毁时，调用当前对象销毁
 			{
 				inTweener.Kill();
-				inTweener = null;
-			}
-			if (outTweener != null) ////防止当Destroy时调用了销毁，启动了Out动画，且在执行中，销毁时，调用当前对象销毁
+				
+			}*/
+			DOTween.Kill(inTweener);
+			inTweener = null;
+			/*if (outTweener != null) ////防止当Destroy时调用了销毁，启动了Out动画，且在执行中，销毁时，调用当前对象销毁
 			{
 				outTweener.Kill();
 				outTweener = null;
-			}
-
-			if (tickUntilQuitDA != null)
+			}*/
+			DOTween.Kill(outTweener);
+			outTweener = null;
+			
+			/*if (tickUntilQuitDA != null)
 			{
 				tickUntilQuitDA.Kill();
-			}
+			}*/
+			
+			DOTween.Kill(tickUntilQuitDA);
+			tickUntilQuitDA = null;
 
 		}
 		private void EndCB()

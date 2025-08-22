@@ -2,6 +2,7 @@ using System;
 using Libs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Classic
@@ -27,11 +28,18 @@ namespace Classic
         {
             money = cash;
             cashTmp.text = OnLineEarningMgr.Instance.GetMoneyStr(cash, needIcon: false);
-            Sprite sp = Resources.Load<Sprite>("Platform/"+spriteIndex);
-            if (sp != null)
+            
+            AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
             {
-                image.sprite = sp;
-            }
+                if (result != null)
+                {
+                    Sprite sp = result.GetSprite(spriteIndex.ToString());
+                    if (sp != null)
+                    {
+                        image.sprite = sp;
+                    }
+                }
+            });
 
             emailTMP.text = account;
             DateTime now = DateTime.Now;
@@ -41,7 +49,9 @@ namespace Classic
         {
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
             this.Close();
-            WithDrawManager.Instance.ReduceCash(money);
+            //WithDrawManager.Instance.ReduceCash(money);
+            Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
+            
         }
     }
 }

@@ -22,9 +22,9 @@ public class WithDrawRecordPanelItem:MonoBehaviour,LoopScrollPrefabSource, LoopS
 
     public void Show()
     {
-        // gameObject.SetActive(true);
-        // loopVerticalScrollRect.totalCount = WithDrawManager.Instance.GetRecordItemCount();
-        // loopVerticalScrollRect.RefillCells();
+        gameObject.SetActive(true);
+        loopVerticalScrollRect.totalCount = WithDrawManager.Instance.GetRecordItemCount();
+        loopVerticalScrollRect.RefillCells();
     }
     
     public void Hide()

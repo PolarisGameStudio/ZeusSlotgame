@@ -21,8 +21,10 @@ public class RedeemItem : MonoBehaviour
     private RectTransform checking;
     private RectTransform inProgress;
     private RectTransform withDraw;
+    private RectTransform moneyFinish;
     private RectTransform condition;
     private TextMeshProUGUI progressTMP;
+    private TextMeshProUGUI moneyFinishTMP;
     private Image progressBar;
     private TextMeshProUGUI conditionTMP;
     private TextMeshProUGUI countDownTMP;
@@ -35,10 +37,12 @@ public class RedeemItem : MonoBehaviour
         conditionTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "Condition/taskInfoTMP");
         progressTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "inProgress/bottom/progressTMP");
         paltformImg = Utils.Utilities.RealFindObj<Image>(transform, "platformIMG");
-        redeemBtn = Utils.Utilities.RealFindObj<Button>(transform, "redeemBtn");
+        redeemBtn = Utils.Utilities.RealFindObj<Button>(transform, "moneyFinish/redeemBtn");
+        moneyFinishTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "moneyFinish/progressTMP");
         checking = Utils.Utilities.RealFindObj<RectTransform>(transform, "checking");
         inProgress = Utils.Utilities.RealFindObj<RectTransform>(transform, "inProgress");
         withDraw = Utils.Utilities.RealFindObj<RectTransform>(transform, "withDraw");
+        moneyFinish = Utils.Utilities.RealFindObj<RectTransform>(transform, "moneyFinish");
         condition = Utils.Utilities.RealFindObj<RectTransform>(transform, "Condition");
         progressBar = Utils.Utilities.RealFindObj<Image>(transform, "inProgress/bottom/checking/progressBar");
         countDownTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "checking/CountDown");
@@ -110,7 +114,7 @@ public class RedeemItem : MonoBehaviour
                 break;
             //进行中满足领取条件
             case RedeemItemState.Complete:
-                ShowCompleteUI();
+                ShowCompleteUI2();
                 break;
             //进行中已点击领取按钮
             case RedeemItemState.Wait:
@@ -129,7 +133,7 @@ public class RedeemItem : MonoBehaviour
 
     private void ShowInProgressUI()
     {
-        redeemBtn.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
         checking.gameObject.SetActive(false);
         inProgress.gameObject.SetActive(true);
         withDraw.gameObject.SetActive(false);
@@ -152,7 +156,7 @@ public class RedeemItem : MonoBehaviour
 
     private void ShowCompleteUI()
     {
-        redeemBtn.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
         checking.gameObject.SetActive(false);
         inProgress.gameObject.SetActive(false);
         withDraw.gameObject.SetActive(true);
@@ -163,10 +167,24 @@ public class RedeemItem : MonoBehaviour
         int TargetNum = CardSystemManager.Instance.GetTotalCardTypeCount();
         withdrawProgressTmp.text = string.Format("{0}/{1}", HasCollectNum, TargetNum);
     }
+    
+    private void ShowCompleteUI2()
+    {
+        moneyFinish.gameObject.SetActive(true);
+        checking.gameObject.SetActive(false);
+        inProgress.gameObject.SetActive(false);
+        withDraw.gameObject.SetActive(false);
+        condition.gameObject.SetActive(false);
+        FaildText.gameObject.SetActive(false);
+       
+        moneyFinishTMP.text = string.Format("{0}/{1}",
+            OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.HasCollectNum, needIcon: false),
+            OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.TargetNum, needIcon: false));
+    }
 
     private void ShowWithDrawUI()
     {
-        redeemBtn.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
         checking.gameObject.SetActive(false);
         inProgress.gameObject.SetActive(false);
         withDraw.gameObject.SetActive(true);
@@ -180,7 +198,7 @@ public class RedeemItem : MonoBehaviour
         inProgress.gameObject.SetActive(false);
         withDraw.gameObject.SetActive(false);
         condition.gameObject.SetActive(false);
-        redeemBtn.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
         FaildText.gameObject.SetActive(false);
         if (timeCor!=null)
         {

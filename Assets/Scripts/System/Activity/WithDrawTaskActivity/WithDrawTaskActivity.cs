@@ -340,7 +340,7 @@ namespace Activity
                 key = "MoreWinCash";
                 int leftCash = (int)(Task.TargetNum - Task.HasCollectNum);
                 arg1 = string.Format("<color=#D800D9>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr(leftCash, 2, false, true));
-            }else if (Task is CollectCardTypeCountTask)
+            }else if (Task is CollectCardTypeCountTask || Task is CollectNewCardTypeCountTask)
             {
                 key = "MoreCollectCards";
             }

@@ -22,6 +22,10 @@ namespace Libs
         public void Init()
         {
             ParseConfig();
+            if (!isOpen)
+            {
+                return;
+            }
             AddListener();
             LoadProgressData();
         }

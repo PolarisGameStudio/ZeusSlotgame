@@ -29,8 +29,6 @@ namespace Libs
             HasCollectNum += addCash;
             // Debug.Log($"[AccumulateTotalCashTask][UpdateTaskStatus]  taskId:{TaskId}");
             base.UpdateTaskStatus();
-            //广播刷新任务
-            Messenger.Broadcast(UpdateTaskDataMsg);
         }
         public override string GetProgressDesc()
         {

@@ -157,7 +157,7 @@ namespace Libs
 			}
 			if(!inQueue) GameObject.DestroyImmediate(ui.gameObject);//不适用Destroy方法，是因为调用此方法不能帧内销毁，后面判断不生效
 			
-			SeBackgroundTimeScale ();
+			// SeBackgroundTimeScale ();
         }
 
 		private GameObject GetDlgRootNodeGo<T>(GameObject ui)

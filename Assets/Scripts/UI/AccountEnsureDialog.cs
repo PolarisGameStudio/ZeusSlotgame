@@ -49,7 +49,7 @@ namespace Classic
         {
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
             this.Close();
-            //WithDrawManager.Instance.ReduceCash(money);
+            WithDrawManager.Instance.ReduceCash(money);
             Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
             
         }

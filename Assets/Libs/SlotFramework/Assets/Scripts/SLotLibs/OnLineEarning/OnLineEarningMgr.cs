@@ -268,11 +268,17 @@ public class OnLineEarningMgr
         {
             newCash = newCash * _baseOnlineEarningModel.CashMultiple();
         }
+        int totalCash = cash + newCash;
+        if (!isInfiniteOpen()&&totalCash>=GetMaxValue()*GetCashMultiple())
+        {
+            totalCash= (int)Math.Floor(GetMaxValue()*GetCashMultiple()*0.98f);
+            newCash = totalCash - cash;
+        }
         if (newCash>0)
         {
             Messenger.Broadcast<int>(OnLineEarningConstants.IncreaseCashMsg, newCash);
         }
-        SetCash(cash + newCash);
+        SetCash(totalCash);
     }
     //金钱汇率 以美元为基数转换
     

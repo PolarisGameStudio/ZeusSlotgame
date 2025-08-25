@@ -35,9 +35,8 @@ namespace Classic
             if (tweenAction != null && tweenAction.IsPlaying) {
                 tweenAction.Stop(true);
             }
-			if (tweener != null) { 
-				tweener.Kill (true);
-            }
+            
+			DOTween.Kill(tweener);
 
             finalNum = number;
 
@@ -64,10 +63,7 @@ namespace Classic
 		{
 			if (coinText == null) 
 			{
-				if (tweener != null) 
-				{
-					tweener.Kill ();
-				}
+				DOTween.Kill(tweener);
 				return;
 			}
 			if(initNum ==0)

@@ -26,7 +26,7 @@ namespace Libs
 
         public override string GetDesc()
         {
-            return "CollectNewCardTypeCount";
+            return "CollectNumCards";
         }
     }
 }

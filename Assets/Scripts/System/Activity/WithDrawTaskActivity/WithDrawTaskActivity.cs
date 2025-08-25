@@ -234,7 +234,7 @@ namespace Activity
             int iconId = 0;
             if (Task!= null)
             {
-                if (Task is CollectCardTypeCountTask|| Task is CollectNewCardTypeCountTask)
+                if (Task is CollectCardTypeCountTask|| Task is CollectNewCardTypeCountTask|| Task is CollectNewCardCountTask)
                 {
                     iconId = 3;
                 }
@@ -326,16 +326,14 @@ namespace Activity
         public string GetTaskInfoDescForTip()
         {
             string info = "";
-            string key = "";
-            string arg1 = "";
+            string key = Task.GetDesc();
+            string arg1 = string.Format("<color=#D800D9>{0}</color>",Task.TargetNum - Task.HasCollectNum);
             if (Task is CollectSpinCountTask)
             {
                 key = "MoreSpinTimes";
-                arg1 = string.Format("<color=#D800D9>{0}</color>",Task.TargetNum - Task.HasCollectNum);
             }else if (Task is CollectADCountTask)
             {
                 key = "MoreVideoAds";
-                arg1 = string.Format("<color=#D800D9>{0}</color>",Task.TargetNum - Task.HasCollectNum);
             }
             else if (Task is CollectCashFromZeroTask|| Task is AccumulateTotalCashTask)
             {
@@ -345,7 +343,6 @@ namespace Activity
             }else if (Task is CollectCardTypeCountTask)
             {
                 key = "MoreCollectCards";
-                arg1 = string.Format("<color=#D800D9>{0}</color>",Task.TargetNum - Task.HasCollectNum);
             }
             LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,key);
             if (localizedString!=null)

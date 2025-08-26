@@ -21,13 +21,27 @@ namespace Libs
     
     public class TaskManager:MonoSingleton<TaskManager>
     {
-        private Dictionary<int, BaseTask> taskDict = new Dictionary<int, BaseTask>();
+        public TaskDataProgress taskDataProgress = new TaskDataProgress();
+        public Dictionary<int, BaseTask> taskDict = new Dictionary<int, BaseTask>();
         public void OnInit()
         {
-            //先加载存储在本地的任务进度数据
-            LoadTaskDictPlayerPrefers();
-            // //创建在plist节点下配置的任务信息。跳过已存储在本地的
-            // CreatePlistTask();
+            LoadProgressData();
+        }
+
+        void LoadProgressData()
+        {
+            TaskDataProgress  data = StoreManager.Instance.LoadDataJson<TaskDataProgress>(taskDataProgress.fileName);
+            if (data!=null)
+            {
+                taskDict = data.taskDict;
+                taskDataProgress.LoadData(data);
+            }
+        }
+        
+        public void SaveProgressData()
+        {
+            taskDataProgress.taskDict = taskDict;
+            taskDataProgress.SaveData();
         }
         
         public void SaveTaskDictPlayerPrefers()

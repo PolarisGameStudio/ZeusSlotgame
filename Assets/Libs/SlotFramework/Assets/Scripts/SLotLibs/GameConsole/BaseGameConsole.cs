@@ -320,7 +320,7 @@ public class BaseGameConsole :MonoBehaviour
 		{
 			CommandManager.Instance.SaveAckingCommand();
 			UserManager.GetInstance().UserProfile().LastExitGameTime = DateTime.Now;
-			TaskManager.Instance.SaveTaskDictPlayerPrefers();
+			TaskManager.Instance.SaveProgressData();
 			Analytics.GetInstance().LogEvent(Analytics.AppOut);
 			if (UserManager.GetInstance().UserProfile().HasGrantInitialBonus())
 			{
@@ -421,7 +421,7 @@ public class BaseGameConsole :MonoBehaviour
 		}
 		RulePatternManager.SaveLocalRuleData();
 		AsyncLogger.Instance.SaveData();
-		TaskManager.Instance.SaveTaskDictPlayerPrefers();
+		TaskManager.Instance.SaveProgressData();
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 		CardSystemManager.Instance.SaveProgressData();

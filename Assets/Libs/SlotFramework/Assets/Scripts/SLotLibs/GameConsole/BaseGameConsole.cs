@@ -424,11 +424,7 @@ public class BaseGameConsole :MonoBehaviour
 		TaskManager.Instance.SaveProgressData();
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
-		CardSystemManager.Instance.SaveProgressData();
-		WithDrawManager.Instance.SaveProgressData();
 		ADManager.Instance.SaveADProgressData();
-		TaskTipManager.Instance.SaveProgressData();
-
 	}
 	
 	void Update()

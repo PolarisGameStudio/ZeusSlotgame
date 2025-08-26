@@ -200,7 +200,7 @@ namespace Libs
                 return false;
             }
 
-            if (!OnLineEarningMgr.Instance.isThreeHundredOpen())
+            if (OnLineEarningMgr.Instance.isInfiniteOpen())
             {
                 return false;
             }
@@ -265,7 +265,7 @@ namespace Libs
                 return false;
             }
 
-            if (OnLineEarningMgr.Instance.isThreeHundredOpen())
+            if (!OnLineEarningMgr.Instance.isInfiniteOpen())
             {
                 return false;
             }

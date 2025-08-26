@@ -196,7 +196,6 @@ namespace Activity
                 {
                     randomReward = Random.Range(_minReward,_maxReward + 1);
                 }
-                
             }
             else if (OnLineEarningMgr.Instance.isThreeHundredOpen())
             {
@@ -205,6 +204,13 @@ namespace Activity
                 if (IsCloseReward)
                 {
                     randomReward = (int)(randomReward * _closeRewardRate);
+                }
+            }else if (OnLineEarningMgr.Instance.isIntervalDataPatternOpen())
+            {
+                randomReward = OnLineEarningMgr.Instance.GetRewardsByName(OnLineEarningConstants.REWARD_CONTINUESPIN);
+                if (!IsCloseReward)
+                {
+                    randomReward *= 2;
                 }
             }
             return randomReward;

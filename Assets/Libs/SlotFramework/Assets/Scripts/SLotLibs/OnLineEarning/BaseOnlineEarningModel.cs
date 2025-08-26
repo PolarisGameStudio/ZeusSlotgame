@@ -28,7 +28,9 @@ namespace Core
         
         //插屏广告翻倍奖励的倍数，默认为 1
         public int ADMultiple = 1;
-       
+        
+        private int Multiple = 1;
+
         public int CurLuckyADNumber
         {
             set
@@ -128,6 +130,8 @@ namespace Core
 
         public virtual void ParseConfig(Dictionary<string,object> config)
         {
+            LuckyADLimit = Utilities.GetInt(config,OnLineEarningConstants.LuckyVideoLimit,15);
+            Multiple = Utilities.GetInt(config,OnLineEarningConstants.Multiple,100);
             Dictionary<string,object> rewards = Utils.Utilities.GetValue<Dictionary<string,object>>(config,OnLineEarningConstants.RewardTimerKey,null);
             if (rewards == null)
             {
@@ -146,7 +150,6 @@ namespace Core
                 BaseOnLineEarningTimer timer= CreateRewardTimer(name, rewardData);
                 rewardTimers[name] = timer;
             }
-            LuckyADLimit = Utilities.GetInt(config,OnLineEarningConstants.LuckyVideoLimit,15);
         }
 
         BaseOnLineEarningTimer CreateRewardTimer(string name,Dictionary<string,object> rewardData)
@@ -204,7 +207,7 @@ namespace Core
 
         public virtual int CashMultiple()
         {
-            return 100;
+            return Multiple;
         }
         
         public virtual bool CanShowBig()
@@ -274,6 +277,10 @@ namespace Core
         public virtual int GetH5Reward()
         {
             return 0;
+        }
+        public virtual int GetMaxValue()
+        {
+            return 1;
         }
         public virtual void AddGetRewardCount()
         {

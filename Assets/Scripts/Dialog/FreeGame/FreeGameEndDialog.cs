@@ -232,7 +232,7 @@ public class FreeGameEndDialog : UIDialog
     public void OnStart(long coins, int count,int cash)
     {
         totalCoins = coins;
-        totalCash = OnLineEarningMgr.Instance.isThreeHundredOpen()?OnLineEarningMgr.Instance.GetRewardsByName(OnLineEarningConstants.REWARD_FREEGAMEEND):cash;
+        totalCash = !OnLineEarningMgr.Instance.isInfiniteOpen()?OnLineEarningMgr.Instance.GetRewardsByName(OnLineEarningConstants.REWARD_FREEGAMEEND):cash;
         if(FreeGameCount != null) 
             FreeGameCount.SetText(count.ToString());
         if (FreeGameWinCash!=null)

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -75,8 +75,7 @@ public class WesternTreasureCoinItem : MonoBehaviour
                 animator.Play("JackpotGame_show");
                 break;
             case 3:
-                //animator.Play("JackpotGame_win");
-                
+                animator.Play("JackpotGame_win");
                 break;
             default:
                 break;

@@ -152,7 +152,7 @@ namespace Core
             }
         }
         
-        public int GetMaxValue()
+        public override int GetMaxValue()
         {
             return maxValue;
         }
@@ -198,7 +198,7 @@ namespace Core
             {
                 rewardNum = 0;
                 //关闭H5按钮
-                SharedPlayerPrefs.SetPlayerPrefsBoolValue(HideH5TagKey,false);
+                SharedPlayerPrefs.SetPlayerPrefsBoolValue(OnLineEarningConstants.HideH5TagKey,false);
                 Messenger.Broadcast<bool>(GameConstants.OnH5InitSuccess,false);
                 //通知原生部分
                 PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UserAmount,newNum);
@@ -253,10 +253,7 @@ namespace Core
             }
             return rewardNum;
         }
-        public override int CashMultiple()
-        {
-            return 10000;
-        }
+        
         public override void PopSmallDialogEnd()
         {
             CurSpinTime =0;
@@ -306,7 +303,7 @@ namespace Core
         }
         public override bool CanShowH5()
         {
-            return GetRewardCount >=1 && SharedPlayerPrefs.GetPlayerBoolValue(HideH5TagKey,true)&& PlatformManager.Instance.CheckCanShowH5();
+            return GetRewardCount >=1 && SharedPlayerPrefs.GetPlayerBoolValue(OnLineEarningConstants.HideH5TagKey,true)&& PlatformManager.Instance.CheckCanShowH5();
         }
 
         public override int GetH5Reward()
@@ -324,7 +321,7 @@ namespace Core
             else if(OnLineEarningMgr.Instance.Cash()+amount>GetMaxValue()*9990)
             {
                 Messenger.Broadcast<bool>(GameConstants.OnH5InitSuccess,false);
-                SharedPlayerPrefs.SetPlayerPrefsBoolValue(HideH5TagKey,false);
+                SharedPlayerPrefs.SetPlayerPrefsBoolValue(OnLineEarningConstants.HideH5TagKey,false);
             }
         }
 

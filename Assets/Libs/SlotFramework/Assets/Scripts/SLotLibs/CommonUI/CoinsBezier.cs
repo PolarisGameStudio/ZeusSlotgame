@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using App;
@@ -564,7 +564,7 @@ namespace Libs
 
 			// 路径设定
 			bezierMiddlePoints.Add(new List<Vector3>());
-			if (OnLineEarningMgr.Instance.isThreeHundredOpen())
+			if (!OnLineEarningMgr.Instance.isInfiniteOpen())
 			{
 				bezierMiddlePoints[0].Add(new Vector3(-1.5f, 0.4f, 0f));
 				bezierMiddlePoints[0].Add(new Vector3(1f, 0.7f, 0f));

@@ -221,9 +221,9 @@ public class SlotBottomPanel : MonoBehaviour
         BetPanel.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
         if (BetPanel_300!=null)
         {
-            BetPanel_300.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen());
+            BetPanel_300.SetActive(!OnLineEarningMgr.Instance.isInfiniteOpen());
         }
-        if (OnLineEarningMgr.Instance.isThreeHundredOpen())
+        if (!OnLineEarningMgr.Instance.isInfiniteOpen())
         {
             if (CoinsPanelBottom!=null)
             {

@@ -84,7 +84,7 @@ namespace Classic
                     BaseGameConsole.singletonInstance.SlotMachineController.CoinsTransform = coinsPanel.coinTarget;
                     BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel.cashTarget;
                 }
-                else if (OnLineEarningMgr.Instance.isThreeHundredOpen())
+                else
                 {
                     BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel_300.cashTarget;
                 }
@@ -101,7 +101,8 @@ namespace Classic
 
         void UpdateUI()
         {
-            if (OnLineEarningMgr.Instance.isThreeHundredOpen()&& image_300bg!=null)
+            //300模式和区间模式共用一套ui
+            if (!OnLineEarningMgr.Instance.isInfiniteOpen()&& image_300bg!=null)
             {
                 GetComponent<Image>().sprite = image_300bg;
             }
@@ -110,12 +111,13 @@ namespace Classic
             withDrawPanel.InitMoney(OnLineEarningMgr.Instance.Cash());
             if (withDrawPanel_300!=null)
             {
-                withDrawPanel_300.gameObject.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen()&!PlatformManager.Instance.IsWhiteBao());
+                withDrawPanel_300.gameObject.SetActive(!OnLineEarningMgr.Instance.isInfiniteOpen()&!PlatformManager.Instance.IsWhiteBao());
                 withDrawPanel_300.InitMoney(OnLineEarningMgr.Instance.Cash());
             }
             levelPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
             if (levelPanel_300!=null)
             {
+                //只有300模式显示
                 levelPanel_300.gameObject.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen());
             }
         }
@@ -173,6 +175,5 @@ namespace Classic
             FlyCoinsPanel.Instance.topPanelRect = (transform as RectTransform);
             FlyCoinsPanel.Instance.GetCurrentCoinsPanelTrans(coinsPanel.transform);
         }
-
     }
 }

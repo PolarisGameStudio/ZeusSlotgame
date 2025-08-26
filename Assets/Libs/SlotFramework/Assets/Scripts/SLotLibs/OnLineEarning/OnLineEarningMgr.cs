@@ -58,6 +58,7 @@ public class OnLineEarningMgr
     private int OnLineEarningModel = 0;
     private InfiniteModel _infiniteModel;
     private ThreeHundredModel _threeHundredModel;
+    private IntervalDataPattern _intervalDataPattern;
 
     private BaseOnlineEarningModel _baseOnlineEarningModel;
     //系统开启按钮
@@ -118,6 +119,19 @@ public class OnLineEarningMgr
             }
             _threeHundredModel.ParseConfig(ThreeHundredConfigDict);
             _baseOnlineEarningModel = _threeHundredModel;
+        }
+        else if (OnLineEarningModel == 2)
+        {
+            Dictionary<string,object> IntervalModelConfig = Utils.Utilities.GetValue<Dictionary<string,object>>(config,OnLineEarningConstants.IntervalModelConfig,null);
+            if(IntervalModelConfig == null) 
+                throw new ArgumentNullException ("PopPlan dict not in big plist");
+            //开启300模式，解析300模式配置
+            if (_intervalDataPattern == null)
+            {
+                _intervalDataPattern = new IntervalDataPattern();
+            }
+            _intervalDataPattern.ParseConfig(IntervalModelConfig);
+            _baseOnlineEarningModel = _intervalDataPattern;
         }
         newUserSpinCount = Utilities.GetInt(config,OnLineEarningConstants.NewUserLimitKey,0);
         //加载本地化数据
@@ -190,6 +204,11 @@ public class OnLineEarningMgr
         return isOpen && _threeHundredModel != null;
     }
     
+    public bool isIntervalDataPatternOpen()
+    {
+        return isOpen && _intervalDataPattern != null;
+    }
+    
     public InfiniteModel GetPopPlanConfig()
     {
         return _infiniteModel;
@@ -198,7 +217,12 @@ public class OnLineEarningMgr
     {
         return _threeHundredModel;
     }
-
+    
+    public IntervalDataPattern GetIntervalDataPattern()
+    {
+        return _intervalDataPattern;
+    }
+    
     #region Cash
 
     private string language = "";
@@ -507,7 +531,7 @@ public class OnLineEarningMgr
     {
         string str = "";
         double money = ConvertMoneyToDouble(amount, decimalPlace);
-        if (money<0.01&& money>0&&isThreeHundredOpen())
+        if (money<0.01&& money>=0&&!isInfiniteOpen())
         {
             money = 0.01;
         }
@@ -605,12 +629,7 @@ public class OnLineEarningMgr
 
     public int GetMaxValue()
     {
-        if (isThreeHundredOpen())
-        {
-            return (_baseOnlineEarningModel as ThreeHundredModel).GetMaxValue();
-        }
-
-        return 1;
+        return _baseOnlineEarningModel.GetMaxValue();
     }
     
     public bool IsWhiteBao()

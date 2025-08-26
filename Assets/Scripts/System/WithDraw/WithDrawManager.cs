@@ -18,6 +18,7 @@ namespace System
         public bool haveClickShowAccount = false;
         //提现的公共冷却时间
         private int coolTime = 0;
+        public static bool WithDrawUIShow = false;
         public static WithDrawManager Instance{
             get{ 
                 return Singleton<WithDrawManager>.Instance;

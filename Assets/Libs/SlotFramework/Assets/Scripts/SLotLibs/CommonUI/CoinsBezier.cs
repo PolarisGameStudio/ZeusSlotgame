@@ -20,23 +20,23 @@ namespace Libs
 		public Transform startTransform;
 		private static CoinsBezier _instance;
 
-		public DelayAction stopCoinShakeDelay = null;
-		public Animator coinShakeAnimator;
+		private DelayAction stopCoinShakeDelay = null;
+		private Animator coinShakeAnimator;
 		public float coinShakeTime;
 
 		// 用来描述曲线与运动过程中变化的相关参数
 		// 曲线的中间点的相对坐标
-		public static List<List<Vector3>> bezierMiddlePoints;
+		private static List<List<Vector3>> bezierMiddlePoints;
 		// 曲线中间点的相对随机偏移量范围
-		public static List<float> bezierMiddlePointsOffset;
+		private static List<float> bezierMiddlePointsOffset;
 		// 描述硬币随运动的大小变化
-		public static List<List<Vector2>> sizeScaleChangePolylines;
+		private static List<List<Vector2>> sizeScaleChangePolylines;
 		// 描述硬币在何时运动到曲线的何处
-		public static List<List<Vector2>> timeScaleChangePolylines;
+		private static List<List<Vector2>> timeScaleChangePolylines;
 		// 硬币从起点运动到终点的时间范围
-		public static List<Vector2> timeDuration;
+		private static List<Vector2> timeDuration;
 		// 硬币出现的持续时间
-		public static List<float> popDuration;
+		private static List<float> popDuration;
 
 		// 用来在unity中实时调试曲线的参数，调完之后记得写到代码里。仅支持对一段曲线的调试
 		[Header("是否启用调试")]
@@ -155,7 +155,7 @@ namespace Libs
 			return endPos;
 		}
 
-		public void PlayCoinEffect(Vector3 fromPosition)
+		private void PlayCoinEffect(Vector3 fromPosition)
 		{
 			if(CoinEffect==null)return;
 			if (_coinEffect!=null)
@@ -173,7 +173,7 @@ namespace Libs
 			}
 		}
 
-		public void StopCoinEffect()
+		private void StopCoinEffect()
 		{
 			if(CoinEffect==null)return;
 			_coinEffect = this.transform.Find("CoinEffect").gameObject;
@@ -337,13 +337,10 @@ namespace Libs
 				float offset = Random.Range(-1f, 1f);
 //				offset = -1f + 2f * i / (count - 1);
 				// 从池中取物体，节省性能
-				CoinBezierObject element = CreateBezierObject();
+				CoinBezierObject element = (PoolMgr.DefaultPools.GetOrCreatePool("BezierCoins").CreateObject( BezierObject) as GameObject).GetComponent<CoinBezierObject>();
 				// 起始位置、起始大小设置
 				element.gameObject.SetActive (true);
-				if (element.gameObject.GetComponent<Animator>()!=null)
-				{
-					element.gameObject.GetComponent<Animator>().enabled = false;
-				}
+				element.gameObject.GetComponent<Animator>().enabled = false;
 
 				element.transform.SetParent (this.transform, false);
 				element.transform.localPosition = fromPosition;
@@ -424,12 +421,6 @@ namespace Libs
 			Messenger.Broadcast(GameConstants.SET_COINSPANEL_TWEENER_PARAM, minEndTime - sigma, maxEndTime - minEndTime);
 		}
 
-        public CoinBezierObject CreateBezierObject()
-        {
-	        CoinBezierObject element = (PoolMgr.DefaultPools.GetOrCreatePool(PoolKey).CreateObject(BezierObject) as GameObject).GetComponent<CoinBezierObject>();
-	        return element;
-        }
-        
         // 停止所有的金币，令其隐藏
         public void KillAllCoins() {
             foreach (CoinBezierObject element in bezierObjects) {
@@ -441,11 +432,11 @@ namespace Libs
         private void KillCoin(CoinBezierObject element) {
 //            element.gameObject.SetActive(false);
 //            StartCoroutine(UI.Utils.UIUtil.DelayAction(2f, delegate () {
-                PoolMgr.DefaultPools.GetOrCreatePool(PoolKey).DestoryObject(element.gameObject);
+                PoolMgr.DefaultPools.GetOrCreatePool("BezierCoins").DestoryObject(element.gameObject);
 //            }));
         }
 
-        public void GetAnimator()
+		private void GetAnimator()
 		{
 			// if (coinShakeAnimator == null) {
 			// 	if (BaseGameConsole.singletonInstance.IsInLobby ()) {
@@ -459,7 +450,7 @@ namespace Libs
 
 		// 播放终点的金币动画，在金币到达终点时调用
 		// 一定时间后停止动画，若在此之前又有新的金币到达（函数被调用）则重置计时器
-		public void PlayCoinAnimation() {
+		private void PlayCoinAnimation() {
 			if (stopCoinShakeDelay == null) {
 				stopCoinShakeDelay = new DelayAction(coinShakeTime, null, StopCoinAnimation);
 			}
@@ -475,18 +466,18 @@ namespace Libs
 		}
 
 		// 停止终点的金币动画
-		public void StopCoinAnimation() {
+		private void StopCoinAnimation() {
 			if (coinShakeAnimator != null) {
 				coinShakeAnimator.SetTrigger("Stop");
 			}
 		}
 	
-		public float genOffset ()
+		private float genOffset ()
 		{
 			return UnityEngine.Random.Range (-100, 100);
 		}
 
-		public List<Object> bezierObjects = new List<Object>();
+		private List<Object> bezierObjects = new List<Object>();
 
 		// 曲线的种类
 		public enum BezierType {
@@ -502,7 +493,7 @@ namespace Libs
 		}
 
 		// 这两个方法会返回应该使用的参数的编号
-		public int GetBezierSettingIndex(BezierType bezierType) {
+		private int GetBezierSettingIndex(BezierType bezierType) {
 			switch (bezierType) {
 			case BezierType.ByPosition:
 				return -1;
@@ -531,7 +522,7 @@ namespace Libs
 			return 0;
 		}
 
-		public int GetBezierSettingIndex(Vector3 worldPos) {
+		private int GetBezierSettingIndex(Vector3 worldPos) {
 			if (worldPos.y > 1) {
 				if (worldPos.x < -4.8) {
 					return 4;
@@ -557,7 +548,7 @@ namespace Libs
 		}
 
 		// 在这里设定曲线中间点的相对坐标
-		public static void BezierMiddlePointSettings() {
+		private static void BezierMiddlePointSettings() {
 			if (bezierMiddlePoints == null) {
 				bezierMiddlePoints = new List<List<Vector3>>();
 			}
@@ -599,7 +590,7 @@ namespace Libs
 		}
 
 		// 在这里设定曲线中间点的随机相对偏移量最大值
-		public static void BezierMiddlePointOffsetSettings() {
+		private static void BezierMiddlePointOffsetSettings() {
 			if (bezierMiddlePointsOffset == null) {
 				bezierMiddlePointsOffset = new List<float>();
 			}
@@ -614,7 +605,7 @@ namespace Libs
 		}
 
 		// 在这里设定物体在何时运动到曲线的何处
-		public static void TimeScaleChangeSettings() {
+		private static void TimeScaleChangeSettings() {
 			if (timeScaleChangePolylines == null) {
 				timeScaleChangePolylines = new List<List<Vector2>>();
 			}
@@ -659,7 +650,7 @@ namespace Libs
 		}
 
 		// 在这里设定物体在运动时的大小变化
-		public static void SizeScaleChangeSettings() {
+		private static void SizeScaleChangeSettings() {
 			if (sizeScaleChangePolylines == null) {
 				sizeScaleChangePolylines = new List<List<Vector2>>();
 			}
@@ -708,7 +699,7 @@ namespace Libs
 		}
 
 		// 在这里设定物体做曲线运动的时间范围
-		public static void TimeDurationSettings() {
+		private static void TimeDurationSettings() {
 			if (timeDuration == null) {
 				timeDuration = new List<Vector2>();
 			}
@@ -723,7 +714,7 @@ namespace Libs
 		}
 
 		// 在这里设定物体出现的出现时间
-		public static void PopDurationSettings() {
+		private static void PopDurationSettings() {
 			if (popDuration == null) {
 				popDuration = new List<float>();
 			}

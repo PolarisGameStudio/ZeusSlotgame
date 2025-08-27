@@ -2089,31 +2089,17 @@ public class BaseSlotMachineController : MonoBehaviour
 	    Libs.CoinsBezier.Instance.Create (from, to, bezierType, callback);
     }
 
-	public void CreateCoinBezierFromInputMouse(CoinsBezier.BezierObjectType bezierObjectType= CoinsBezier.BezierObjectType.Coin)
+    public void CreateCoinBezierFromInputMouse ( )
     {
-	    Transform targetTransformVector;
-	    if (bezierObjectType == CoinsBezier.BezierObjectType.Cash)
-	    {
-		    targetTransformVector = CashTransform;
-	    }
-	    else  
-	    {
-		    targetTransformVector = this.CoinsTransform;
-	    }
+	    Transform targetTransformVector = this.CoinsTransform;
+
 	    if (ToCamera == null || targetTransformVector == null) {
 		    return;
 	    }
 
 	    Vector3 from = Libs.CoinsBezier.Instance.LocalPositionFromInputMouse ();
 	    Vector2 to = Libs.CoinsBezier.Instance.LocalPositionFromTransForm (ToCamera, targetTransformVector);
-	    if (bezierObjectType == CoinsBezier.BezierObjectType.Cash)
-	    {
-		    Libs.CashBezier.Instance.Create (from, to, CoinsBezier.BezierType.DailyBonus);
-	    }
-	    else
-	    {
-		    Libs.CoinsBezier.Instance.Create (from, to, Libs.CoinsBezier.BezierType.DailyBonus);
-	    }
+	    Libs.CoinsBezier.Instance.Create (from, to, Libs.CoinsBezier.BezierType.DailyBonus);
     }
 
 	

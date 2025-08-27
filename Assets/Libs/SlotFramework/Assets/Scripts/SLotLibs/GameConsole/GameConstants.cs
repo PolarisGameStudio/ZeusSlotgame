@@ -1373,4 +1373,5 @@ public static class GameConstants
 	public const string SHOW_WITH_DRAW_TIPS_PANEL = "SHOW_WITH_DRAW_TIPS_PANEL";
 	
 	public const string TriggerBonusGame = "TriggerBonusGame";
+	public const string PlayFullScreenAnimation= "PlayFullScreenAnimation";
 }

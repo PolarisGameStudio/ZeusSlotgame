@@ -644,4 +644,8 @@ public class GameDialogManager : MonoBehaviour
 	{
 		
 	}
+	protected virtual void OpenAccountLoginTipsDialog(int cash)
+	{
+		
+	}
 }

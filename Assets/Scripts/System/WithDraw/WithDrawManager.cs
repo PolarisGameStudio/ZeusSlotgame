@@ -16,6 +16,7 @@ namespace System
         //用于区分当前点击的是哪一个任务绑定的UI
         public int CurSelectTaskId = 0;
         public bool haveClickShowAccount = false;
+        public bool IsInWithDrawProgress = false;
         //提现的公共冷却时间
         private int coolTime = 0;
         public static bool WithDrawUIShow = false;

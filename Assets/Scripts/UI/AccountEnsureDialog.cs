@@ -51,6 +51,7 @@ namespace Classic
         {
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
             this.Close();
+            WithDrawManager.Instance.IsInWithDrawProgress = true;
             WithDrawManager.Instance.ReduceCash(money);
             Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
             Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);

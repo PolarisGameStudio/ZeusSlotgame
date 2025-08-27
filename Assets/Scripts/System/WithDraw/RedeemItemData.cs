@@ -107,11 +107,12 @@ namespace System
             if(!WithDrawManager.WithDrawUIShow) return;
             Debug.Log($"[RedeemItemData][UpdateTaskData] [task.TaskId ==]:{task.TaskId}   [SelectId==]:{WithDrawManager.Instance.GetSelectId()}");
             bool isSelf = WithDrawManager.Instance.GetSelectId() == task.TaskId;
-            if (isSelf)
+            if (isSelf && WithDrawManager.Instance.IsInWithDrawProgress)
             {
                 //可领奖时长 = 现在时间+额外领奖时长
                 task.CanRewardTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
                 WithDrawManager.Instance.ResetSelectId();
+                WithDrawManager.Instance.IsInWithDrawProgress = false;
             }
             UpdateState();
             //此处是否刷新UI取决于界面是否关闭

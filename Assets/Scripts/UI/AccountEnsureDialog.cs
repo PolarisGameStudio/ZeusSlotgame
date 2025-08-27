@@ -45,6 +45,8 @@ namespace Classic
             DateTime now = DateTime.Now;
             dataTmp.text = now.ToString("MM/dd/yyyy");
         }
+
+        private const string Redeem = "Redeem";
         private void EnsureBtnClick()
         {
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
@@ -52,6 +54,11 @@ namespace Classic
             WithDrawManager.Instance.ReduceCash(money);
             Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
             Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);
+
+            int count = PlayerPrefs.GetInt(Redeem, 0);
+            count++;
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, Redeem, count);
+            PlayerPrefs.SetInt(Redeem, count);
             
         }
     }

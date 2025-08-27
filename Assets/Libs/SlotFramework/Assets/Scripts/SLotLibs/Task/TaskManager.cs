@@ -3,22 +3,10 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Plugins;
 using UnityEngine;
+using Utils;
 
 namespace Libs
 {
-    [System.Serializable]
-    public class TaskDictItem
-    {
-        public int taskId;   // 
-        public BaseTask task;
-    }
-    
-    [System.Serializable]
-    public class TaskDictWrapper
-    {
-        public List<TaskDictItem> list = new List<TaskDictItem>();
-    }
-    
     public class TaskManager:MonoSingleton<TaskManager>
     {
         public TaskDataProgress taskDataProgress = new TaskDataProgress();
@@ -33,52 +21,55 @@ namespace Libs
             TaskDataProgress  data = StoreManager.Instance.LoadDataJson<TaskDataProgress>(taskDataProgress.fileName);
             if (data!=null)
             {
-                taskDict = data.taskDict;
                 taskDataProgress.LoadData(data);
             }
         }
         
         public void SaveProgressData()
         {
-            taskDataProgress.taskDict = taskDict;
             taskDataProgress.SaveData();
         }
+
+        public List<Dictionary<string,object>> ConvertTaskDataToJson()
+        {
+            List<Dictionary<string,object>> taskDataList = new List<Dictionary<string, object>>();
+            foreach (var item in taskDict)
+            {
+                Dictionary<string,object> dict = item.Value.GetSaveDataDict();
+                taskDataList.Add(dict);
+            }
+            return taskDataList;
+        }
         
-        public void SaveTaskDictPlayerPrefers()
+        /// <summary>
+        /// 新创建的任务需要调用此方法克隆本地保存的任务进度
+        /// </summary>
+        /// <param name="task"></param>
+        public void CloneTaskProgress(BaseTask task)
         {
-            var wrapper = new TaskDictWrapper();
-            foreach (var kvp in taskDict)
-            {
-                wrapper.list.Add(new TaskDictItem(){taskId = kvp.Key, task = kvp.Value});
-            }
-            string taskStr = Newtonsoft.Json.JsonConvert.SerializeObject(wrapper,new JsonSerializerSettings {
-                TypeNameHandling = TypeNameHandling.All});
-            Debug.Log($"[TaskManager][SaveTaskDictPlayerPrefers] [taskStr]:{taskStr}");
-            PlayerPrefs.SetString(TaskConstants.SaveTaskDict_Key,taskStr);
-        }
-
-        private void LoadTaskDictPlayerPrefers()
-        {
-            string taskStr = PlayerPrefs.GetString(TaskConstants.SaveTaskDict_Key,"");
-            if (string.IsNullOrEmpty(taskStr))
+            //再创建本地保存的任务
+            if (taskDataProgress.taskDataList == null || taskDataProgress.taskDataList.Count == 0)
             {
                 return;
             }
+            foreach (var taskDictItem in taskDataProgress.taskDataList)
+            {
+                int taskId = Utilities.GetInt(taskDictItem, TaskConstants.TaskId_Key, 0);
+                if (taskDict.ContainsKey(taskId))
+                {
+                    //已经存在的任务不再创建
+                    continue;
+                }
 
-            TaskDictWrapper taskDictWrapper = JsonConvert.DeserializeObject<TaskDictWrapper>(taskStr,new JsonSerializerSettings {
-                TypeNameHandling = TypeNameHandling.All});
-            if (taskDictWrapper.list == null || taskDictWrapper.list.Count == 0)
-            {
-                Debug.LogError($"[TaskManager][LoadTaskDictPlayerPrefers] taskDictWrapper.list is empty");
-                return;
-            }
-            //从 json数据中加载存储在本地的任务进度
-            foreach (var item in taskDictWrapper.list)
-            {
-                taskDict.Add(item.taskId,item.task); 
+                if (taskId != task.TaskId)
+                {
+                    continue;
+                }
+                //加载本地保存的任务数据
+                task.LoadSaveDataDict(taskDictItem);
+                break;
             }
         }
-
         
         /// <summary>
         /// 外部系统通过此方法获取任务并注册，已缓存的直接获取，未缓存的直接创建
@@ -90,13 +81,8 @@ namespace Libs
         {
             //创建对象，主要是走一遍构造函数
             BaseTask task = TaskFactory.CreateTask(dict);
-            BaseTask savedTask = GetTaskById(taskId);
-            if (savedTask != null)
-            {
-                //将已保存任务进度和状态相关信息克隆
-                task.Clone(savedTask);
-            }
-            taskDict[task.TaskId] = task;
+            CloneTaskProgress(task);
+            taskDict[taskId] = task;
             return task;
         }
 

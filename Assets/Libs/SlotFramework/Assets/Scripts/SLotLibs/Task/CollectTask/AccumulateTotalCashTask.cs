@@ -34,13 +34,12 @@ namespace Libs
             base.UpdateTaskStatus();
         }
 
-        public override void Clone(BaseTask task)
+        public override void LoadSaveDataDict(Dictionary<string, object> taskDict)
         {
-            base.Clone(task);
-            HasCollectNum = Math.Max(OnLineEarningMgr.Instance.Cash(), task.HasCollectNum);
-            UpdateTaskStatus();
+            base.LoadSaveDataDict(taskDict);
+            HasCollectNum = Math.Max(OnLineEarningMgr.Instance.Cash(), this.HasCollectNum);
         }
-        
+
         public override string GetProgressDesc()
         {
             return string.Format("{0}/{1}",OnLineEarningMgr.Instance.GetMoneyStr((int)HasCollectNum,0,false,true),

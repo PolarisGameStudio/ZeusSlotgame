@@ -5,18 +5,18 @@ namespace Libs
     public class TaskDataProgress:ProgressDataBase<TaskDataProgress>
     {
         public string fileName = "TaskDataProgress";
-        public Dictionary<int, BaseTask> taskDict = new Dictionary<int, BaseTask>();
+        public List<Dictionary<string,object>> taskDataList = new List<Dictionary<string, object>>();
         public override void LoadData(TaskDataProgress progressData)
         {
-            taskDict = progressData.taskDict;
+            taskDataList = progressData.taskDataList;
         }
 
         public override void SaveData()
         {
-            taskDict = TaskManager.Instance.taskDict;
+            taskDataList = TaskManager.Instance.ConvertTaskDataToJson();
             StoreManager.Instance.SaveDataJson(fileName,this);
         }
-
+        
         public override void ClearData()
         {
             StoreManager.Instance.DeleteProgress(fileName);

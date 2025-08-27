@@ -187,5 +187,26 @@ namespace Libs
             ParentTask = task.ParentTask;
             Mark = task.Mark;
         }
+        public virtual void LoadSaveDataDict(Dictionary<string,object> taskDict)
+        {
+            if (taskDict == null) return;
+            HasCollectNum = Utilities.GetLong(taskDict, TaskConstants.CollectNumber_Key, 0);
+            CanRewardTime = Utilities.GetLong(taskDict, TaskConstants.CanRewardTime_Key, 0);
+            SpinTotalNum = Utilities.GetInt(taskDict, TaskConstants.SpinTotalNum_Key, 0);
+            State = Utilities.GetInt(taskDict, TaskConstants.TaskState_Key, 0);
+            IsTaskConditionOK = HasCollectNum >= TargetNum;
+        }
+        
+        //存储进度相关动态数据，方便本地存储
+        public virtual Dictionary<string, object> GetSaveDataDict()
+        {
+            Dictionary<string,object> data = new Dictionary<string, object>();
+            data[TaskConstants.TaskId_Key] = TaskId;
+            data[TaskConstants.CollectNumber_Key] = HasCollectNum;
+            data[TaskConstants.CanRewardTime_Key] = CanRewardTime;
+            data[TaskConstants.SpinTotalNum_Key] = SpinTotalNum;
+            data[TaskConstants.TaskState_Key] = State;
+            return data;
+        }
     }
 }

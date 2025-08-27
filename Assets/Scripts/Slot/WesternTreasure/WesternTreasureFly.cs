@@ -247,6 +247,8 @@ public class WesternTreasureFly : MonoBehaviour
         if (entry.animation.name != animationName)
         {
             //播放完Tree 4动画后，继续播放idle动画
+            skeletonGraphic.AnimationState.ClearTrack(0);
+            skeletonGraphic.Skeleton.SetSlotsToSetupPose();
             skeletonGraphic.AnimationState.SetAnimation(0, animationName, true);
         }
     }

@@ -262,8 +262,9 @@ public class RedeemItem : MonoBehaviour
     {
         //先隐藏自身
         Debug.Log("RedeemItem ShowFailedUI");
-        // this.gameObject.SetActive(false);
-        Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemMsg);
+        this.gameObject.SetActive(false);
+        //下面会导致无限调用，循环广播
+        //Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemMsg);
     }
     
     private void ShowConditionUI()

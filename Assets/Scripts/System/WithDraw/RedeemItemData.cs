@@ -104,7 +104,6 @@ namespace System
         //任务状态已刷新，根据当前的状态进行操作
         private void UpdateTaskData()
         {
-            if(!WithDrawManager.WithDrawUIShow) return;
             Debug.Log($"[RedeemItemData][UpdateTaskData] [task.TaskId ==]:{task.TaskId}   [SelectId==]:{WithDrawManager.Instance.GetSelectId()}");
             bool isSelf = WithDrawManager.Instance.GetSelectId() == task.TaskId;
             if (isSelf)
@@ -146,6 +145,7 @@ namespace System
             data["index"] =  index;
             data["platSpIndex"] = platSpIndex;
             data["cash"] = (int)task.TargetNum;
+            data["taskId"] = task.TaskId;
             RecordItemData itemData = new RecordItemData(data);
             return itemData;
         }

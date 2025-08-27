@@ -69,7 +69,6 @@ public class WithDrawDialog : UIDialog
         Messenger.AddListener(GameDialogManager.CloseWithDrawDialog,Close);
         Messenger.AddListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateCashNum);
         Messenger.AddListener(WithDrawConstants.ShowTipMsg,ShowTip);
-        WithDrawManager.WithDrawUIShow = true;
     }
 
     protected override void OnDisable()
@@ -77,7 +76,6 @@ public class WithDrawDialog : UIDialog
         Messenger.RemoveListener(GameDialogManager.CloseWithDrawDialog,Close);
         Messenger.RemoveListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateCashNum);
         Messenger.RemoveListener(WithDrawConstants.ShowTipMsg,ShowTip);
-        WithDrawManager.WithDrawUIShow = false;
     }
 
     public void UpdateCashNum()

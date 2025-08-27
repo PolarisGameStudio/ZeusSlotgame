@@ -263,8 +263,15 @@ public class RedeemItem : MonoBehaviour
         //先隐藏自身
         Debug.Log("RedeemItem ShowFailedUI");
         this.gameObject.SetActive(false);
-        //下面会导致无限调用，循环广播
-        //Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemMsg);
+        //如果不加这条判断的话，下面会导致无限调用，循环广播
+        if(WithDrawManager.Instance.HasData(itemData.task.TaskId)) return;
+        //提现状态失败，转换为集卡任务
+        RecordItemData recordItemData = itemData.ToRecordItemData();
+        WithDrawManager.Instance.RemoveRedeemItem(itemData);
+        WithDrawManager.Instance.AddRecordItemData(recordItemData);
+        
+        
+        Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemMsg);
     }
     
     private void ShowConditionUI()

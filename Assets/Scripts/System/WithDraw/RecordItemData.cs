@@ -18,12 +18,14 @@ namespace System
         public int curProgress = 0;
         public int targetProgress = 0;
         public int cash = 0;
+        public int taskId;
         public RecordItemData(Dictionary<string, object> config)
         {
             data = config;
             index = Utilities.GetInt(config, "index", -1);
             cash = Utilities.GetInt(config, "cash", 0);
             platSpIndex = Utilities.GetInt(config, "platSpIndex", -1);
+            taskId =  Utilities.GetInt(config, "taskId", -1);
         }
         
         public void OnInit(RecordItem item)

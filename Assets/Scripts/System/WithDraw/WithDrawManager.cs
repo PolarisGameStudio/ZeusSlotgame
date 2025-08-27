@@ -18,7 +18,6 @@ namespace System
         public bool haveClickShowAccount = false;
         //提现的公共冷却时间
         private int coolTime = 0;
-        public static bool WithDrawUIShow = false;
         public static WithDrawManager Instance{
             get{ 
                 return Singleton<WithDrawManager>.Instance;
@@ -191,6 +190,15 @@ namespace System
                 return;
             }
             recordItemDict.Add(itemData);
+        }
+
+        public bool HasData(int taskId)
+        {
+            foreach (var data in recordItemDict)
+            {
+                if (data.taskId == taskId) return true;
+            }
+            return false;
         }
         
         //当前选中的 toggle 序号

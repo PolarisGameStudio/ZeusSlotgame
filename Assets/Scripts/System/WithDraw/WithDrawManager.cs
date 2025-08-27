@@ -263,6 +263,7 @@ namespace System
         }
         public void ShowWithDrawDialog()
         {
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
             //打开提现弹窗
             Messenger.Broadcast(GameDialogManager.OpenWithDrawDialog);
         }

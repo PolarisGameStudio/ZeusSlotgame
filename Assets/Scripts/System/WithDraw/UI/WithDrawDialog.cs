@@ -73,6 +73,7 @@ public class WithDrawDialog : UIDialog
 
     protected override void OnDisable()
     {
+        Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
         Messenger.RemoveListener(GameDialogManager.CloseWithDrawDialog,Close);
         Messenger.RemoveListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateCashNum);
         Messenger.RemoveListener(WithDrawConstants.ShowTipMsg,ShowTip);
@@ -118,5 +119,10 @@ public class WithDrawDialog : UIDialog
                 tweenerTip.Kill();
                 tweenerTip = null;
             });
+    }
+
+    public override void Close()
+    {
+        base.Close();
     }
 }

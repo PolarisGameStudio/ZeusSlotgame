@@ -10,21 +10,19 @@ namespace Classic
     public class AccountLoginTipsDialog:UIDialog
     {
       
-        public Button ensureBtn;
-        public Button closeBtn;
-        public TextMeshProUGUI time; 
-        private int money = 0;
+        private Button _ensureBtn;
+        private TextMeshProUGUI _time; 
         protected override void Awake()
         {
             base.Awake();
-            ensureBtn.onClick.AddListener(EnsureBtnClick);
-            closeBtn.onClick.AddListener(Close);
+            _ensureBtn =  Utils.Utilities.RealFindObj<Button>(transform, "Anchor/ensureBtn");
+            _time =  Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "Anchor/time");
+            _ensureBtn.onClick.AddListener(EnsureBtnClick);
         }
         
         private Coroutine _countdown;
         public void SetUIData(int cash)
         {
-            money = cash;
             
             var endTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
             
@@ -40,7 +38,7 @@ namespace Classic
                 try
                 {
                     TimeSpan timeSpan = TimeSpan.FromSeconds(endTime - nowTime);
-                    time.text = TimeUtils.GetLeftTime_Day_And_HMS(timeSpan);
+                    _time.text = TimeUtils.GetLeftTime_Day_And_HMS(timeSpan);
                 }
                 catch (Exception e)
                 {

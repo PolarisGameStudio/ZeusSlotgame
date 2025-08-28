@@ -11,6 +11,18 @@ using UnityEditor;
 #endif
 public class DeletePrefs
 {
+    
+    [MenuItem("Libs/删除/删除所有数据")]
+    public static void DeleteAll()
+    {
+        DeleteAllPrefs();
+        DeleteAllDownloadData();
+        DeleteAllDownloadData();
+        DeleteSceneProgressData();
+        DeleteSystemProgressData();
+        DeletePackUselessData();
+        Debug.Log("delete all success");
+    }
     [MenuItem("Libs/删除/删除本地pref数据")]
     public static void DeleteAllPrefs()
     {
@@ -30,7 +42,7 @@ public class DeletePrefs
         Debug.Log("delete download data success" + path);
     }
     [MenuItem("Libs/删除/删除关卡保存数据 #&d")]
-    public static void DeletSceneProgressData()
+    public static void DeleteSceneProgressData()
     {
 	    string folderPath = Path.Combine (Application.persistentDataPath, SceneProgressManager.DataFolderName);
 	    if (Directory.Exists(folderPath))
@@ -45,7 +57,7 @@ public class DeletePrefs
 	    Debug.Log("delete scene data success");
     }
     [MenuItem("Libs/删除/删除系统保存数据 #&d")]
-    public static void DeletSystemProgressData()
+    public static void DeleteSystemProgressData()
     {
         string folderPath = Path.Combine (Application.persistentDataPath, StoreManager.DataFolderName);
         if (Directory.Exists(folderPath))

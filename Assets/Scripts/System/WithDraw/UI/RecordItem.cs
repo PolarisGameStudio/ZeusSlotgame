@@ -9,7 +9,7 @@ public class RecordItem: MonoBehaviour
 {
     private TextMeshProUGUI cashTMP;
     private TextMeshProUGUI progressTMP;
-    //private Image progressBar;
+    private Image progressBar;
     public RecordItemData itemData;
     private Image paltformImg;
     private Button redeemBtn;
@@ -18,7 +18,7 @@ public class RecordItem: MonoBehaviour
     {
         cashTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "cashTMP");
         progressTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "inProgress/bottom/progressTMP");
-        //progressBar = Utils.Utilities.RealFindObj<Image>(transform, "inProgress/bottom/checking/progressBar");
+        progressBar = Utils.Utilities.RealFindObj<Image>(transform, "inProgress/bottom/checking/progressBar");
         paltformImg = Utils.Utilities.RealFindObj<Image>(transform, "platformIMG");
         redeemBtn =  Utils.Utilities.RealFindObj<Button>(transform, "redeemBtn ");
         if (redeemBtn != null)
@@ -35,7 +35,7 @@ public class RecordItem: MonoBehaviour
     {
         cashTMP.text = OnLineEarningMgr.Instance.GetMoneyStr(itemData.cash,needIcon:false);
         progressTMP.text = $"{itemData.curProgress}/{itemData.targetProgress}";
-        /*if (progressBar != null)
+        if (progressBar != null)
         {
             if (itemData.targetProgress > 0)
             {
@@ -45,7 +45,7 @@ public class RecordItem: MonoBehaviour
             {
                 progressBar.fillAmount = 0;
             }
-        }*/
+        }
         
         AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
         {

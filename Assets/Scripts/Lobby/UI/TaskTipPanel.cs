@@ -76,7 +76,9 @@ public class TaskTipPanel : MonoBehaviour
         }
         
         //设置背景
-        background.sprite = backgroundSprites[TaskToBGSpriteIndex.TryGetValue(task.TaskType, out int index) ? index : 0];
+        int index = 1;
+        // background.sprite = backgroundSprites[TaskToBGSpriteIndex.TryGetValue(task.TaskType, out int index) ? index : 0];
+        background.sprite = backgroundSprites[index];
         //设置图标
         image_icon.sprite = GetSpriteByType(task.TaskType);
         slider.fillAmount = 0f;
@@ -132,6 +134,8 @@ public class TaskTipPanel : MonoBehaviour
                 sp = iconSprites[7];
                 break;
             case TaskConstants.CollectCardTask_Key:
+            case TaskConstants.CollectNewCardCountTask_Key:
+            case TaskConstants.CollectNewCardTypeCountTask_Key:
                 sp = iconSprites[8];
                 break;
         }

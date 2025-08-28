@@ -358,6 +358,7 @@ public class BaseGameConsole :MonoBehaviour
 			AsyncLogger.Instance.SaveData();
 			UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 			TimeUtils.SetPauseDataTime();
+			CardSystemManager.Instance.SaveProgressData();
 		}
 		else
 		{
@@ -425,6 +426,7 @@ public class BaseGameConsole :MonoBehaviour
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 		ADManager.Instance.SaveADProgressData();
+		CardSystemManager.Instance.SaveProgressData();
 	}
 	
 	void Update()

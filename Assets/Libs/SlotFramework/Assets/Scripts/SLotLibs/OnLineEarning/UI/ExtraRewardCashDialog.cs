@@ -14,8 +14,9 @@ namespace Core.UI
         private float time = 0.5f;
         private float idletime = 0.5f;
 
-        public void SetUIData(int cash)
+        public void SetUIData(int coins)
         {
+            cash = coins;
             AudioEntity.Instance.PlayRollUpEffect(0.7f);
             Cashtween = Utils.Utilities.AnimationTo(curCash, cash, time, SetCashCoins, null, () =>
             {

@@ -390,7 +390,7 @@ namespace Core
             }
             if (key == OnLineEarningConstants.REWARD_ExtraAward)
             {
-                reward =(int)(reward * OnLineEarningMgr.Instance.popRewardRate);
+                reward =(int)Math.Floor(reward * OnLineEarningMgr.Instance.popRewardRate);
             }
             return reward;
         }

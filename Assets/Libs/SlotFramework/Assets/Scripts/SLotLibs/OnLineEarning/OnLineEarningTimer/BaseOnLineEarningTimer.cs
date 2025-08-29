@@ -11,7 +11,6 @@ namespace OnLineEarning
     {
         Random = 0,
         Level = 1,
-        ThreeHundred = 2,
     }
     /// <summary>
     /// 奖励节点的功能接口
@@ -24,7 +23,7 @@ namespace OnLineEarning
         readonly string Max_Key = "max";
         readonly string Level_Key = "Level";
         readonly string Range_Key = "Range";
-       
+        readonly string Rate_Key = "Rate";
 
         public string name = "";
         private int rewardModel = 0;
@@ -34,7 +33,7 @@ namespace OnLineEarning
         public OnLineRewardType type;
         public List<int> rewards;
         private float range;//用于 level 的浮点范围
-        private float rate;//用于300模式奖励的缩放比例
+        private float rate = 1f;//用于300模式奖励的缩放比例
 
         private Dictionary<string, object> data = new Dictionary<string, object>();
         public BaseOnLineEarningTimer(string name,Dictionary<string,object> config = null)
@@ -50,10 +49,7 @@ namespace OnLineEarning
         
         void ParseConfig(Dictionary<string,object> data)
         {
-            if (OnLineEarningMgr.Instance.isThreeHundredOpen())
-            {
-                type = OnLineRewardType.ThreeHundred;
-            }else if (data.ContainsKey(Random_Key))
+            if (data.ContainsKey(Random_Key))
             {
                 //random类型在 min和 max区间取值
                 type = OnLineRewardType.Random;
@@ -81,6 +77,7 @@ namespace OnLineEarning
                     rewards.Add((int)rewardList[i]);
                 }
             }
+            rate = Utilities.GetFloat(data, Rate_Key, 1f);
         }
         
         /// <summary>
@@ -101,30 +98,8 @@ namespace OnLineEarning
                 float maxNum = baseNum * (1 + range);
                 //向下取整
                 num = (int)Math.Floor(Random.Range(minNum,maxNum));
-            }else if (type ==OnLineRewardType.ThreeHundred)
-            {
-                num = GetReward300();
             }
             return num;
-        }
-
-        public virtual int GetReward300()
-        {
-            if (OnLineEarningMgr.Instance.isThreeHundredOpen())
-            {
-                return OnLineEarningMgr.Instance.GetThreeHundredConfig().GetReward(false);
-            }
-            return 0;
-        }
-        
-        public virtual bool IsConditionMeet()
-        {
-            return true;
-        }
-
-        public virtual void DoAction()
-        {
-            
         }
     }
 }

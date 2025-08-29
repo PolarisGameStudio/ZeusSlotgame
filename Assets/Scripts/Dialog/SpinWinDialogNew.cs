@@ -309,13 +309,13 @@ public class SpinWinDialogNew : UIDialog
             FlyCash(needFly);
         }
         FlyCoins(false);
-        Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
         if (!PlatformManager.Instance.IsWhiteBao())
         {
             Libs.AudioEntity.Instance.PlayCoinCollectionEffect();
         }
         new DelayAction( .8f, null, () =>
         {
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
             this.Close();
             if (!PlatformManager.Instance.IsWhiteBao())
             {

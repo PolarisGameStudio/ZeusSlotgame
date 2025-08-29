@@ -80,6 +80,7 @@ public class GameDialogManager : MonoBehaviour
 	public const string OpenSpinWithDrawEndDialogMsg = "OpenSpinWithDrawEndDialog";
 	public const string OpenRewardCashDialogMsg = "OpenRewardCashDialogMsg";
 	public const string OpenContinueSpinDialogMsg = "OpenContinueSpinDialogMsg";
+	public const string OpenExtraAwardCashDialogMsg = "OpenExtraAwardCashDialogMsg";
 
 	public const string OpenNewUserGuidDialogMsg = "OpenNewUserGuidDialog";
 	public const string OpenAccountDialogMsg = "OpenAccountDialog";
@@ -172,6 +173,7 @@ public class GameDialogManager : MonoBehaviour
             // Messenger.AddListener (OpenBetHigherDialog, openBetHigherDialog);
             Messenger.AddListener<System.Action>(OpenSpinLimitDialog, OpenSpinLimimiDialogMsg);
             Messenger.AddListener<int>(OpenRewardCashDialogMsg, OpenRewardCashDialog);
+            Messenger.AddListener<int>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
 
 
             #region PopReward
@@ -277,6 +279,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener<int>(OpenGetMoreCashDialog, OnOpenGetMoreCashDialog);
 			Messenger.RemoveListener(OpenNewUserGuidDialogMsg, OpenNewUserGuidDialog);
 			Messenger.RemoveListener<int>(OpenRewardCashDialogMsg, OpenRewardCashDialog);
+			Messenger.RemoveListener<int>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
 
 			
 			Messenger.RemoveListener<int,int,System.Action>(OpenSpinWithDrawStartDialogMsg, OpenSpinWithDrawStartDialog);
@@ -626,6 +629,10 @@ public class GameDialogManager : MonoBehaviour
 	}
 	
 	protected virtual void OpenRewardCashDialog(int cash)
+	{
+		
+	}
+	protected virtual void OpenExtraAwardCashDialog(int cash)
 	{
 		
 	}

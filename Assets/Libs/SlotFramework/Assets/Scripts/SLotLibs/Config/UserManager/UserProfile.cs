@@ -184,7 +184,6 @@ namespace Core
         public void SaveToPlayerPrefs()
         {
             PlayerPrefs.SetInt(LEVEL, level);
-            OnLineEarningMgr.Instance.SaveToPlayerPrefs();
             SharedPlayerPrefs.SavePlayerPrefsLong(BALANCE, balance);
             SharedPlayerPrefs.SavePlayerPrefsLong(TOTAL_SPINS, totalSpins);
             SharedPlayerPrefs.SavePlayerPrefsLong(USER_LAST_TIME_LANUCH_TIME, lastLaunchTimeLong);

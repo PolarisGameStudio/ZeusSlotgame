@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Libs;
 using OnLineEarning;
 using UnityEngine;
 using Utils;
+using Random = UnityEngine.Random;
 
 namespace Core
 {
@@ -146,6 +148,10 @@ namespace Core
             }
 
             reward = GetReward();
+            if (key == OnLineEarningConstants.REWARD_ExtraAward)
+            {
+                reward =(int)Math.Floor(reward * OnLineEarningMgr.Instance.popRewardRate);
+            }
             return reward;
         }
     }

@@ -391,6 +391,10 @@ namespace Core
                     } 
                 }
             }
+            if (key == OnLineEarningConstants.REWARD_ExtraAward)
+            {
+                reward =(int)(reward * OnLineEarningMgr.Instance.popRewardRate);
+            }
             return reward;
         }
         #endregion

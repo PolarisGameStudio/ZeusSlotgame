@@ -8,14 +8,5 @@ namespace OnLineEarning
         {
             
         }
-
-        public override int GetReward300()
-        {
-            if (OnLineEarningMgr.Instance.isThreeHundredOpen())
-            {
-                OnLineEarningMgr.Instance.GetThreeHundredConfig().GetReward(true);
-            }
-            return 0;
-        }
     }
 }

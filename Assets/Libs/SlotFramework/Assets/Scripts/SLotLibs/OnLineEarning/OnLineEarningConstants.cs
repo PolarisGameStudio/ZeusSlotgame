@@ -9,10 +9,15 @@ public class OnLineEarningConstants
     public static readonly string REWARD_NewUser = "NewUser";
     public static readonly string REWARD_H5Reward = "H5Reward";
     public static readonly string REWARD_FREEGAMEEND = "FreeGameEnd";
+    public static readonly string REWARD_ExtraAward = "ExtraAward";
+
 
     public static readonly string IncreaseCashMsg= "IncreaseCashMsg";
     public static readonly string RewardTimerKey = "Rewards";
     public static readonly string NewUserLimitKey = "NewUserLimit";
+    public static readonly string PopRewardRateKey = "PopRewardRate";    
+    public static readonly string PopRewardLimitKey = "PopRewardLimit";
+
     public static readonly string LuckyVideoLimit = "LuckyVideoLimit";
     public static readonly string REWARD_CONTINUESPIN= "ContinueSpin";
 

@@ -70,7 +70,12 @@ public class OnLineEarningMgr
     private int newUserSpinCount = 0; //新用户在spin几次后弹出一个奖励弹板
 
     private bool isWhitePackage = false; //白包用户
-    
+
+    //300和区间模式下，奖励弹板的弹出限制
+    private int PopRewardLimit = 3;
+    //300和区间模式下，奖励弹板的弹出条件数数 curRewardCount >= PopRewardLimit
+    public int curRewardCount = 0;
+    public float popRewardRate = 1f;
     
     public const string PopSpinWinCountKey = "PopSpinWinCountKey";
     public int PopSpinWinCount
@@ -85,6 +90,9 @@ public class OnLineEarningMgr
             return value;
         }
     }
+    
+    OnLineEarningProgressData progressData = new OnLineEarningProgressData();
+    
     public void ParseConfig(Dictionary<string,object> config)
     {
         isOpen = Utils.Utilities.GetBool(config,OPEN_KEY,true);
@@ -120,9 +128,11 @@ public class OnLineEarningMgr
             _baseOnlineEarningModel = _threeHundredModel;
         }
         newUserSpinCount = Utilities.GetInt(config,OnLineEarningConstants.NewUserLimitKey,0);
+        PopRewardLimit = Utilities.GetInt(config,OnLineEarningConstants.PopRewardLimitKey,0);
+        popRewardRate = Utilities.GetFloat(config,OnLineEarningConstants.PopRewardRateKey,1f);
+
         //加载本地化数据
-        LoadFromPlayerPrefs();
-        
+        LoadProgressData();
     }
 
     OnLineEarningMgr()
@@ -131,6 +141,8 @@ public class OnLineEarningMgr
         Messenger.AddListener<bool>(GameConstants.RefreshCashInFree, RefreshCashInFree);
         Messenger.AddListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
         Messenger.AddListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
+        Messenger.AddListener<ReelManager,long>(GameConstants.SpinAwardEndMsg,HandleSpinAwardEnd);
+
         // Messenger.AddListener(GameConstants.IntervalBackToApp, IntervalBackToApp);
     }
     ~OnLineEarningMgr()
@@ -139,6 +151,7 @@ public class OnLineEarningMgr
         Messenger.RemoveListener<bool>(GameConstants.RefreshCashInFree,RefreshCashInFree);
         Messenger.RemoveListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
         Messenger.RemoveListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
+        Messenger.RemoveListener<ReelManager,long>(GameConstants.SpinAwardEndMsg,HandleSpinAwardEnd);
         // Messenger.RemoveListener(GameConstants.IntervalBackToApp, IntervalBackToApp);
     }
     
@@ -158,21 +171,71 @@ public class OnLineEarningMgr
             }).Play();
         }
     }
+
+    //处理300和区间模式下，奖励弹板的弹出
+    //当前spin未有任何奖励弹窗弹出时，bigwin,freespin,bonus,rewardcash,withdrawactivity等都不弹出时，计一次数，
+    //当计数达到一定值时，弹出奖励弹窗
+    //有任何奖励弹窗弹出时次数重置
+    void HandleSpinAwardEnd(ReelManager reelManager, long coins)
+    {
+        //当前spin结果有bigwin
+        if (BaseSlotMachineController.Instance.hasPopReward || BaseSlotMachineController.Instance.isBigWin || BaseSlotMachineController.Instance.isMegaWin || BaseSlotMachineController.Instance.isEpicWin)
+        {
+            curRewardCount = 0;
+            SaveProgressData();
+            return;
+        }
+        //当前spin结果有freespin
+        if (reelManager.HitFs||reelManager.isFreespinBonus)
+        {
+            curRewardCount = 0;
+            SaveProgressData();
+            return;
+        }
+        //当前spin结果有bonus
+        if (reelManager.HasBonusGame)
+        {
+            curRewardCount = 0;
+            SaveProgressData();
+            return;
+        }
+        //当前spin结果有luckycash奖励弹版
+        if (BaseSlotMachineController.Instance.hasPopReward)
+        {
+            curRewardCount = 0;
+            SaveProgressData();
+            return;
+        }
+        curRewardCount++;
+        if (curRewardCount>=PopRewardLimit)
+        {
+            curRewardCount = 0;
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
+            //满足弹出条件弹出小弹窗
+            Messenger.Broadcast<int>(GameDialogManager.OpenExtraAwardCashDialogMsg,GetRewardsByName(OnLineEarningConstants.REWARD_ExtraAward));
+        }
+        SaveProgressData();
+    }
     
     void ShowRewardCashDialog(int cash)
     {
         //弹出奖励现金的弹板
         Messenger.Broadcast<int>(GameDialogManager.OpenRewardCashDialogMsg, cash);
     }
-    
-    public void SaveToPlayerPrefs()
+    void LoadProgressData()
     {
-        PlayerPrefs.SetInt(CASH, cash);
+        OnLineEarningProgressData  data = StoreManager.Instance.LoadDataJson<OnLineEarningProgressData>(progressData.fileName);
+        if (data!=null)
+        {
+            curRewardCount = data.curRewardCount;
+            cash = data.cash;
+            progressData.LoadData(data);
+        }
     }
-    
-    private void LoadFromPlayerPrefs()
+        
+    public void SaveProgressData()
     {
-        cash = SharedPlayerPrefs.GetPlayerPrefsIntValue(CASH,0);
+        progressData.SaveData();
     }
     
     private void RefreshCashInFree(bool show)
@@ -235,7 +298,7 @@ public class OnLineEarningMgr
         }
         cash = newCash;
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"Cash",cash.ToString());
-        SharedPlayerPrefs.SetPlayerPrefsIntValue(CASH,cash); 
+        SaveProgressData();
     }
     
     public virtual void IncreaseCash(int newCash,bool needMultiple = false)

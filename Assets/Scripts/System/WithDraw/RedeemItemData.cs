@@ -85,14 +85,31 @@ namespace System
                 }
                 else if (task.CanRewardTime > 0)
                 {
-                    //已经点击了领取按钮，任务进度已回退,此时 istaskconditionOK不影响
-                    if (task.CanRewardTime>TimeUtils.ConvertDateTimeLong(DateTime.Now))
+                    if (WithDrawManager.Instance.NeedLoginDays)
                     {
-                        state = RedeemItemState.Wait;
+                        //是否达到要求天数
+                        var loginDays = WithDrawManager.Instance.UpDateLoginDays(task.TaskId);
+                        var requireDays = WithDrawManager.Instance.GetCoolTime();
+                        if (loginDays >= requireDays)
+                        {
+                            state = RedeemItemState.Failed;
+                        }
+                        else
+                        {
+                            state = RedeemItemState.Wait;
+                        }
                     }
                     else
                     {
-                        state = RedeemItemState.Failed;
+                        //已经点击了领取按钮，任务进度已回退,此时 istaskconditionOK不影响
+                        if (task.CanRewardTime>TimeUtils.ConvertDateTimeLong(DateTime.Now))
+                        {
+                            state = RedeemItemState.Wait;
+                        }
+                        else
+                        {
+                            state = RedeemItemState.Failed;
+                        }
                     }
                 }
             }else if (task.GetTaskState() == TaskState.CLOSE)
@@ -111,7 +128,7 @@ namespace System
             {
                 //可领奖时长 = 现在时间+额外领奖时长
                 task.CanRewardTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
-                WithDrawManager.Instance.ResetSelectId();
+  
                 WithDrawManager.Instance.IsInWithDrawProgress = false;
             }
             UpdateState();

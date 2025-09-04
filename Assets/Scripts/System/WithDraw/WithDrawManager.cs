@@ -13,13 +13,17 @@ namespace System
         private const string ItemKey = "ItemConfig";
 
         private const string PlatformKey = "Platform";
+        private const string TaskFinishTime = "TaskFinishTime";
+        private const string LoginDays = "LoginDays";
+        
         //用于区分当前点击的是哪一个任务绑定的UI
         public int CurSelectTaskId = 0;
         public bool haveClickShowAccount = false;
         public bool IsInWithDrawProgress = false;
-        //提现的公共冷却时间
+        //提现的公共冷却时间(单位秒),配置为负数的话代表“需要累计登录的天数”，如-7，代表要累计登录7天
         private int coolTime = 0;
         public static bool WithDrawUIShow = false;
+        public bool NeedLoginDays = false;
         public static WithDrawManager Instance{
             get{ 
                 return Singleton<WithDrawManager>.Instance;
@@ -73,7 +77,56 @@ namespace System
             progressData.SaveData();
         }
         #endregion
+
+        private void SaveTaskFinishTime(int taskId)
+        {
+            // 只保存日期部分（去掉时分秒），这样比较的是“哪一天”
+            string today = DateTime.Now.Date.ToString("yyyy-MM-dd");
+            string taskTime = TaskFinishTime + taskId;
+            PlayerPrefs.SetString(taskTime, today);
+            string loginDays = LoginDays + taskId;
+            PlayerPrefs.SetInt(loginDays, 1);
+            PlayerPrefs.Save();
+        }
+
+        public int GetLoginDays(int taskId)
+        {
+            string loginDays = LoginDays + taskId;
+            int days = PlayerPrefs.GetInt(loginDays,0);
+            return days;
+        }
         
+        private bool IsNewDayLogin(string key)
+        {
+            string taskFinishTime = PlayerPrefs.GetString(key);
+            if (DateTime.TryParse(taskFinishTime, out DateTime lastLoginDate))
+            {
+                DateTime today = DateTime.Now.Date;
+                if (lastLoginDate < today)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public int UpDateLoginDays(int taskId)
+        {
+            string taskTime = TaskFinishTime + taskId;
+            if (!PlayerPrefs.HasKey(taskTime)) return 0;
+            string loginDays = LoginDays + taskId;
+            int days = PlayerPrefs.GetInt(loginDays);
+            if (IsNewDayLogin(taskTime))
+            {
+                days++;
+                PlayerPrefs.SetInt(loginDays, days);
+                string today = DateTime.Now.Date.ToString("yyyy-MM-dd");
+                PlayerPrefs.SetString(taskTime, today);
+                PlayerPrefs.Save();
+            }
+            return days;
+        }
+
         public void ParseConfig()
         {
             Dictionary<string,object> config = Plugins.Configuration.GetInstance().GetValue<Dictionary<string,object>>(ConfigKey,null);
@@ -83,6 +136,11 @@ namespace System
                 return;
             }
             coolTime  = Utilities.GetInt(config,WithDrawConstants.CoolTimeKey,0);
+            if (coolTime < 0)
+            {
+                NeedLoginDays = true;
+                coolTime = - coolTime;
+            }
             Dictionary<string,object> itemConfigs = Utilities.GetValue<Dictionary<string,object>>(config,ItemKey,null);
             if (itemConfigs==null || itemConfigs.Count == 0)
             {
@@ -262,6 +320,10 @@ namespace System
             //广播刷新任务减钱
             Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
             // ShowWithDrawDialog();
+            if (NeedLoginDays)
+            {
+                SaveTaskFinishTime(CurSelectTaskId);
+            }
         }
         public void ShowWithDrawDialog()
         {

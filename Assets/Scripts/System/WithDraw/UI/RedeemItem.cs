@@ -6,6 +6,7 @@ using CardSystem;
 using Libs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.U2D;
 using UnityEngine.UI;
 
@@ -126,7 +127,14 @@ public class RedeemItem : MonoBehaviour
                 break;
             //进行中已点击领取按钮
             case RedeemItemState.Wait:
-                ShowCountDownUI();
+                if (WithDrawManager.Instance.NeedLoginDays)
+                {
+                    ShowLoginDaysUI();
+                }
+                else
+                {
+                    ShowCountDownUI();
+                }
                 break;
             //进行中提现失败
             case RedeemItemState.Failed:
@@ -256,6 +264,25 @@ public class RedeemItem : MonoBehaviour
         }
         long endTime = itemData.task.CanRewardTime;
         timeCor = CoroutineUtil.Instance.StartCoroutine(ShowCountDownText(endTime));
+    }
+
+    private void ShowLoginDaysUI()
+    {
+        checking.gameObject.SetActive(true);
+        inProgress.gameObject.SetActive(false);
+        withDraw.gameObject.SetActive(false);
+        condition.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
+        FaildText.gameObject.SetActive(false);
+        var days = WithDrawManager.Instance.GetLoginDays(itemData.task.TaskId);
+        var all = WithDrawManager.Instance.GetCoolTime();
+        
+        
+        LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"CumulativeLoginFor");
+        
+        localizedString.Arguments = new object[] {all,days};
+        
+        countDownTMP.text =  localizedString.GetLocalizedString();
     }
 
     private void ShowFailedUI()

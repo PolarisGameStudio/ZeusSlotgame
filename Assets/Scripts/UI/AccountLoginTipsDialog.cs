@@ -3,6 +3,7 @@ using System.Collections;
 using Libs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.UI;
 
 namespace Classic
@@ -23,10 +24,20 @@ namespace Classic
         private Coroutine _countdown;
         public void SetUIData(int cash)
         {
+            if (WithDrawManager.Instance.NeedLoginDays)
+            {
+                LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"ProgressNum");
+        
+                localizedString.Arguments = new object[] {1,WithDrawManager.Instance.GetCoolTime()};
+        
+                _time.text =  localizedString.GetLocalizedString();
+            }
+            else
+            {
+                var endTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
             
-            var endTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
-            
-            _countdown = CoroutineUtil.Instance.StartCoroutine(ShowCountDownText(endTime));
+                _countdown = CoroutineUtil.Instance.StartCoroutine(ShowCountDownText(endTime));
+            }
         }
         
         private readonly WaitForSecondsRealtime _waitOneSecond = new WaitForSecondsRealtime(1);
@@ -53,12 +64,16 @@ namespace Classic
         protected override void OnDisable()
         {
             base.OnDisable();
-            CoroutineUtil.Instance.StopCoroutine(_countdown);
+            if (_countdown != null)
+            {
+                CoroutineUtil.Instance.StopCoroutine(_countdown);
+            }
         }
 
         private void EnsureBtnClick()
         {
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
+            WithDrawManager.Instance.ResetSelectId();
             this.Close();
         }
     }

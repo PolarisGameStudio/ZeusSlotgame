@@ -36,6 +36,11 @@ public class TaskTipPanel : MonoBehaviour
 
     public void RefreshInfo(int taskType)
     {
+        if (!TaskTipManager.Instance.isOpen)
+        {
+            this.gameObject.SetActive(false);
+            return;
+        }
         txtInfo = transform.Find("txt_info").GetComponent<UIText>();
         progress = transform.Find("slider_progress/txt_progress").GetComponent<UIText>();
         slider = transform.Find("slider_progress/img_bar").GetComponent<Image>();

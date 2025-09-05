@@ -1781,7 +1781,7 @@ public class BaseSlotMachineController : MonoBehaviour
     {
 	    bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
 	                      SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
-	    OpenConfigParam<SpinWinDialogNew> param = new OpenConfigParam<SpinWinDialogNew>(isPortrait,0,OpenType.Normal,"",new MachineUIPopupStrategy(),
+	    OpenConfigParam<SpinWinDialog> param = new OpenConfigParam<SpinWinDialog>(isPortrait,0,OpenType.Normal,"",new MachineUIPopupStrategy(),
 		    (dialog) =>
 		    {
 			    reelManager.SetBackGroundAudio(1f,0.3f);

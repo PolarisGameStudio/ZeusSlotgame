@@ -187,6 +187,10 @@ namespace Core
             {
                 timer = new FreeGameEndTimer(name, rewardData);
             }
+            else if (name == OnLineEarningConstants.REWARD_ExtraAward)
+            {
+                timer = new ExtraRewardTimer(name, rewardData);
+            }
             return timer;
         }
 

@@ -25,7 +25,7 @@ public class SpinWinAnimationEvent : MonoBehaviour
 
 	public void OpenBaoEffect()
 	{
-		baoEffect[index].SetActive(true);
+		// baoEffect[index].SetActive(true);
 	}
 
 

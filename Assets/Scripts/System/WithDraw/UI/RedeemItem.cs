@@ -362,6 +362,7 @@ public class RedeemItem : MonoBehaviour
 
     public void OnDispose()
     {
+        RemoveListener();
         //旧数据解绑prefab
         if (itemData!=null)
         {

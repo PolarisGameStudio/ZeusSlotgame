@@ -49,6 +49,8 @@ public class WesternTreasureMiniDialog : UIDialog
         }
     }
 
+    public float time = 1.5f;
+
     public void OnStart(double coins,int jackpotType = 0)
     {
         totalCoins = Utils.Utilities.CastValueLong(coins);
@@ -61,7 +63,7 @@ public class WesternTreasureMiniDialog : UIDialog
         // }
         
         AudioEntity.Instance.PlayRollUpEffect();
-        tween = Utils.Utilities.AnimationTo(this.curCoins, coins, 3f, UpdateTextUI, null, () =>
+        tween = Utils.Utilities.AnimationTo(this.curCoins, coins, time, UpdateTextUI, null, () =>
         {
             AudioEntity.Instance.StopRollingUpEffect();
             tween = null;
@@ -69,7 +71,7 @@ public class WesternTreasureMiniDialog : UIDialog
         if (!PlatformManager.Instance.IsWhiteBao())
         {
             //金币滚动
-            Cashtween = Utils.Utilities.AnimationTo(curCash, totalCash, 2f, SetCashCoins, null, () =>
+            Cashtween = Utils.Utilities.AnimationTo(curCash, totalCash, time, SetCashCoins, null, () =>
             {
                 SetCashCoins(totalCash);
                 Cashtween = null;

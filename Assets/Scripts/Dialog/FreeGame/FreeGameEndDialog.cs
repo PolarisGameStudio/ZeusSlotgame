@@ -228,7 +228,8 @@ public class FreeGameEndDialog : UIDialog
         }
         Messenger.Broadcast(SlotControllerConstants.OnBlanceChangeForDisPlay);
     }
-    
+
+    public float time =1.5f;
     public void OnStart(long coins, int count,int cash)
     {
         totalCoins = coins;
@@ -240,7 +241,7 @@ public class FreeGameEndDialog : UIDialog
             FreeGameWinCash.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao() && totalCash > 0);
         }
         AudioEntity.Instance.PlayRollUpEffect();
-        tween = Utils.Utilities.AnimationTo (this.curCoins, coins, 2f, UpdateTextUI, null,()=>
+        tween = Utils.Utilities.AnimationTo (this.curCoins, coins, time, UpdateTextUI, null,()=>
         {
             AudioEntity.Instance.StopRollingUpEffect();
             tween = null;
@@ -248,7 +249,7 @@ public class FreeGameEndDialog : UIDialog
         if (!PlatformManager.Instance.IsWhiteBao())
         {
             //金币滚动
-            Cashtween = Utils.Utilities.AnimationTo(curCash, totalCash, 2f, SetCashCoins, null, () =>
+            Cashtween = Utils.Utilities.AnimationTo(curCash, totalCash, time, SetCashCoins, null, () =>
             {
                 SetCashCoins(totalCash);
                 Cashtween = null;

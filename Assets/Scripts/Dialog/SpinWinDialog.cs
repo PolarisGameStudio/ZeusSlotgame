@@ -92,14 +92,11 @@ public class SpinWinDialog : UIDialog
 		{
 			totalCash = OnLineEarningMgr.Instance.GetSpinWinReward((int)spinWinType);
 			//金币滚动
-			new DelayAction(0.4f, null,() =>
+			Cashtween = Utils.Utilities.AnimationTo(curCash, totalCash, time, SetCashCoins, null, () =>
 			{
-				Cashtween = Utils.Utilities.AnimationTo(curCash, totalCash, time, SetCashCoins, null, () =>
-				{
-					SetCashCoins(totalCash);
-					Cashtween = null;
-				});
-			}).Play();
+				SetCashCoins(totalCash);
+				Cashtween = null;
+			});
 		}
 		cashText.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
 		int popCount = OnLineEarningMgr.Instance.AddPopSpinWinCount();

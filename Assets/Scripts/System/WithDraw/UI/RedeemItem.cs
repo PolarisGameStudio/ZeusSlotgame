@@ -6,6 +6,7 @@ using CardSystem;
 using Libs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.U2D;
 using UnityEngine.UI;
 
@@ -30,13 +31,17 @@ public class RedeemItem : MonoBehaviour
     private Coroutine timeCor;
     private TextMeshProUGUI FaildText;
     private TextMeshProUGUI withdrawProgressTmp;
+    private RectTransform moneyFinish;
+    private TextMeshProUGUI moneyFinishTMP;
+
     private void Awake()
     {
         cashTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "cashTMP");
         conditionTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "Condition/taskInfoTMP");
         progressTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "inProgress/bottom/progressTMP");
         paltformImg = Utils.Utilities.RealFindObj<Image>(transform, "platformIMG");
-        redeemBtn = Utils.Utilities.RealFindObj<Button>(transform, "redeemBtn");
+        redeemBtn = Utils.Utilities.RealFindObj<Button>(transform, "moneyFinish/redeemBtn");
+        moneyFinishTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "moneyFinish/progressTMP");
         checking = Utils.Utilities.RealFindObj<RectTransform>(transform, "checking");
         inProgress = Utils.Utilities.RealFindObj<RectTransform>(transform, "inProgress");
         withDraw = Utils.Utilities.RealFindObj<RectTransform>(transform, "withDraw");
@@ -45,6 +50,7 @@ public class RedeemItem : MonoBehaviour
         countDownTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "checking/CountDown");
         withdrawProgressTmp = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "withDraw/withdrawProgressTMP");
         withdrawBtn = Utils.Utilities.RealFindObj<Button>(transform, "withDraw/withdrawBtn");
+        moneyFinish = Utils.Utilities.RealFindObj<RectTransform>(transform, "moneyFinish");
 
         FaildText= Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "FaildTMP");
         if (redeemBtn != null)
@@ -56,27 +62,43 @@ public class RedeemItem : MonoBehaviour
             UGUIEventListener.Get(withdrawBtn.gameObject).onClick = OnButtonClickHandler;
         }
     }
-
-    private void OnEnable()
-    {
-        Messenger.AddListener(WithDrawConstants.UpdateRedeemItemState, OnTaskStatusChange);
-    }
-    
     private void OnDisable()
     {
-        Messenger.RemoveListener(WithDrawConstants.UpdateRedeemItemState, OnTaskStatusChange);
+        RemoveListener();
     }
 
-
-    void OnTaskStatusChange()
+    void AddListener()
     {
-        //刷新ui显示
+        if (itemData!=null)
+        {
+            Messenger.AddListener(itemData.task.UpdateTaskDataMsg,UpdateTaskData);
+        }
+    }
+
+    void RemoveListener()
+    {
+        if (itemData!=null)
+        {
+            Messenger.RemoveListener(itemData.task.UpdateTaskDataMsg,UpdateTaskData);
+        }
+    }
+    
+    void UpdateTaskData()
+    {
+        // itemData.UpdateTaskData();
+        if (itemData.state == RedeemItemState.Selected)
+        {
+            itemData.task.CanRewardTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
+        }
+        itemData.UpdateState();
         Refresh();
     }
     
     public void UpdateData(int i, RedeemItemData data)
     {
         itemData = data;
+        //添加监听
+        AddListener();
         Refresh();
         AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
         {
@@ -122,7 +144,14 @@ public class RedeemItem : MonoBehaviour
                 break;
             //进行中已点击领取按钮
             case RedeemItemState.Wait:
-                ShowCountDownUI();
+                if (WithDrawManager.Instance.NeedLoginDays)
+                {
+                    ShowLoginDaysUI();
+                }
+                else
+                {
+                    ShowCountDownUI();
+                }
                 break;
             //进行中提现失败
             case RedeemItemState.Failed:
@@ -188,34 +217,38 @@ public class RedeemItem : MonoBehaviour
     
     private void ShowInProgressUI()
     {
-        redeemBtn.gameObject.SetActive(false);
         checking.gameObject.SetActive(false);
         inProgress.gameObject.SetActive(true);
         withDraw.gameObject.SetActive(false);
         condition.gameObject.SetActive(false);
         FaildText.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
         ShowTaskIcon(true);
         SetProgressText();
     }
 
     private void ShowCompleteUI()
     {
-        redeemBtn.gameObject.SetActive(false);
         checking.gameObject.SetActive(false);
         inProgress.gameObject.SetActive(false);
-        withDraw.gameObject.SetActive(true);
+        // withDraw.gameObject.SetActive(true);
+        withDraw.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(true);
         condition.gameObject.SetActive(false);
         FaildText.gameObject.SetActive(false);
         ShowTaskIcon(false);
-        //钱的图标换成了卡牌图标
-        int HasCollectNum = CardSystemManager.Instance.GetHaveCardTypeCount();
-        int TargetNum = CardSystemManager.Instance.GetTotalCardTypeCount();
-        withdrawProgressTmp.text = string.Format("{0}/{1}", HasCollectNum, TargetNum);
+        // //钱的图标换成了卡牌图标
+        // int HasCollectNum = CardSystemManager.Instance.GetHaveCardTypeCount();
+        // int TargetNum = CardSystemManager.Instance.GetTotalCardTypeCount();
+        // withdrawProgressTmp.text = string.Format("{0}/{1}", HasCollectNum, TargetNum);
+        moneyFinishTMP.text = string.Format("{0}/{1}",
+            OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.HasCollectNum, needIcon: false),
+            OnLineEarningMgr.Instance.GetMoneyStr((int)itemData.task.TargetNum, needIcon: false));
     }
 
     private void ShowWithDrawUI()
     {
-        redeemBtn.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
         checking.gameObject.SetActive(false);
         inProgress.gameObject.SetActive(false);
         withDraw.gameObject.SetActive(true);
@@ -225,11 +258,11 @@ public class RedeemItem : MonoBehaviour
 
     private void ShowCountDownUI()
     {
+        moneyFinish.gameObject.SetActive(false);
         checking.gameObject.SetActive(true);
         inProgress.gameObject.SetActive(false);
         withDraw.gameObject.SetActive(false);
         condition.gameObject.SetActive(false);
-        redeemBtn.gameObject.SetActive(false);
         FaildText.gameObject.SetActive(false);
         if (timeCor!=null)
         {
@@ -239,7 +272,25 @@ public class RedeemItem : MonoBehaviour
         long endTime = itemData.task.CanRewardTime;
         timeCor = CoroutineUtil.Instance.StartCoroutine(ShowCountDownText(endTime));
     }
-
+    private void ShowLoginDaysUI()
+    {
+        checking.gameObject.SetActive(true);
+        inProgress.gameObject.SetActive(false);
+        withDraw.gameObject.SetActive(false);
+        condition.gameObject.SetActive(false);
+        moneyFinish.gameObject.SetActive(false);
+        FaildText.gameObject.SetActive(false);
+        var days = WithDrawManager.Instance.GetLoginDays(itemData.task.TaskId);
+        var all = WithDrawManager.Instance.GetCoolTime();
+        
+        
+        LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"CumulativeLoginFor");
+        
+        localizedString.Arguments = new object[] {all,days};
+        
+        countDownTMP.text =  localizedString.GetLocalizedString();
+    }
+    
     private void ShowFailedUI()
     {
         //先隐藏自身
@@ -250,6 +301,7 @@ public class RedeemItem : MonoBehaviour
     
     private void ShowConditionUI()
     {
+        moneyFinish.gameObject.SetActive(false);
         checking.gameObject.SetActive(false);
         inProgress.gameObject.SetActive(false);
         withDraw.gameObject.SetActive(false);
@@ -262,6 +314,7 @@ public class RedeemItem : MonoBehaviour
         // WithDrawManager.Instance.ReduceCash((int)itemData.task.TargetNum);
         if (go == redeemBtn.gameObject)
         {
+            itemData.state = RedeemItemState.Selected;
             //点击了领取按钮
             WithDrawManager.Instance.ShowAccountDialog(itemData.task.TaskId,(int)itemData.task.TargetNum);
         }
@@ -301,7 +354,6 @@ public class RedeemItem : MonoBehaviour
     
     void RecoverToComplete()
     {
-        //加钱
         itemData.WithDrawFailed();
         //提现失败，删除当前元素，通知 scrollView 刷新
         ShowFailedUI();

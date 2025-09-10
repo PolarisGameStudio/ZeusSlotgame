@@ -465,6 +465,19 @@ namespace Classic
                 }));
         }
         
+        protected override void OpenAccountLoginTipsDialog(int cash)
+        {
+            UIDialog dialog = UIManager.Instance.GetActiveDialog();
+            OpenType type = dialog == null ? OpenType.Normal : OpenType.FrontOfHead;
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<AccountLoginTipsDialog>(isPortrait,dialog.eId,openType:type,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
+                {
+                    dialog.SetUIData(cash);
+                }));
+        }
+        
         protected override void OpenContinueSpinDialog(int activityId)
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&

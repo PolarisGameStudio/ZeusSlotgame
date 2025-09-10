@@ -9,6 +9,7 @@ namespace System
     public enum RedeemItemState
     {
         InProgress = 0,
+        Selected,
         Complete,
         Wait,
         Failed,
@@ -39,12 +40,12 @@ namespace System
             //根据任务刷新状态
             UpdateState();
             //初始化时根据失败状态执行
-            Messenger.AddListener(task.UpdateTaskDataMsg,UpdateTaskData);
+            // Messenger.AddListener(task.UpdateTaskDataMsg,UpdateTaskData);
         }
 
         ~RedeemItemData()
         {
-            Messenger.RemoveListener(task.UpdateTaskDataMsg,UpdateTaskData);
+            // Messenger.RemoveListener(task.UpdateTaskDataMsg,UpdateTaskData);
         }
 
         public void OnInit(RedeemItem item)
@@ -85,41 +86,37 @@ namespace System
                 }
                 else if (task.CanRewardTime > 0)
                 {
-                    //已经点击了领取按钮，任务进度已回退,此时 istaskconditionOK不影响
-                    if (task.CanRewardTime>TimeUtils.ConvertDateTimeLong(DateTime.Now))
+                    if (WithDrawManager.Instance.NeedLoginDays)
                     {
-                        state = RedeemItemState.Wait;
+                        //是否达到要求天数
+                        var loginDays = WithDrawManager.Instance.UpDateLoginDays(task.TaskId);
+                        var requireDays = WithDrawManager.Instance.GetCoolTime();
+                        if (loginDays >= requireDays)
+                        {
+                            state = RedeemItemState.Failed;
+                        }
+                        else
+                        {
+                            state = RedeemItemState.Wait;
+                        }
                     }
                     else
                     {
-                        state = RedeemItemState.Failed;
+                        //已经点击了领取按钮，任务进度已回退,此时 istaskconditionOK不影响
+                        if (task.CanRewardTime>TimeUtils.ConvertDateTimeLong(DateTime.Now))
+                        {
+                            state = RedeemItemState.Wait;
+                        }
+                        else
+                        {
+                            state = RedeemItemState.Failed;
+                        }
                     }
                 }
             }else if (task.GetTaskState() == TaskState.CLOSE)
             {
                 state = RedeemItemState.Done;
             }
-        }
-
-        //任务状态已刷新，根据当前的状态进行操作
-        private void UpdateTaskData()
-        {
-            // Debug.Log($"[RedeemItemData][UpdateTaskData] [task.TaskId ==]:{task.TaskId}   [SelectId==]:{WithDrawManager.Instance.GetSelectId()}");
-            bool isSelf = WithDrawManager.Instance.GetSelectId() == task.TaskId;
-            if (isSelf)
-            {
-                //可领奖时长 = 现在时间+额外领奖时长
-                task.CanRewardTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
-                WithDrawManager.Instance.ResetSelectId();
-            }
-            UpdateState();
-            //此处是否刷新UI取决于界面是否关闭
-            if (itemUI!=null)
-            {
-                Debug.Log("绑定过刷新Ui taskId:{task.TaskId}");
-                Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);
-            }
-            //Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);
         }
 
         public void WithDrawFailed()

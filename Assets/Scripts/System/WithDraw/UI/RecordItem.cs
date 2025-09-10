@@ -1,7 +1,9 @@
 
 using System;
+using Libs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 public class RecordItem: MonoBehaviour
 {
@@ -34,11 +36,17 @@ public class RecordItem: MonoBehaviour
                 progressBar.fillAmount = 0;
             }
         }
-        Sprite sp = Resources.Load<Sprite>("Platform/"+itemData.platSpIndex);
-        if (sp != null)
+        AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
         {
-            paltformImg.sprite = sp;
-        }
+            if (result != null)
+            {
+                Sprite sp = result.GetSprite(itemData.platSpIndex.ToString());
+                if (sp != null)
+                {
+                    paltformImg.sprite = sp;
+                }
+            }
+        });
     }
     
     public void UpdateData(int i, RecordItemData data)

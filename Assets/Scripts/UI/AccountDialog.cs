@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
+using UnityEngine.U2D;
 
 namespace Classic
 {
@@ -34,11 +35,17 @@ namespace Classic
         public override void Refresh()
         {
             base.Refresh();
-            Sprite sp = Resources.Load<Sprite>("Platform/"+platformIndex);
-            if (sp != null)
+            AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
             {
-                image.sprite = sp;
-            }
+                if (result != null)
+                {
+                    Sprite sp = result.GetSprite(platformIndex.ToString());
+                    if (sp != null)
+                    {
+                        image.sprite = sp;
+                    }
+                }
+            });
         }
         
         private void EnsureBtnClick(GameObject go)

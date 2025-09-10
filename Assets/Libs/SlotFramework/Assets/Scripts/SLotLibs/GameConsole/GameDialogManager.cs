@@ -84,6 +84,8 @@ public class GameDialogManager : MonoBehaviour
 	public const string OpenNewUserGuidDialogMsg = "OpenNewUserGuidDialog";
 	public const string OpenAccountDialogMsg = "OpenAccountDialog";
 	public const string OpenAccountEnsureMsg = "OpenAccountEnsureMsg";
+	public const string OpenAccountLoginTipsMsg = "OpenAccountLoginTipsMsg";
+
 	//cardSystem
 	public const string OpenCardSystemCollectionDialogMsg = "OpenCardSystemCollectionDialog";
 	public const string OpenCardSystemGetCardDialogMsg = "OpenCardSystemGetCardDialogMsg";
@@ -188,6 +190,7 @@ public class GameDialogManager : MonoBehaviour
 
             Messenger.AddListener<int,int>(OpenAccountDialogMsg, OpenAccountDialog);
             Messenger.AddListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
+            Messenger.AddListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
             Messenger.AddListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
             #endregion
 
@@ -281,6 +284,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.AddListener<int,System.Action>(OpenSpinWithDrawEndDialogMsg, OpenSpinWithDrawEndDialog);
 			Messenger.RemoveListener<int,int>(OpenAccountDialogMsg, OpenAccountDialog);
 			Messenger.RemoveListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
+			Messenger.RemoveListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
 			Messenger.RemoveListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
 			
 			#region cardSystem
@@ -638,6 +642,11 @@ public class GameDialogManager : MonoBehaviour
 	}
 	
 	protected virtual void OpenTaskTipsDialog(Sprite sprite,int taskType)
+	{
+		
+	}
+	
+	protected virtual void OpenAccountLoginTipsDialog(int cash)
 	{
 		
 	}

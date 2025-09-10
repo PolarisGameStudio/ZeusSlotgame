@@ -2,6 +2,7 @@ using System;
 using Libs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Classic
@@ -27,21 +28,35 @@ namespace Classic
         {
             money = cash;
             cashTmp.text = OnLineEarningMgr.Instance.GetMoneyStr(cash, needIcon: false);
-            Sprite sp = Resources.Load<Sprite>("Platform/"+spriteIndex);
-            if (sp != null)
+            AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
             {
-                image.sprite = sp;
-            }
+                if (result != null)
+                {
+                    Sprite sp = result.GetSprite(spriteIndex.ToString());
+                    if (sp != null)
+                    {
+                        image.sprite = sp;
+                    }
+                }
+            });
 
             emailTMP.text = account;
             DateTime now = DateTime.Now;
             dataTmp.text = now.ToString("MM/dd/yyyy");
         }
+        private const string Redeem = "Redeem";
         private void EnsureBtnClick()
         {
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
             this.Close();
             WithDrawManager.Instance.ReduceCash(money);
+            Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
+            // Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);
+
+            int count = PlayerPrefs.GetInt(Redeem, 0);
+            count++;
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, Redeem, count);
+            PlayerPrefs.SetInt(Redeem, count);
         }
     }
 }

@@ -25,14 +25,6 @@ MonoBehaviour:
     m_Address: Prefab/UI/AccountEnsureDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 2aa069aaad22a47c7a9d6a94d6cd8791
-    m_Address: Prefab/UI/AccountTaskDialog_p.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: d7fdbe3f1c46548dca594922fc1f2217
-    m_Address: Prefab/UI/AccountTimeDialog_p.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 71783851a69ba431581d240fa91cbfc7
     m_Address: Prefab/UI/BetChangeDialog.prefab
     m_ReadOnly: 0

@@ -22,6 +22,10 @@ namespace Libs
         public void Init()
         {
             ParseConfig();
+            if (!isOpen)
+            {
+                return;
+            }
             AddListener();
             LoadProgressData();
         }
@@ -50,14 +54,14 @@ namespace Libs
                 .GetValue<Dictionary<string, object>>(TaskTipConstants.TaskTipConfigKey, null);
             if (config == null)
             {
-                Debug.LogError("TaskTipManager: ParseConfig failed, config is null");
+                // Debug.LogError("TaskTipManager: ParseConfig failed, config is null");
                 return;
             }
 
             isOpen = Utils.Utilities.GetBool(config, "IsOpen", false);
             if (!isOpen)
             {
-                Debug.Log("TaskTipManager: Task tips are disabled");
+                // Debug.Log("TaskTipManager: Task tips are disabled");
                 return;
             }
 
@@ -299,7 +303,7 @@ namespace Libs
             //withdrawdialog展示的任务
             if (CheckShowWithDrawTaskTip(taskType))
             {
-                Debug.Log("TaskTipManager isWithDrawDialogShow");
+                // Debug.Log("TaskTipManager isWithDrawDialogShow");
                 isWithDrawDialogShow = true;
                 return TaskManager.Instance.GetTaskByType(taskType);
             }

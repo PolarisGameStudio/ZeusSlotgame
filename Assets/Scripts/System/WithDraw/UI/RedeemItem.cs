@@ -155,7 +155,8 @@ public class RedeemItem : MonoBehaviour
                 break;
             //进行中提现失败
             case RedeemItemState.Failed:
-                ShowFailedUI();
+                //没有失败的相关显示
+                // ShowFailedUI();
                 break;
             //任务已完成
             case RedeemItemState.Done:
@@ -294,7 +295,7 @@ public class RedeemItem : MonoBehaviour
     private void ShowFailedUI()
     {
         //先隐藏自身
-        Debug.Log("RedeemItem ShowFailedUI");
+        // Debug.Log("RedeemItem ShowFailedUI");
         // this.gameObject.SetActive(false);
         Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemMsg);
     }

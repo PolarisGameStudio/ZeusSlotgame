@@ -194,6 +194,18 @@ namespace System
                 return 0;
             }
             List<RedeemItemData> redeemItemList = redeemItemDict[PlatformKey + index];
+            //获取数据之前进行一遍筛选，防止在一次session中出现bug
+            for (int i = 0; i < redeemItemList.Count; i++)
+            {
+                RedeemItemData itemData = redeemItemList[i];
+                itemData.UpdateState();
+                if (itemData.IsFished())
+                {
+                    RecordItemData recordItemData = itemData.ToRecordItemData();
+                    recordItemDict.Add(recordItemData);
+                    redeemItemList.Remove(itemData);
+                }
+            }
             return redeemItemList.Count;
         }
 

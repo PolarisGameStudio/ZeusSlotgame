@@ -321,6 +321,7 @@ public class BaseGameConsole :MonoBehaviour
 			CommandManager.Instance.SaveAckingCommand();
 			UserManager.GetInstance().UserProfile().LastExitGameTime = DateTime.Now;
 			TaskManager.Instance.SaveProgressData();
+			CardSystemManager.Instance.SaveProgressData();
 			Analytics.GetInstance().LogEvent(Analytics.AppOut);
 			if (UserManager.GetInstance().UserProfile().HasGrantInitialBonus())
 			{
@@ -425,6 +426,7 @@ public class BaseGameConsole :MonoBehaviour
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 		ADManager.Instance.SaveADProgressData();
+		CardSystemManager.Instance.SaveProgressData();
 		TaskTipManager.Instance.SaveProgressData();
 
 	}

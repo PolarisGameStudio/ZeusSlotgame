@@ -158,7 +158,7 @@ namespace Libs
             BaseTask task = TaskManager.Instance.GetTaskByType(TaskConstants.CollectSymbolCountTask_Key);
             if (task == null)
             {
-                Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectSymbolCountTask_Key);
+                // Debug.LogError("TaskTipPanel task is null, taskType: " + TaskConstants.CollectSymbolCountTask_Key);
                 return;
             }
 

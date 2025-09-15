@@ -235,11 +235,25 @@ public class PlistColumnEditorWindow : EditorWindow
                 {
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.PrefixLabel("Value");
-                    string newValue = EditorGUILayout.TextField(node.Value);
-                    if (newValue != node.Value)
+
+                    if (node.NodeType == PlistNodeType.Boolean)
                     {
-                        node.Value = newValue;
+                        bool boolValue = node.Value == "true";
+                        bool newBoolValue = EditorGUILayout.Toggle(boolValue);
+                        if (newBoolValue != boolValue)
+                        {
+                            node.Value = newBoolValue ? "true" : "false";
+                        }
                     }
+                    else
+                    {
+                        string newValue = EditorGUILayout.TextField(node.Value);
+                        if (newValue != node.Value)
+                        {
+                            node.Value = newValue;
+                        }
+                    }
+
                     EditorGUILayout.EndHorizontal();
                 }
             }
@@ -391,7 +405,18 @@ public class PlistColumnEditorWindow : EditorWindow
                 name = EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey");
                 if (string.IsNullOrEmpty(name)) return;
 
-                value = type == PlistNodeType.Integer ? "0" : "NewValue";
+                if (type == PlistNodeType.Boolean)
+                {
+                    value = "true"; // 默认 true
+                }
+                else if (type == PlistNodeType.Integer)
+                {
+                    value = "0";
+                }
+                else
+                {
+                    value = "NewValue";
+                }
 
                 // 创建 <key> + <value> 节点
                 XmlElement keyElement = xmlDoc.CreateElement("key");
@@ -615,11 +640,15 @@ public class PlistColumnEditorWindow : EditorWindow
 
                 if (IsValueNode(valueNode))
                 {
+                    string nodeValue = valueNode.Name == "true" || valueNode.Name == "false"
+                        ? valueNode.Name // 对 true/false，值就是节点名
+                        : valueNode.InnerText;
+
                     var node = new PlistTreeNode
                     {
                         Name = key,
                         NodeType = GetNodeType(valueNode.Name),
-                        Value = valueNode.InnerText,
+                        Value = nodeValue,
                         XmlValueNode = valueNode,
                         XmlKeyNode = child,
                         Parent = parent,
@@ -655,11 +684,15 @@ public class PlistColumnEditorWindow : EditorWindow
 
             if (IsValueNode(itemNode))
             {
+                string nodeValue = itemNode.Name == "true" || itemNode.Name == "false"
+                    ? itemNode.Name
+                    : itemNode.InnerText;
+
                 var node = new PlistTreeNode
                 {
                     Name = $"[{i}]",
                     NodeType = GetNodeType(itemNode.Name),
-                    Value = itemNode.InnerText,
+                    Value = nodeValue,
                     XmlValueNode = itemNode,
                     Parent = parent,
                     Path = currentPath
@@ -752,7 +785,28 @@ public class PlistColumnEditorWindow : EditorWindow
     {
         if (node.XmlValueNode != null && !node.IsContainer)
         {
-            node.XmlValueNode.InnerText = node.Value;
+            if (node.NodeType == PlistNodeType.Boolean)
+            {
+                // 如果当前值不是 "true" 或 "false"，纠正它
+                if (node.Value != "true" && node.Value != "false")
+                {
+                    node.Value = "false"; // 默认设为 false
+                }
+
+                // 如果当前节点名不是期望的，需要替换节点
+                if (node.XmlValueNode.Name != node.Value)
+                {
+                    XmlElement newElement = xmlDoc.CreateElement(node.Value);
+                    node.XmlValueNode.ParentNode.ReplaceChild(newElement, node.XmlValueNode);
+                    node.XmlValueNode = newElement;
+                }
+                // 注意：不要设置 InnerText！保持 <true/> 或 <false/> 空标签形式
+            }
+            else
+            {
+                // 其他类型正常设置 InnerText
+                node.XmlValueNode.InnerText = node.Value;
+            }
         }
 
         if (node.Children != null)

@@ -192,6 +192,10 @@ public class OnLineEarningMgr
     //有任何奖励弹窗弹出时次数重置
     void HandleSpinAwardEnd(ReelManager reelManager, long coins)
     {
+        if (isWhitePackage)
+        {
+            return;
+        }
         //当前spin结果有bigwin
         if (BaseSlotMachineController.Instance.hasPopReward || BaseSlotMachineController.Instance.isBigWin || BaseSlotMachineController.Instance.isMegaWin || BaseSlotMachineController.Instance.isEpicWin)
         {

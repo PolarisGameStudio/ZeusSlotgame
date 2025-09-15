@@ -27,15 +27,21 @@ public class PlistColumnEditorWindow : EditorWindow
     [MenuItem("Tools/Plist Column Editor")]
     public static void ShowWindow()
     {
-        GetWindow<PlistColumnEditorWindow>("Plist Column Editor");
+        var window = GetWindow<PlistColumnEditorWindow>("Plist Column Editor");
+        //  设置固定路径
+        string projectRoot = Application.dataPath.Replace("/Assets", "").Replace("\\Assets", "");
+        window.xmlPath = Path.Combine(projectRoot, "Assets/AssetResources/Resources/GameConfig.plist.xml");
+        window.LoadPlist();
     }
 
     private void OnGUI()
     {
         EditorGUILayout.Space();
-
-        EditorGUILayout.BeginHorizontal();
+        
         xmlPath = EditorGUILayout.TextField("Plist Path:", xmlPath);
+        
+        /*EditorGUILayout.BeginHorizontal();
+        
         if (GUILayout.Button("Browse", GUILayout.Width(80)))
         {
             string selected = EditorUtility.OpenFilePanel("Select Plist File", "", "plist,xml");
@@ -45,23 +51,14 @@ public class PlistColumnEditorWindow : EditorWindow
                 LoadPlist();
             }
         }
-        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndHorizontal();*/
 
         if (string.IsNullOrEmpty(xmlPath))
         {
             EditorGUILayout.HelpBox("Please select a .plist file.", MessageType.Info);
             return;
         }
-
-        if (rootNode == null)
-        {
-            if (GUILayout.Button("Load Plist"))
-            {
-                LoadPlist();
-            }
-            return;
-        }
-
+        
         if (GUILayout.Button("Save to Plist"))
         {
             SavePlist();
@@ -195,7 +192,7 @@ public class PlistColumnEditorWindow : EditorWindow
             }
             else
             {
-                // ✅ 修改：显示 Name + 类型标识
+                //  修改：显示 Name + 类型标识
                 EditorGUILayout.BeginHorizontal(GUILayout.Height(22));
                 {
                     // 左侧：节点名称
@@ -216,7 +213,7 @@ public class PlistColumnEditorWindow : EditorWindow
                 }
                 EditorGUILayout.EndHorizontal();
 
-                // ✅ 手动检测鼠标事件（必须放在绘制后）
+                //  手动检测鼠标事件（必须放在绘制后）
                 Event e = Event.current;
                 Rect labelRect = GUILayoutUtility.GetLastRect(); // 获取刚绘制的区域
                 if (labelRect.Contains(e.mousePosition))
@@ -767,33 +764,48 @@ public class PlistColumnEditorWindow : EditorWindow
         }
     }
 
+
     private void SaveWithPlistHeader()
     {
-        StringBuilder sb = new StringBuilder();
-        using (StringWriter sw = new StringWriter(sb))
-        using (XmlTextWriter writer = new XmlTextWriter(sw))
+        // 1. 检查并移除已存在的任何 DOCTYPE 节点，以防冲突
+        if (xmlDoc.DocumentType != null)
         {
-            writer.Formatting = Formatting.Indented;
-            writer.Indentation = 1;
-            writer.IndentChar = '\t';
-            xmlDoc.WriteTo(writer);
+            xmlDoc.RemoveChild(xmlDoc.DocumentType);
         }
 
-        string xmlContent = sb.ToString();
+        // 2. 创建一个正确、完整的 DOCTYPE 节点
+        // 参数: name, publicId, systemId, internalSubset
+        // 我们不需要 internalSubset，所以传入 null，这样就不会生成 "[]"
+        XmlDocumentType docType = xmlDoc.CreateDocumentType(
+            "plist", 
+            "-//Apple//DTD PLIST 1.0//EN", 
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd", 
+            null
+        );
 
-        if (!xmlContent.Contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
+        // 3. 将新的 DOCTYPE 节点插入到文档中
+        // 它必须位于根元素 (DocumentElement) 之前
+        xmlDoc.InsertBefore(docType, xmlDoc.DocumentElement);
+
+        // 4. 使用 XmlWriterSettings 来精确控制输出格式
+        XmlWriterSettings settings = new XmlWriterSettings
         {
-            xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + xmlContent;
-        }
+            // 确保包含 XML 声明 <?xml version="1.0" encoding="UTF-8"?>
+            OmitXmlDeclaration = false,
+            // 使用不带 BOM 的 UTF-8 编码，这是 plist 的标准格式
+            Encoding = new UTF8Encoding(false), 
+            // 设置缩进
+            Indent = true,
+            IndentChars = "\t",
+            // 确保换行符是 Unix 风格 (\n)
+            NewLineChars = "\n"
+        };
 
-        if (!xmlContent.Contains("<!DOCTYPE plist"))
+        // 5. 使用 XmlWriter 来保存文档
+        using (XmlWriter writer = XmlWriter.Create(xmlPath, settings))
         {
-            int insertIndex = xmlContent.IndexOf("?>") + 2;
-            string doctype = "\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">";
-            xmlContent = xmlContent.Insert(insertIndex, doctype);
+            xmlDoc.Save(writer);
         }
-
-        File.WriteAllText(xmlPath, xmlContent, new UTF8Encoding(false));
     }
 }
 

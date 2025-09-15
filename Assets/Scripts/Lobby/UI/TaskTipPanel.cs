@@ -81,9 +81,9 @@ public class TaskTipPanel : MonoBehaviour
         }
         
         //设置背景
-        // int index = 1;
-        background.sprite = backgroundSprites[TaskToBGSpriteIndex.TryGetValue(task.TaskType, out int index) ? index : 0];
-        // background.sprite = backgroundSprites[index];
+        int index = 1;
+        // background.sprite = backgroundSprites[TaskToBGSpriteIndex.TryGetValue(task.TaskType, out int index) ? index : 0];
+        background.sprite = backgroundSprites[index];
         //设置图标
         image_icon.sprite = GetSpriteByType(task.TaskType);
         slider.fillAmount = 0f;

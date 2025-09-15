@@ -396,6 +396,8 @@ namespace Libs
                     AccumulateTotalCashTask _ => "MoreWinCash",
                     CollectCashFromZeroTask _ => "MoreWinCash",
                     CollectCardTypeCountTask _ => "MoreCollectCards",
+                    CollectNewCardCountTask _ => "MoreCollectCards",
+                    CollectNewCardTypeCountTask _ => "MoreCollectCards",
                     _ => string.Empty
                 };
 

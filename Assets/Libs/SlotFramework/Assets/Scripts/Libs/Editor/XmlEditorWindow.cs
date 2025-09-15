@@ -18,9 +18,9 @@ public class PlistColumnEditorWindow : EditorWindow
     // 用于重命名时临时存储
     private PlistTreeNode nodeToRename;
     private string originalName;
-    
+
     private PlistTreeNode renamingNode; // 当前正在重命名的节点
-    private string renamingInput = "";  // 输入框内容
+    private string renamingInput = ""; // 输入框内容
     private int renamingColumnIndex = -1;
     private int renamingItemIndex = -1;
 
@@ -92,7 +92,10 @@ public class PlistColumnEditorWindow : EditorWindow
         selectedIndices.Clear();
         if (rootNode != null)
         {
-            columns.Add(new List<PlistTreeNode> { rootNode });
+            columns.Add(new List<PlistTreeNode>
+            {
+                rootNode
+            });
             selectedIndices.Add(-1);
         }
     }
@@ -125,11 +128,11 @@ public class PlistColumnEditorWindow : EditorWindow
 
         CancelRename();
         Repaint();
-        
+
         GUI.FocusControl(null);
     }
-    
-    
+
+
 
     private void CancelRename()
     {
@@ -160,7 +163,7 @@ public class PlistColumnEditorWindow : EditorWindow
 
             Rect rect = EditorGUILayout.GetControlRect(false, 22);
 
-            
+
             if (renamingNode == node)
             {
                 EditorGUI.BeginChangeCheck();
@@ -183,28 +186,46 @@ public class PlistColumnEditorWindow : EditorWindow
                         CancelRename();
                         e.Use();
                     }
-                }else if (e.type == EventType.MouseDown && !rect.Contains(e.mousePosition))
+                }
+                else if (e.type == EventType.MouseDown && !rect.Contains(e.mousePosition))
                 {
-                    CommitRename(); // 或 CancelRename()
+                    CommitRename();
                     e.Use();
                 }
             }
             else
             {
-                // 绘制节点背景（可选：用按钮样式或自定义绘制）
-                EditorGUI.LabelField(rect, node.Name, style);
-
-                // ✅ 手动检测鼠标事件
-                Event e = Event.current;
-                if (rect.Contains(e.mousePosition))
+                // ✅ 修改：显示 Name + 类型标识
+                EditorGUILayout.BeginHorizontal(GUILayout.Height(22));
                 {
-                    // 左键点击
+                    // 左侧：节点名称
+                    GUILayout.Label(node.Name, style, GUILayout.ExpandWidth(true));
+
+                    // 右侧：类型标识（灰色小字）
+                    string typeLabel = GetDisplayTypeLabel(node);
+                    GUIStyle typeStyle = new GUIStyle(EditorStyles.miniLabel)
+                    {
+                        fontStyle = FontStyle.Italic,
+                        alignment = TextAnchor.MiddleRight,
+                        normal =
+                        {
+                            textColor = new Color(0.5f, 0.5f, 0.5f)
+                        }
+                    };
+                    GUILayout.Label(typeLabel, typeStyle, GUILayout.Width(60));
+                }
+                EditorGUILayout.EndHorizontal();
+
+                // ✅ 手动检测鼠标事件（必须放在绘制后）
+                Event e = Event.current;
+                Rect labelRect = GUILayoutUtility.GetLastRect(); // 获取刚绘制的区域
+                if (labelRect.Contains(e.mousePosition))
+                {
                     if (e.type == EventType.MouseDown && e.button == 0)
                     {
                         HandleColumnClick(colIndex, i);
-                        e.Use(); // 阻止事件冒泡
+                        e.Use();
                     }
-                    // 右键点击
                     else if (e.type == EventType.ContextClick || (e.type == EventType.MouseDown && e.button == 1))
                     {
                         ShowContextMenu(colIndex, i);
@@ -232,12 +253,28 @@ public class PlistColumnEditorWindow : EditorWindow
         GUILayout.EndVertical();
     }
 
+    private string GetDisplayTypeLabel(PlistTreeNode node)
+    {
+        switch (node.NodeType)
+        {
+            case PlistNodeType.String: return "string";
+            case PlistNodeType.Integer: return "int";
+            case PlistNodeType.Real: return "float";
+            case PlistNodeType.Boolean: return "bool";
+            case PlistNodeType.Date: return "date";
+            case PlistNodeType.Dict: return "dict";
+            case PlistNodeType.Array: return "array";
+            case PlistNodeType.Root: return "root";
+            default: return "?";
+        }
+    }
+
     private void ShowContextMenu(int colIndex, int itemIndex)
     {
         var node = columns[colIndex][itemIndex];
         GenericMenu menu = new GenericMenu();
 
-        // ✅ 只有拥有 <key> 节点的项才能重命名（即：是 dict 的子项）
+        //  只有拥有 <key> 节点的项才能重命名（即：是 dict 的子项）
         if (node.XmlKeyNode != null)
         {
             menu.AddItem(new GUIContent("重命名"), false, () => RenameNode(node));
@@ -250,7 +287,12 @@ public class PlistColumnEditorWindow : EditorWindow
         // 添加子节点（仅容器节点或根节点）
         if (node.IsContainer)
         {
-            menu.AddItem(new GUIContent("添加"), false, () => ShowAddMenu(node));
+            // 使用 "/" 创建子菜单结构
+            menu.AddItem(new GUIContent("添加/添加 String"), false, () => AddChildNode(node, PlistNodeType.String, "string"));
+            menu.AddItem(new GUIContent("添加/添加 Integer"), false, () => AddChildNode(node, PlistNodeType.Integer, "integer"));
+            menu.AddItem(new GUIContent("添加/添加 Boolean"), false, () => AddChildNode(node, PlistNodeType.Boolean, "true"));
+            menu.AddItem(new GUIContent("添加/添加 Dict"), false, () => AddChildNode(node, PlistNodeType.Dict, "dict"));
+            menu.AddItem(new GUIContent("添加/添加 Array"), false, () => AddChildNode(node, PlistNodeType.Array, "array"));
         }
         else
         {
@@ -284,7 +326,7 @@ public class PlistColumnEditorWindow : EditorWindow
                 renamingColumnIndex = col;
                 renamingItemIndex = idx;
 
-                // ✅ 下一帧自动聚焦并选中文本
+                //  下一帧自动聚焦并选中文本
                 EditorApplication.delayCall += () =>
                 {
                     EditorGUI.FocusTextInControl($"rename_{col}_{idx}");
@@ -292,20 +334,6 @@ public class PlistColumnEditorWindow : EditorWindow
                 break;
             }
         }
-    }
-
-    private void ShowAddMenu(PlistTreeNode parentNode)
-    {
-        GenericMenu menu = new GenericMenu();
-
-        // 添加不同类型的子节点
-        menu.AddItem(new GUIContent("添加 String"), false, () => AddChildNode(parentNode, PlistNodeType.String, "string"));
-        menu.AddItem(new GUIContent("添加 Integer"), false, () => AddChildNode(parentNode, PlistNodeType.Integer, "integer"));
-        menu.AddItem(new GUIContent("添加 Boolean"), false, () => AddChildNode(parentNode, PlistNodeType.Boolean, "true"));
-        menu.AddItem(new GUIContent("添加 Dict"), false, () => AddChildNode(parentNode, PlistNodeType.Dict, "dict"));
-        menu.AddItem(new GUIContent("添加 Array"), false, () => AddChildNode(parentNode, PlistNodeType.Array, "array"));
-
-        menu.ShowAsContext();
     }
 
     private void AddChildNode(PlistTreeNode parentNode, PlistNodeType type, string xmlType)
@@ -316,7 +344,7 @@ public class PlistColumnEditorWindow : EditorWindow
         // 对于 dict/array，需要先添加 <key>，再添加值节点
         if (type == PlistNodeType.Dict || type == PlistNodeType.Array)
         {
-            //name = EditorUtility.DisplayDialogEditText("添加子项", "输入键名：", "NewKey");
+            name = EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey");
             if (string.IsNullOrEmpty(name)) return;
 
             // 创建 <key> 节点
@@ -363,10 +391,10 @@ public class PlistColumnEditorWindow : EditorWindow
             // 叶子节点：string/integer/boolean
             if (parentNode.NodeType == PlistNodeType.Dict)
             {
-                //name = EditorUtility.DisplayDialogEditText("添加子项", "输入键名：", "NewKey");
+                name = EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey");
                 if (string.IsNullOrEmpty(name)) return;
 
-                value =  type == PlistNodeType.Integer ? "0" : "NewValue";
+                value = type == PlistNodeType.Integer ? "0" : "NewValue";
 
                 // 创建 <key> + <value> 节点
                 XmlElement keyElement = xmlDoc.CreateElement("key");
@@ -403,7 +431,7 @@ public class PlistColumnEditorWindow : EditorWindow
             }
             else if (parentNode.NodeType == PlistNodeType.Array)
             {
-                value =  type == PlistNodeType.Integer ? "0" : "NewValue";
+                value = type == PlistNodeType.Integer ? "0" : "NewValue";
 
                 XmlElement valueElement = xmlDoc.CreateElement(xmlType);
                 valueElement.InnerText = value;
@@ -677,7 +705,7 @@ public class PlistColumnEditorWindow : EditorWindow
     private bool IsValueNode(XmlNode node)
     {
         return node.Name == "string" || node.Name == "integer" || node.Name == "real" ||
-               node.Name == "true" || node.Name == "false" || node.Name == "date";
+            node.Name == "true" || node.Name == "false" || node.Name == "date";
     }
 
     private XmlNode GetNextSibling(XmlNode node)
@@ -791,7 +819,7 @@ public class PlistTreeNode
     public List<PlistTreeNode> Children;
     public PlistTreeNode Parent; // 新增：指向父节点，便于删除和刷新
     public XmlNode XmlValueNode; // 值节点：<string>, <dict>, <array> 等
-    public XmlNode XmlKeyNode;   // key 节点（仅 dict 子项有）
+    public XmlNode XmlKeyNode; // key 节点（仅 dict 子项有）
     public string Path;
 
     public bool IsContainer => NodeType == PlistNodeType.Dict || NodeType == PlistNodeType.Array || NodeType == PlistNodeType.Root;

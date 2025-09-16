@@ -47,25 +47,23 @@ public static class EditorUtils2
         }
     }
 
-    public static string DisplayDialogEditText(string title, string message, string defaultValue)
+    // 不再返回 string，而是接受一个 Action<string> 作为回调
+    public static void DisplayDialogEditText(string title, string message, string defaultValue, System.Action<string> onConfirm)
     {
-        
-        Debug.Log($"[EditorUtils2] DisplayDialogEditText called: {title}"); // 👈 加这一行
-        string result = null;
-        bool done = false;
+        Debug.Log($"[EditorUtils2] DisplayDialogEditText called: {title}");
 
-        InputDialog.Show(title, message, defaultValue, s =>
+        // InputDialog.Show 现在接收一个额外的回调，当用户取消或关闭窗口时调用
+        // (假设 InputDialog.Show 也可以接受一个 onCancel 回调，如果它支持的话)
+        InputDialog.Show(title, message, defaultValue, (userInput) => 
         {
-            result = s;
-            done = true;
+            // 当用户点击确认时，我们调用从外部传进来的 onConfirm 回调
+            if (onConfirm != null)
+            {
+                onConfirm(userInput);
+            }
         });
 
-        // 等待用户操作（模态窗口阻塞直到关闭）
-        while (!done)
-        {
-            System.Threading.Thread.Sleep(100);
-        }
-
-        return result;
+        // 移除了致命的 while 循环！
+        // 这个方法会立即返回，不会阻塞主线程。
     }
 }

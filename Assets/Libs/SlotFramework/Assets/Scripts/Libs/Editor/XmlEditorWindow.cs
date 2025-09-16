@@ -137,7 +137,7 @@ public class PlistColumnEditorWindow : EditorWindow
             // 在路径栏上方留出一点空间
             EditorGUILayout.Space(5);
 
-            // 为了支持富文本，我们需要创建一个新的 GUIStyle
+            // 为了支持富文本，需要创建一个新的 GUIStyle
             GUIStyle pathStyle = new GUIStyle(EditorStyles.helpBox);
             pathStyle.richText = true; // 启用富文本解析
 
@@ -454,122 +454,121 @@ public class PlistColumnEditorWindow : EditorWindow
         }
     }
 
-    private void AddChildNode(PlistTreeNode parentNode, PlistNodeType type, string xmlType)
+   private void AddChildNode(PlistTreeNode parentNode, PlistNodeType type, string xmlType)
     {
-        string name = "NewKey";
         string value = "";
 
         // 对于 dict/array，需要先添加 <key>，再添加值节点
         if (type == PlistNodeType.Dict || type == PlistNodeType.Array)
         {
-            name = EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey");
-            if (string.IsNullOrEmpty(name)) return;
-
-            // 创建 <key> 节点
-            XmlElement keyElement = xmlDoc.CreateElement("key");
-            keyElement.InnerText = name;
-
-            // 创建值节点（dict/array）
-            XmlElement valueElement = xmlDoc.CreateElement(xmlType);
-
-            // 插入到父节点（必须是 dict）
-            if (parentNode.XmlValueNode?.Name == "dict")
+            // 调用异步方法，并把后续逻辑全部放入回调中
+            EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey", (name) =>
             {
-                parentNode.XmlValueNode.AppendChild(keyElement);
-                parentNode.XmlValueNode.AppendChild(valueElement);
-
-                // 创建树节点
-                var newNode = new PlistTreeNode
-                {
-                    Name = name,
-                    NodeType = type,
-                    Children = new List<PlistTreeNode>(),
-                    XmlValueNode = valueElement,
-                    XmlKeyNode = keyElement,
-                    Parent = parentNode,
-                    Path = $"{parentNode.Path}/{name}"
-                };
-
-                parentNode.Children.Add(newNode);
-
-                // 如果当前列正在显示 parentNode，则刷新
-                int colIndex = columns.FindIndex(col => col.Contains(parentNode));
-                if (colIndex >= 0)
-                {
-                    RefreshColumnsFrom(colIndex);
-                    // 自动选中新节点并进入重命名模式
-                    int newIndex = columns[colIndex].Count - 1;
-                    selectedIndices[colIndex] = newIndex;
-                    RenameNode(newNode); // 自动进入重命名
-                }
-            }
-        }
-        else
-        {
-            // 叶子节点：string/integer/boolean
-            if (parentNode.NodeType == PlistNodeType.Dict)
-            {
-                name = EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey");
+                // -------------------------------------------------------------
+                // | 这个大括号内的代码，只会在用户点击确认后才会执行！ |
+                // -------------------------------------------------------------
                 if (string.IsNullOrEmpty(name)) return;
 
-                if (type == PlistNodeType.Boolean)
-                {
-                    value = "true"; // 默认 true
-                }
-                else if (type == PlistNodeType.Integer)
-                {
-                    value = "0";
-                }
-                else
-                {
-                    value = "NewValue";
-                }
-
-                // 创建 <key> + <value> 节点
+                // 创建 <key> 节点
                 XmlElement keyElement = xmlDoc.CreateElement("key");
                 keyElement.InnerText = name;
 
+                // 创建值节点（dict/array）
                 XmlElement valueElement = xmlDoc.CreateElement(xmlType);
-                valueElement.InnerText = value;
 
-                parentNode.XmlValueNode?.AppendChild(keyElement);
-                parentNode.XmlValueNode?.AppendChild(valueElement);
-
-                // 创建树节点
-                var newNode = new PlistTreeNode
+                // 插入到父节点（必须是 dict）
+                if (parentNode.XmlValueNode?.Name == "dict")
                 {
-                    Name = name,
-                    NodeType = type,
-                    Value = value,
-                    XmlValueNode = valueElement,
-                    XmlKeyNode = keyElement,
-                    Parent = parentNode,
-                    Path = $"{parentNode.Path}/{name}"
-                };
+                    parentNode.XmlValueNode.AppendChild(keyElement);
+                    parentNode.XmlValueNode.AppendChild(valueElement);
 
-                parentNode.Children.Add(newNode);
+                    // 创建树节点
+                    var newNode = new PlistTreeNode
+                    {
+                        Name = name,
+                        NodeType = type,
+                        Children = new List<PlistTreeNode>(),
+                        XmlValueNode = valueElement,
+                        XmlKeyNode = keyElement,
+                        Parent = parentNode,
+                        Path = $"{parentNode.Path}/{name}"
+                    };
 
-                int colIndex = columns.FindIndex(col => col.Contains(parentNode));
-                if (colIndex >= 0)
-                {
-                    RefreshColumnsFrom(colIndex);
-                    int newIndex = columns[colIndex].Count - 1;
-                    selectedIndices[colIndex] = newIndex;
-                    RenameNode(newNode); // 自动重命名 key
+                    parentNode.Children.Add(newNode);
+
+                    // 刷新并自动进入重命名
+                    int colIndex = columns.FindIndex(col => col.Contains(parentNode));
+                    if (colIndex >= 0)
+                    {
+                        RefreshColumnsFrom(colIndex);
+                        selectedIndices[colIndex] = parentNode.Children.Count - 1;
+                        RenameNode(newNode);
+                    }
                 }
+            });
+        }
+        else // 叶子节点：string/integer/boolean
+        {
+            if (parentNode.NodeType == PlistNodeType.Dict)
+            {
+                // 同样，调用异步方法，把后续逻辑放入回调
+                EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey", (name) =>
+                {
+                    // -------------------------------------------------------------
+                    // | 这个大括号内的代码，也只会在用户点击确认后才会执行！ |
+                    // -------------------------------------------------------------
+                    if (string.IsNullOrEmpty(name)) return;
+
+                    if (type == PlistNodeType.Boolean) value = "true";
+                    else if (type == PlistNodeType.Integer) value = "0";
+                    else value = "NewValue";
+
+                    // 创建 <key> + <value> 节点
+                    XmlElement keyElement = xmlDoc.CreateElement("key");
+                    keyElement.InnerText = name;
+
+                    XmlElement valueElement = xmlDoc.CreateElement(xmlType);
+                    valueElement.InnerText = value;
+
+                    parentNode.XmlValueNode?.AppendChild(keyElement);
+                    parentNode.XmlValueNode?.AppendChild(valueElement);
+
+                    // 创建树节点
+                    var newNode = new PlistTreeNode
+                    {
+                        Name = name,
+                        NodeType = type,
+                        Value = value,
+                        XmlValueNode = valueElement,
+                        XmlKeyNode = keyElement,
+                        Parent = parentNode,
+                        Path = $"{parentNode.Path}/{name}"
+                    };
+
+                    parentNode.Children.Add(newNode);
+
+                    int colIndex = columns.FindIndex(col => col.Contains(parentNode));
+                    if (colIndex >= 0)
+                    {
+                        RefreshColumnsFrom(colIndex);
+                        selectedIndices[colIndex] = parentNode.Children.Count - 1;
+                        RenameNode(newNode);
+                    }
+                });
             }
             else if (parentNode.NodeType == PlistNodeType.Array)
             {
+                // (数组部分不需要输入名称，所以逻辑不变)
                 value = type == PlistNodeType.Integer ? "0" : "NewValue";
+                if (type == PlistNodeType.Boolean) value = "true";
+
 
                 XmlElement valueElement = xmlDoc.CreateElement(xmlType);
                 valueElement.InnerText = value;
 
                 parentNode.XmlValueNode?.AppendChild(valueElement);
 
-                // 数组项名称为 [index]
                 string itemName = $"[{parentNode.Children.Count}]";
-
                 var newNode = new PlistTreeNode
                 {
                     Name = itemName,
@@ -579,27 +578,20 @@ public class PlistColumnEditorWindow : EditorWindow
                     Parent = parentNode,
                     Path = $"{parentNode.Path}[{parentNode.Children.Count}]"
                 };
-
                 parentNode.Children.Add(newNode);
 
                 int colIndex = columns.FindIndex(col => col.Contains(parentNode));
                 if (colIndex >= 0)
                 {
                     RefreshColumnsFrom(colIndex);
-                    
-                    // 在 AddChildNode 最后，RefreshColumnsFrom 后：
                     if (columns.Count > colIndex + 1)
                     {
-                        // 新增列，初始化滚动位置
                         if (columnScrollPositions.Count <= colIndex + 1)
                         {
                             columnScrollPositions.Add(Vector2.zero);
                         }
                     }
-                    
-                    int newIndex = columns[colIndex].Count - 1;
-                    selectedIndices[colIndex] = newIndex;
-                    // 自动选中并聚焦值编辑器（你可以在 DrawColumn 中检测选中叶子节点时自动聚焦 TextField）
+                    selectedIndices[colIndex] = parentNode.Children.Count - 1;
                 }
             }
         }

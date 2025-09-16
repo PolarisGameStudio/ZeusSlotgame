@@ -83,8 +83,51 @@ public class PlistColumnEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndScrollView();
+        
+        // --- 新增：绘制底部的选中路径栏 ---
+        DrawSelectedPath();
+        
         //  新增：处理鼠标滚轮事件
         HandleMouseWheelScroll();
+    }
+    
+    private void DrawSelectedPath()
+    {
+        // 1. 创建一个列表，用于存储路径的各个部分
+        List<string> pathParts = new List<string>();
+
+        // 2. 遍历所有列
+        for (int i = 0; i < columns.Count; i++)
+        {
+            // 获取当前列的选中索引
+            int selectedIndex = selectedIndices[i];
+
+            // 检查是否存在有效的选择
+            if (selectedIndex >= 0 && selectedIndex < columns[i].Count)
+            {
+                // 获取选中的节点并将其名称添加到路径列表中
+                PlistTreeNode selectedNode = columns[i][selectedIndex];
+                pathParts.Add(selectedNode.Name);
+            }
+            else
+            {
+                // 如果在任何一列没有选择，那么路径就到此为止
+                break;
+            }
+        }
+
+        // 3. 如果路径列表不为空，则将其格式化并显示出来
+        if (pathParts.Count > 0)
+        {
+            // 使用 " > " 连接所有路径部分，形成最终的路径字符串
+            string fullPath = string.Join(" > ", pathParts);
+            
+            // 在路径栏上方留出一点空间
+            EditorGUILayout.Space(5);
+
+            // 使用一个带背景的样式（HelpBox）来显示路径，使其更醒目
+            EditorGUILayout.LabelField(fullPath, EditorStyles.helpBox);
+        }
     }
     private void HandleMouseWheelScroll()
     {

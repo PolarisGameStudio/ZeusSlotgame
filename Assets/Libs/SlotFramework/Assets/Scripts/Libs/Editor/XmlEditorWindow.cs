@@ -31,6 +31,8 @@ public class PlistColumnEditorWindow : EditorWindow
     private string valueEditorControlName = "ValueTextField";
     private bool isValueEditorJustInitiated = false;
 
+    // --- 新增：用于复制/粘贴功能的剪贴板 ---
+    private static PlistTreeNode clipboardNode;
       #endregion
 
       #region Window Initialization
@@ -317,11 +319,29 @@ public class PlistColumnEditorWindow : EditorWindow
         Repaint();
     }
 
-    private void ShowContextMenu(int colIndex, int itemIndex)
+        private void ShowContextMenu(int colIndex, int itemIndex)
     {
         var node = columns[colIndex][itemIndex];
         GenericMenu menu = new GenericMenu();
 
+        // --- 复制 ---
+        // 任何节点都可以被复制
+        menu.AddItem(new GUIContent("Copy"), false, () => CopyNode(node));
+
+        // --- 粘贴 ---
+        // 只有当剪贴板里有东西，并且当前节点是容器时，才允许粘贴
+        if (clipboardNode != null && node.IsContainer)
+        {
+            menu.AddItem(new GUIContent("Paste"), false, () => PasteNode(node));
+        }
+        else
+        {
+            menu.AddDisabledItem(new GUIContent("Paste"));
+        }
+
+        menu.AddSeparator(""); // 添加一条分割线
+
+        // --- 重命名 ---
         if (node.XmlKeyNode != null)
         {
             menu.AddItem(new GUIContent("Rename"), false, () => RenameNode(node));
@@ -331,6 +351,7 @@ public class PlistColumnEditorWindow : EditorWindow
             menu.AddDisabledItem(new GUIContent("Rename"));
         }
 
+        // --- 添加 ---
         if (node.IsContainer)
         {
             menu.AddItem(new GUIContent("Add Item/String"), false, () => AddChildNode(node, PlistNodeType.String, "string"));
@@ -343,7 +364,8 @@ public class PlistColumnEditorWindow : EditorWindow
         {
             menu.AddDisabledItem(new GUIContent("Add Item"));
         }
-
+        
+        // --- 删除 ---
         if (node != rootNode)
         {
             menu.AddItem(new GUIContent("Delete"), false, () => DeleteNode(node));
@@ -354,6 +376,106 @@ public class PlistColumnEditorWindow : EditorWindow
         }
 
         menu.ShowAsContext();
+    }
+
+    /// <summary>
+    /// 将一个节点放入剪贴板。
+    /// </summary>
+    private void CopyNode(PlistTreeNode node)
+    {
+        if (node == null) return;
+        clipboardNode = node;
+        Debug.Log($"Copied '{node.Name}' to clipboard.");
+    }
+
+    /// <summary>
+    /// 将剪贴板中的节点深拷贝并粘贴到目标父节点下。
+    /// </summary>
+    private void PasteNode(PlistTreeNode destinationParent)
+    {
+        if (clipboardNode == null || !destinationParent.IsContainer) return;
+
+        // 1. 深拷贝XML节点结构
+        // ImportNode(node, true) 是一个非常强大的功能，可以完美地递归复制整个XML片段
+        XmlElement clonedXmlValueNode = (XmlElement)xmlDoc.ImportNode(clipboardNode.XmlValueNode, true);
+
+        // 2. 递归地创建新的PlistTreeNode数据结构来匹配新的XML结构
+        PlistTreeNode pastedNode = RebuildTreeFromXml(clonedXmlValueNode, clipboardNode);
+        pastedNode.Parent = destinationParent;
+
+        // 3. 处理粘贴到不同容器类型的逻辑
+        if (destinationParent.NodeType == PlistNodeType.Dict || destinationParent.NodeType == PlistNodeType.Root)
+        {
+            // 粘贴到字典时，需要生成一个新的、唯一的Key
+            pastedNode.Name = GenerateUniqueKey(destinationParent);
+            
+            XmlElement keyElement = xmlDoc.CreateElement("key");
+            keyElement.InnerText = pastedNode.Name;
+            pastedNode.XmlKeyNode = keyElement;
+            
+            destinationParent.XmlValueNode.AppendChild(keyElement);
+            destinationParent.XmlValueNode.AppendChild(clonedXmlValueNode);
+        }
+        else if (destinationParent.NodeType == PlistNodeType.Array)
+        {
+            // 粘贴到数组时，名称就是索引
+            pastedNode.Name = $"[{destinationParent.Children.Count}]";
+            destinationParent.XmlValueNode.AppendChild(clonedXmlValueNode);
+        }
+
+        // 4. 更新数据模型并刷新UI
+        destinationParent.Children.Add(pastedNode);
+        ForceRefreshAndSelect(destinationParent, pastedNode);
+    }
+    
+    /// <summary>
+    /// 一个辅助的递归函数，用于从一个已存在的XML片段重建PlistTreeNode的数据结构。
+    /// </summary>
+    /// <param name="currentXmlNode">当前正在处理的（新克隆的）XML值节点</param>
+    /// <param name="templateNode">提供类型和结构参考的原始（被复制的）节点</param>
+    /// <returns>一个新建的、与XML匹配的PlistTreeNode</returns>
+    private PlistTreeNode RebuildTreeFromXml(XmlNode currentXmlNode, PlistTreeNode templateNode)
+    {
+        var newNode = new PlistTreeNode
+        {
+            Name = templateNode.Name, // Name将在PasteNode中被重写
+            NodeType = templateNode.NodeType,
+            Value = templateNode.Value,
+            XmlValueNode = currentXmlNode,
+        };
+
+        if (newNode.IsContainer)
+        {
+            newNode.Children = new List<PlistTreeNode>();
+            if (newNode.NodeType == PlistNodeType.Dict)
+            {
+                // 对于字典，我们需要成对地处理key和value
+                for (int i = 0; i < currentXmlNode.ChildNodes.Count; i += 2)
+                {
+                    XmlNode keyNode = currentXmlNode.ChildNodes[i];
+                    XmlNode valueNode = currentXmlNode.ChildNodes[i + 1];
+                    PlistTreeNode templateChild = templateNode.Children.Find(c => c.Name == keyNode.InnerText);
+
+                    var childNode = RebuildTreeFromXml(valueNode, templateChild);
+                    childNode.Parent = newNode;
+                    childNode.XmlKeyNode = keyNode;
+                    newNode.Children.Add(childNode);
+                }
+            }
+            else // Array
+            {
+                for (int i = 0; i < currentXmlNode.ChildNodes.Count; i++)
+                {
+                    XmlNode valueNode = currentXmlNode.ChildNodes[i];
+                    PlistTreeNode templateChild = templateNode.Children[i];
+                    
+                    var childNode = RebuildTreeFromXml(valueNode, templateChild);
+                    childNode.Parent = newNode;
+                    newNode.Children.Add(childNode);
+                }
+            }
+        }
+        return newNode;
     }
 
     private void HandleFocusLossForRename()

@@ -95,23 +95,25 @@ public class PlistColumnEditorWindow : EditorWindow
     {
         // 1. 创建一个列表，用于存储路径的各个部分
         List<string> pathParts = new List<string>();
+        PlistTreeNode lastSelectedNode = null; // 新增：用于存储最后一个选中的节点
 
         // 2. 遍历所有列
         for (int i = 0; i < columns.Count; i++)
         {
-            // 获取当前列的选中索引
             int selectedIndex = selectedIndices[i];
-
-            // 检查是否存在有效的选择
             if (selectedIndex >= 0 && selectedIndex < columns[i].Count)
             {
-                // 获取选中的节点并将其名称添加到路径列表中
+                // 获取选中的节点
                 PlistTreeNode selectedNode = columns[i][selectedIndex];
+            
+                // 将节点名称添加到路径
                 pathParts.Add(selectedNode.Name);
+            
+                // 更新最后一个选中的节点引用
+                lastSelectedNode = selectedNode; 
             }
             else
             {
-                // 如果在任何一列没有选择，那么路径就到此为止
                 break;
             }
         }
@@ -119,14 +121,28 @@ public class PlistColumnEditorWindow : EditorWindow
         // 3. 如果路径列表不为空，则将其格式化并显示出来
         if (pathParts.Count > 0)
         {
-            // 使用 " > " 连接所有路径部分，形成最终的路径字符串
+            // 使用 " > " 连接所有路径部分
             string fullPath = string.Join(" > ", pathParts);
-            
+        
+            // --- 核心修改：检查最后一个节点 ---
+            // 如果最后一个选中的节点存在，并且它不是一个容器类型（即是string, int等）
+            if (lastSelectedNode != null && !lastSelectedNode.IsContainer)
+            {
+                // 在路径末尾拼接上它的值
+                // 使用富文本标签<b></b>来让值加粗，更易区分
+                fullPath += $": <b>{lastSelectedNode.Value}</b>";
+            }
+            // --- 修改结束 ---
+
             // 在路径栏上方留出一点空间
             EditorGUILayout.Space(5);
 
-            // 使用一个带背景的样式（HelpBox）来显示路径，使其更醒目
-            EditorGUILayout.LabelField(fullPath, EditorStyles.helpBox);
+            // 为了支持富文本，我们需要创建一个新的 GUIStyle
+            GUIStyle pathStyle = new GUIStyle(EditorStyles.helpBox);
+            pathStyle.richText = true; // 启用富文本解析
+
+            // 使用新的样式来显示路径
+            EditorGUILayout.LabelField(fullPath, pathStyle);
         }
     }
     private void HandleMouseWheelScroll()

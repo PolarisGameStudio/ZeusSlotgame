@@ -509,7 +509,7 @@ public class PlistColumnEditorWindow : EditorWindow
         }
         else // 叶子节点：string/integer/boolean
         {
-            if (parentNode.NodeType == PlistNodeType.Dict)
+            if (parentNode.NodeType == PlistNodeType.Dict|| parentNode.NodeType == PlistNodeType.Root)
             {
                 // 同样，调用异步方法，把后续逻辑放入回调
                 EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey", (name) =>
@@ -627,25 +627,42 @@ public class PlistColumnEditorWindow : EditorWindow
     }
 
     // 从指定列开始刷新（重新构建该列及右侧所有列）
+    // 从指定列的“选择”开始，刷新后续所有列
     private void RefreshColumnsFrom(int startColIndex)
     {
-        // 清除 startColIndex 右侧所有列
+        // 1. 清除 startColIndex 右侧所有列的数据
         while (columns.Count > startColIndex + 1)
         {
             columns.RemoveAt(columns.Count - 1);
             selectedIndices.RemoveAt(selectedIndices.Count - 1);
-            columnScrollPositions.RemoveAt(columnScrollPositions.Count - 1); //  新增
+            columnScrollPositions.RemoveAt(columnScrollPositions.Count - 1);
         }
 
-        // 重新构建 startColIndex 列（如果存在）
-        if (startColIndex < columns.Count)
+        // 2. 找到作为“父节点”的、在 startColIndex 列被选中的节点
+        int selectedIndexInSourceColumn = selectedIndices[startColIndex];
+    
+        // 如果当前列没有任何选中项，那就没有子内容可显示，直接返回
+        if (selectedIndexInSourceColumn < 0 || selectedIndexInSourceColumn >= columns[startColIndex].Count)
         {
-            var parent = GetParentNodeOfColumn(startColIndex);
-            if (parent != null)
+            Repaint();
+            return;
+        }
+
+        PlistTreeNode parentForNextColumn = columns[startColIndex][selectedIndexInSourceColumn];
+
+        // 3. 如果这个父节点是容器类型，并且确实有子节点，则更新或创建下一列
+        if (parentForNextColumn.IsContainer && parentForNextColumn.Children != null && parentForNextColumn.Children.Count > 0)
+        {
+            // 如果下一列 (startColIndex + 1) 不存在，就创建它
+            if (columns.Count <= startColIndex + 1)
             {
-                columns[startColIndex] = new List<PlistTreeNode>(parent.Children);
-                selectedIndices[startColIndex] = -1;
+                columns.Add(new List<PlistTreeNode>());
+                selectedIndices.Add(-1);
+                columnScrollPositions.Add(Vector2.zero);
             }
+        
+            // 用父节点的子节点列表来填充下一列的内容
+            columns[startColIndex + 1] = new List<PlistTreeNode>(parentForNextColumn.Children);
         }
 
         Repaint();

@@ -11,6 +11,7 @@ public class PlistColumnEditorWindow : EditorWindow
     private XmlDocument xmlDoc;
     private PlistTreeNode rootNode;
     private Vector2 scrollPos;
+    private List<Vector2> columnScrollPositions = new List<Vector2>();
 
     private List<List<PlistTreeNode>> columns = new List<List<PlistTreeNode>>();
     private List<int> selectedIndices = new List<int>();
@@ -82,11 +83,45 @@ public class PlistColumnEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndScrollView();
+        //  新增：处理鼠标滚轮事件
+        HandleMouseWheelScroll();
+    }
+    private void HandleMouseWheelScroll()
+    {
+        Event e = Event.current;
+        if (e.type == EventType.ScrollWheel)
+        {
+            // 获取当前鼠标位置
+            Vector2 mousePos = e.mousePosition;
+
+            // 遍历每一列，检测鼠标是否在其区域内
+            float currentX = 0f;
+            for (int i = 0; i < columns.Count; i++)
+            {
+                float columnWidth = 220f; // 与 DrawColumn 中的宽度一致
+                Rect columnRect = new Rect(currentX, 0, columnWidth, position.height);
+
+                if (columnRect.Contains(mousePos))
+                {
+                    // 鼠标在此列内，更新该列的滚动位置
+                    if (i < columnScrollPositions.Count)
+                    {
+                        columnScrollPositions[i] += new Vector2(0, e.delta.y * 20f); // 调整滚动速度
+                        e.Use(); // 标记事件已处理，防止传播
+                        Repaint();
+                        break;
+                    }
+                }
+
+                currentX += columnWidth;
+            }
+        }
     }
     private void InitializeColumns()
     {
         columns.Clear();
         selectedIndices.Clear();
+        columnScrollPositions.Clear(); //  新增
         if (rootNode != null)
         {
             columns.Add(new List<PlistTreeNode>
@@ -94,6 +129,7 @@ public class PlistColumnEditorWindow : EditorWindow
                 rootNode
             });
             selectedIndices.Add(-1);
+            columnScrollPositions.Add(Vector2.zero); //  新增
         }
     }
 
@@ -144,10 +180,22 @@ public class PlistColumnEditorWindow : EditorWindow
     {
         var column = columns[colIndex];
         int selectedIndex = selectedIndices[colIndex];
+        
+        //  确保滚动位置数组长度足够
+        if (colIndex >= columnScrollPositions.Count)
+        {
+            columnScrollPositions.Add(Vector2.zero);
+        }
 
         GUILayout.BeginVertical("box", GUILayout.Width(220), GUILayout.ExpandHeight(true));
 
         EditorGUILayout.LabelField($"Level {colIndex + 1}", EditorStyles.boldLabel);
+        
+        //  添加 ScrollView 包裹内容
+        columnScrollPositions[colIndex] = EditorGUILayout.BeginScrollView(
+            columnScrollPositions[colIndex],
+            GUILayout.ExpandHeight(true)
+        );
 
         for (int i = 0; i < column.Count; i++)
         {
@@ -260,7 +308,7 @@ public class PlistColumnEditorWindow : EditorWindow
 
             GUI.color = defaultColor;
         }
-
+        EditorGUILayout.EndScrollView(); //  结束 ScrollView
         GUILayout.EndVertical();
     }
 
@@ -479,6 +527,17 @@ public class PlistColumnEditorWindow : EditorWindow
                 if (colIndex >= 0)
                 {
                     RefreshColumnsFrom(colIndex);
+                    
+                    // 在 AddChildNode 最后，RefreshColumnsFrom 后：
+                    if (columns.Count > colIndex + 1)
+                    {
+                        // 新增列，初始化滚动位置
+                        if (columnScrollPositions.Count <= colIndex + 1)
+                        {
+                            columnScrollPositions.Add(Vector2.zero);
+                        }
+                    }
+                    
                     int newIndex = columns[colIndex].Count - 1;
                     selectedIndices[colIndex] = newIndex;
                     // 自动选中并聚焦值编辑器（你可以在 DrawColumn 中检测选中叶子节点时自动聚焦 TextField）
@@ -524,6 +583,7 @@ public class PlistColumnEditorWindow : EditorWindow
         {
             columns.RemoveAt(columns.Count - 1);
             selectedIndices.RemoveAt(selectedIndices.Count - 1);
+            columnScrollPositions.RemoveAt(columnScrollPositions.Count - 1); //  新增
         }
 
         // 重新构建 startColIndex 列（如果存在）

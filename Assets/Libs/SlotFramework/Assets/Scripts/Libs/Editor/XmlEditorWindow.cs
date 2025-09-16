@@ -7,250 +7,111 @@ using System.Text;
 
 public class PlistColumnEditorWindow : EditorWindow
 {
+      #region Member Variables
+
     private string xmlPath = "";
     private XmlDocument xmlDoc;
     private PlistTreeNode rootNode;
-    private Vector2 scrollPos;
-    private List<Vector2> columnScrollPositions = new List<Vector2>();
 
+    // UI State
+    private Vector2 mainScrollPos;
+    private List<Vector2> columnScrollPositions = new List<Vector2>();
     private List<List<PlistTreeNode>> columns = new List<List<PlistTreeNode>>();
     private List<int> selectedIndices = new List<int>();
 
-    // 用于重命名时临时存储
-    private PlistTreeNode nodeToRename;
-    private string originalName;
+    // Key Renaming State
+    private PlistTreeNode renamingNode;
+    private string renamingInput = "";
+    private string renameControlName = "";
+    private bool isRenameJustInitiated = false;
 
-    private PlistTreeNode renamingNode; // 当前正在重命名的节点
-    private string renamingInput = ""; // 输入框内容
-    private int renamingColumnIndex = -1;
-    private int renamingItemIndex = -1;
+    // Value Editing State
+    private PlistTreeNode editingValueNode;
+    private string editingValueInput = "";
+    private string valueEditorControlName = "ValueTextField";
+    private bool isValueEditorJustInitiated = false;
+
+      #endregion
+
+      #region Window Initialization
 
     [MenuItem("Tools/Plist Column Editor")]
     public static void ShowWindow()
     {
         var window = GetWindow<PlistColumnEditorWindow>("Plist Column Editor");
-        //  设置固定路径
         string projectRoot = Application.dataPath.Replace("/Assets", "").Replace("\\Assets", "");
         window.xmlPath = Path.Combine(projectRoot, "Assets/AssetResources/Resources/GameConfig.plist.xml");
         window.LoadPlist();
     }
 
+      #endregion
+
+      #region Unity GUI Methods
+
     private void OnGUI()
     {
-        EditorGUILayout.Space();
-        
-        xmlPath = EditorGUILayout.TextField("Plist Path:", xmlPath);
-        
-        /*EditorGUILayout.BeginHorizontal();
-        
-        if (GUILayout.Button("Browse", GUILayout.Width(80)))
-        {
-            string selected = EditorUtility.OpenFilePanel("Select Plist File", "", "plist,xml");
-            if (!string.IsNullOrEmpty(selected))
-            {
-                xmlPath = selected;
-                LoadPlist();
-            }
-        }
-        EditorGUILayout.EndHorizontal();*/
+        // --- Focus Loss Detection ---
+        // Must be at the top of OnGUI to work reliably
+        HandleFocusLossForRename();
+        HandleFocusLossForValueEdit();
 
-        if (string.IsNullOrEmpty(xmlPath))
+        // --- Top Bar Controls ---
+        DrawTopBar();
+
+        if (string.IsNullOrEmpty(xmlPath) || xmlDoc == null)
         {
-            EditorGUILayout.HelpBox("Please select a .plist file.", MessageType.Info);
+            EditorGUILayout.HelpBox("Please select a valid .plist file.", MessageType.Info);
             return;
         }
-        
-        if (GUILayout.Button("Save to Plist"))
-        {
-            SavePlist();
-        }
 
-        EditorGUILayout.Space();
+        // --- Main Content Area ---
+        EditorGUILayout.BeginVertical();
 
-        if (columns.Count == 0 && rootNode != null)
-        {
-            InitializeColumns();
-        }
-
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(position.height - 80), GUILayout.ExpandWidth(true));
-
+        // Main scroll view for columns
+        mainScrollPos = EditorGUILayout.BeginScrollView(mainScrollPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
-
         for (int colIndex = 0; colIndex < columns.Count; colIndex++)
         {
             DrawColumn(colIndex);
         }
-
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndScrollView();
-        
-        // --- 新增：绘制底部的选中路径栏 ---
+
+        // Path display bar at the bottom
         DrawSelectedPath();
-        
-        //  新增：处理鼠标滚轮事件
+
+        EditorGUILayout.EndVertical();
+
+        // Handle mouse wheel scrolling over columns
         HandleMouseWheelScroll();
     }
-    
-    private void DrawSelectedPath()
+
+    private void DrawTopBar()
     {
-        // 1. 创建一个列表，用于存储路径的各个部分
-        List<string> pathParts = new List<string>();
-        PlistTreeNode lastSelectedNode = null; // 新增：用于存储最后一个选中的节点
-
-        // 2. 遍历所有列
-        for (int i = 0; i < columns.Count; i++)
+        EditorGUILayout.Space();
+        xmlPath = EditorGUILayout.TextField("Plist Path:", xmlPath);
+        if (GUILayout.Button("Save to Plist"))
         {
-            int selectedIndex = selectedIndices[i];
-            if (selectedIndex >= 0 && selectedIndex < columns[i].Count)
-            {
-                // 获取选中的节点
-                PlistTreeNode selectedNode = columns[i][selectedIndex];
-            
-                // 将节点名称添加到路径
-                pathParts.Add(selectedNode.Name);
-            
-                // 更新最后一个选中的节点引用
-                lastSelectedNode = selectedNode; 
-            }
-            else
-            {
-                break;
-            }
+            SavePlist();
         }
-
-        // 3. 如果路径列表不为空，则将其格式化并显示出来
-        if (pathParts.Count > 0)
-        {
-            // 使用 " > " 连接所有路径部分
-            string fullPath = string.Join(" > ", pathParts);
-        
-            // --- 核心修改：检查最后一个节点 ---
-            // 如果最后一个选中的节点存在，并且它不是一个容器类型（即是string, int等）
-            if (lastSelectedNode != null && !lastSelectedNode.IsContainer)
-            {
-                // 在路径末尾拼接上它的值
-                // 使用富文本标签<b></b>来让值加粗，更易区分
-                fullPath += $": <b>{lastSelectedNode.Value}</b>";
-            }
-            // --- 修改结束 ---
-
-            // 在路径栏上方留出一点空间
-            EditorGUILayout.Space(5);
-
-            // 为了支持富文本，需要创建一个新的 GUIStyle
-            GUIStyle pathStyle = new GUIStyle(EditorStyles.helpBox);
-            pathStyle.richText = true; // 启用富文本解析
-
-            // 使用新的样式来显示路径
-            EditorGUILayout.LabelField(fullPath, pathStyle);
-        }
-    }
-    private void HandleMouseWheelScroll()
-    {
-        Event e = Event.current;
-        if (e.type == EventType.ScrollWheel)
-        {
-            // 获取当前鼠标位置
-            Vector2 mousePos = e.mousePosition;
-
-            // 遍历每一列，检测鼠标是否在其区域内
-            float currentX = 0f;
-            for (int i = 0; i < columns.Count; i++)
-            {
-                float columnWidth = 220f; // 与 DrawColumn 中的宽度一致
-                Rect columnRect = new Rect(currentX, 0, columnWidth, position.height);
-
-                if (columnRect.Contains(mousePos))
-                {
-                    // 鼠标在此列内，更新该列的滚动位置
-                    if (i < columnScrollPositions.Count)
-                    {
-                        columnScrollPositions[i] += new Vector2(0, e.delta.y * 20f); // 调整滚动速度
-                        e.Use(); // 标记事件已处理，防止传播
-                        Repaint();
-                        break;
-                    }
-                }
-
-                currentX += columnWidth;
-            }
-        }
-    }
-    private void InitializeColumns()
-    {
-        columns.Clear();
-        selectedIndices.Clear();
-        columnScrollPositions.Clear(); //  新增
-        if (rootNode != null)
-        {
-            columns.Add(new List<PlistTreeNode>
-            {
-                rootNode
-            });
-            selectedIndices.Add(-1);
-            columnScrollPositions.Add(Vector2.zero); //  新增
-        }
-    }
-
-    private void CommitRename()
-    {
-        if (renamingNode != null)
-        {
-            if (string.IsNullOrWhiteSpace(renamingInput))
-            {
-                EditorUtility.DisplayDialog("Invalid Name", "Name cannot be empty.", "OK");
-                return; // 保持重命名状态
-            }
-
-            if (renamingInput != renamingNode.Name)
-            {
-                // 更新树节点
-                renamingNode.Name = renamingInput;
-
-                // 更新 XML（找到对应的 <key> 节点）
-                if (renamingNode.XmlKeyNode != null)
-                {
-                    renamingNode.XmlKeyNode.InnerText = renamingInput;
-                }
-
-                // 刷新当前列及右侧列
-                RefreshColumnsFrom(renamingColumnIndex);
-            }
-        }
-
-        CancelRename();
-        Repaint();
-
-        GUI.FocusControl(null);
-    }
-
-
-
-    private void CancelRename()
-    {
-        renamingNode = null;
-        renamingInput = "";
-        renamingColumnIndex = -1;
-        renamingItemIndex = -1;
-        GUI.FocusControl(null);
+        EditorGUILayout.Space();
     }
 
     private void DrawColumn(int colIndex)
     {
         var column = columns[colIndex];
         int selectedIndex = selectedIndices[colIndex];
-        
-        //  确保滚动位置数组长度足够
-        if (colIndex >= columnScrollPositions.Count)
+
+        // Ensure scroll position list is large enough
+        while (colIndex >= columnScrollPositions.Count)
         {
             columnScrollPositions.Add(Vector2.zero);
         }
 
         GUILayout.BeginVertical("box", GUILayout.Width(220), GUILayout.ExpandHeight(true));
-
         EditorGUILayout.LabelField($"Level {colIndex + 1}", EditorStyles.boldLabel);
-        
-        //  添加 ScrollView 包裹内容
+
+        // Scroll view for the column's content
         columnScrollPositions[colIndex] = EditorGUILayout.BeginScrollView(
             columnScrollPositions[colIndex],
             GUILayout.ExpandHeight(true)
@@ -261,130 +122,199 @@ public class PlistColumnEditorWindow : EditorWindow
             var node = column[i];
             bool isSelected = (i == selectedIndex);
 
-            GUIStyle style = isSelected ? EditorStyles.label : GUI.skin.GetStyle("Label");
             Color defaultColor = GUI.color;
-            if (isSelected) GUI.color = Color.green;
+            if (isSelected) GUI.backgroundColor = new Color(0.24f, 0.48f, 0.9f); // A nice blue selection color
 
-            Rect rect = EditorGUILayout.GetControlRect(false, 22);
+            // Determine if this item is the one being renamed
+            bool isRenamingThisNode = (renamingNode == node);
 
+            // Get a rect for the list item
+            Rect itemRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
 
-            if (renamingNode == node)
+            // Draw selection background if selected but not renaming
+            if (isSelected && !isRenamingThisNode)
             {
-                EditorGUI.BeginChangeCheck();
-                renamingInput = EditorGUI.TextField(rect, renamingInput);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    // 用户输入时暂不处理，等提交
-                }
+                GUI.Box(itemRect, "");
+            }
 
-                Event e = Event.current;
-                if (e.type == EventType.KeyDown)
-                {
-                    if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
-                    {
-                        CommitRename();
-                        e.Use();
-                    }
-                    else if (e.keyCode == KeyCode.Escape)
-                    {
-                        CancelRename();
-                        e.Use();
-                    }
-                }
-                else if (e.type == EventType.MouseDown && !rect.Contains(e.mousePosition))
-                {
-                    CommitRename();
-                    e.Use();
-                }
+            GUI.backgroundColor = Color.white;
+
+
+            // --- Draw Item Content ---
+            if (isRenamingThisNode)
+            {
+                DrawRenameEditor(itemRect);
             }
             else
             {
-                //  修改：显示 Name + 类型标识
-                EditorGUILayout.BeginHorizontal(GUILayout.Height(22));
-                {
-                    // 左侧：节点名称
-                    GUILayout.Label(node.Name, style, GUILayout.ExpandWidth(true));
+                DrawItemLabel(itemRect, node, isSelected);
+                HandleItemEvents(colIndex, i, itemRect);
+            }
 
-                    // 右侧：类型标识（灰色小字）
-                    string typeLabel = GetDisplayTypeLabel(node);
-                    GUIStyle typeStyle = new GUIStyle(EditorStyles.miniLabel)
-                    {
-                        fontStyle = FontStyle.Italic,
-                        alignment = TextAnchor.MiddleRight,
-                        normal =
-                        {
-                            textColor = new Color(0.5f, 0.5f, 0.5f)
-                        }
-                    };
-                    GUILayout.Label(typeLabel, typeStyle, GUILayout.Width(60));
-                }
-                EditorGUILayout.EndHorizontal();
-
-                //  手动检测鼠标事件（必须放在绘制后）
-                Event e = Event.current;
-                Rect labelRect = GUILayoutUtility.GetLastRect(); // 获取刚绘制的区域
-                if (labelRect.Contains(e.mousePosition))
-                {
-                    if (e.type == EventType.MouseDown && e.button == 0)
-                    {
-                        HandleColumnClick(colIndex, i);
-                        e.Use();
-                    }
-                    else if (e.type == EventType.ContextClick || (e.type == EventType.MouseDown && e.button == 1))
-                    {
-                        ShowContextMenu(colIndex, i);
-                        e.Use();
-                    }
-                }
-
-                // 如果是叶子节点且被选中，显示编辑器
-                if (isSelected && !node.IsContainer)
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.PrefixLabel("Value");
-
-                    if (node.NodeType == PlistNodeType.Boolean)
-                    {
-                        bool boolValue = node.Value == "true";
-                        bool newBoolValue = EditorGUILayout.Toggle(boolValue);
-                        if (newBoolValue != boolValue)
-                        {
-                            node.Value = newBoolValue ? "true" : "false";
-                        }
-                    }
-                    else
-                    {
-                        string newValue = EditorGUILayout.TextField(node.Value);
-                        if (newValue != node.Value)
-                        {
-                            node.Value = newValue;
-                        }
-                    }
-
-                    EditorGUILayout.EndHorizontal();
-                }
+            // If this item is a selected leaf node, draw its value editor below it
+            if (isSelected && !node.IsContainer)
+            {
+                DrawValueEditor(node);
             }
 
             GUI.color = defaultColor;
         }
-        EditorGUILayout.EndScrollView(); //  结束 ScrollView
+
+        EditorGUILayout.EndScrollView();
         GUILayout.EndVertical();
     }
 
-    private string GetDisplayTypeLabel(PlistTreeNode node)
+    private void DrawItemLabel(Rect rect, PlistTreeNode node, bool isSelected)
     {
-        switch (node.NodeType)
+        GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
+        labelStyle.normal.textColor = isSelected ? Color.white : EditorStyles.label.normal.textColor;
+
+        // Draw left-aligned name
+        GUI.Label(new Rect(rect.x, rect.y, rect.width - 60, rect.height), node.Name, labelStyle);
+
+        // Draw right-aligned type
+        GUIStyle typeStyle = new GUIStyle(EditorStyles.miniLabel)
         {
-            case PlistNodeType.String: return "string";
-            case PlistNodeType.Integer: return "int";
-            case PlistNodeType.Real: return "float";
-            case PlistNodeType.Boolean: return "bool";
-            case PlistNodeType.Date: return "date";
-            case PlistNodeType.Dict: return "dict";
-            case PlistNodeType.Array: return "array";
-            case PlistNodeType.Root: return "root";
-            default: return "?";
+            alignment = TextAnchor.MiddleRight,
+            normal =
+            {
+                textColor = isSelected ? new Color(0.8f, 0.8f, 0.8f) : Color.gray
+            }
+        };
+        GUI.Label(new Rect(rect.x + rect.width - 60, rect.y, 60, rect.height), GetDisplayTypeLabel(node), typeStyle);
+    }
+
+    private void DrawRenameEditor(Rect rect)
+    {
+        GUI.SetNextControlName(renameControlName);
+        renamingInput = EditorGUI.TextField(rect, renamingInput);
+    }
+
+    private void DrawValueEditor(PlistTreeNode node)
+    {
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.PrefixLabel("Value");
+
+        if (node.NodeType == PlistNodeType.Boolean)
+        {
+            bool boolValue = node.Value == "true";
+            bool newBoolValue = EditorGUILayout.Toggle(boolValue);
+            if (newBoolValue != boolValue)
+            {
+                node.Value = newBoolValue ? "true" : "false";
+            }
         }
+        else if (editingValueNode == node)
+        {
+            GUI.SetNextControlName(valueEditorControlName);
+            editingValueInput = EditorGUILayout.TextField(editingValueInput);
+        }
+        else
+        {
+            if (GUILayout.Button(node.Value, EditorStyles.textField))
+            {
+                StartValueEdit(node);
+            }
+        }
+
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private void DrawSelectedPath()
+    {
+        List<string> pathParts = new List<string>();
+        PlistTreeNode lastSelectedNode = null;
+
+        for (int i = 0; i < columns.Count; i++)
+        {
+            int selectedIndex = selectedIndices[i];
+            if (selectedIndex >= 0 && selectedIndex < columns[i].Count)
+            {
+                PlistTreeNode selectedNode = columns[i][selectedIndex];
+                pathParts.Add(selectedNode.Name);
+                lastSelectedNode = selectedNode;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (pathParts.Count > 0)
+        {
+            string fullPath = string.Join(" > ", pathParts);
+
+            if (lastSelectedNode != null && !lastSelectedNode.IsContainer)
+            {
+                fullPath += $": <b>{lastSelectedNode.Value}</b>";
+            }
+
+            EditorGUILayout.Space(5);
+            GUIStyle pathStyle = new GUIStyle(EditorStyles.helpBox)
+            {
+                richText = true
+            };
+            EditorGUILayout.LabelField(fullPath, pathStyle);
+        }
+    }
+
+      #endregion
+
+      #region Event Handling
+
+    private void HandleItemEvents(int colIndex, int itemIndex, Rect itemRect)
+    {
+        Event e = Event.current;
+        if (e.type == EventType.MouseDown && itemRect.Contains(e.mousePosition))
+        {
+            if (e.button == 0) // Left click
+            {
+                HandleColumnClick(colIndex, itemIndex);
+                e.Use();
+            }
+            else if (e.button == 1) // Right click
+            {
+                // Select the item first, then show the context menu
+                HandleColumnClick(colIndex, itemIndex);
+                ShowContextMenu(colIndex, itemIndex);
+                e.Use();
+            }
+        }
+    }
+
+    private void HandleColumnClick(int colIndex, int itemIndex)
+    {
+        // If clicking the same item, do nothing
+        if (selectedIndices.Count > colIndex && selectedIndices[colIndex] == itemIndex)
+        {
+            GUI.FocusControl(null); // Deselect text fields if any
+            return;
+        }
+
+        // A different item was clicked, so cancel any active editing
+        CommitRename();
+        CommitValueEdit();
+
+        selectedIndices[colIndex] = itemIndex;
+
+        // Trim columns to the right of the current one
+        while (columns.Count > colIndex + 1)
+        {
+            columns.RemoveAt(columns.Count - 1);
+            selectedIndices.RemoveAt(selectedIndices.Count - 1);
+            columnScrollPositions.RemoveAt(columnScrollPositions.Count - 1);
+        }
+
+        var clickedNode = columns[colIndex][itemIndex];
+        if (clickedNode.IsContainer && clickedNode.Children != null && clickedNode.Children.Count > 0)
+        {
+            columns.Add(new List<PlistTreeNode>(clickedNode.Children));
+            selectedIndices.Add(-1);
+            columnScrollPositions.Add(Vector2.zero);
+        }
+
+        GUI.FocusControl(null);
+        Repaint();
     }
 
     private void ShowContextMenu(int colIndex, int itemIndex)
@@ -392,48 +322,271 @@ public class PlistColumnEditorWindow : EditorWindow
         var node = columns[colIndex][itemIndex];
         GenericMenu menu = new GenericMenu();
 
-        //  只有拥有 <key> 节点的项才能重命名（即：是 dict 的子项）
         if (node.XmlKeyNode != null)
         {
-            menu.AddItem(new GUIContent("重命名"), false, () => RenameNode(node));
+            menu.AddItem(new GUIContent("Rename"), false, () => RenameNode(node));
         }
         else
         {
-            menu.AddDisabledItem(new GUIContent("重命名"));
+            menu.AddDisabledItem(new GUIContent("Rename"));
         }
 
-        // 添加子节点（仅容器节点或根节点）
         if (node.IsContainer)
         {
-            // 使用 "/" 创建子菜单结构
-            menu.AddItem(new GUIContent("添加/添加 String"), false, () => AddChildNode(node, PlistNodeType.String, "string"));
-            menu.AddItem(new GUIContent("添加/添加 Integer"), false, () => AddChildNode(node, PlistNodeType.Integer, "integer"));
-            menu.AddItem(new GUIContent("添加/添加 Boolean"), false, () => AddChildNode(node, PlistNodeType.Boolean, "true"));
-            menu.AddItem(new GUIContent("添加/添加 Dict"), false, () => AddChildNode(node, PlistNodeType.Dict, "dict"));
-            menu.AddItem(new GUIContent("添加/添加 Array"), false, () => AddChildNode(node, PlistNodeType.Array, "array"));
+            menu.AddItem(new GUIContent("Add Item/String"), false, () => AddChildNode(node, PlistNodeType.String, "string"));
+            menu.AddItem(new GUIContent("Add Item/Integer"), false, () => AddChildNode(node, PlistNodeType.Integer, "integer"));
+            menu.AddItem(new GUIContent("Add Item/Boolean"), false, () => AddChildNode(node, PlistNodeType.Boolean, "true"));
+            menu.AddItem(new GUIContent("Add Item/Dictionary"), false, () => AddChildNode(node, PlistNodeType.Dict, "dict"));
+            menu.AddItem(new GUIContent("Add Item/Array"), false, () => AddChildNode(node, PlistNodeType.Array, "array"));
         }
         else
         {
-            menu.AddDisabledItem(new GUIContent("添加"));
+            menu.AddDisabledItem(new GUIContent("Add Item"));
         }
 
-        // 删除（不能删除根节点）
         if (node != rootNode)
         {
-            menu.AddItem(new GUIContent("删除"), false, () => DeleteNode(node, colIndex, itemIndex));
+            menu.AddItem(new GUIContent("Delete"), false, () => DeleteNode(node));
         }
         else
         {
-            menu.AddDisabledItem(new GUIContent("删除"));
+            menu.AddDisabledItem(new GUIContent("Delete"));
         }
 
         menu.ShowAsContext();
     }
 
+    private void HandleFocusLossForRename()
+    {
+        if (renamingNode == null || isRenameJustInitiated) return;
+
+        Event e = Event.current;
+        if (e.type == EventType.KeyDown)
+        {
+            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
+            {
+                CommitRename();
+                e.Use();
+            }
+            else if (e.keyCode == KeyCode.Escape)
+            {
+                CancelRename();
+                e.Use();
+            }
+        }
+        else if (GUI.GetNameOfFocusedControl() != renameControlName)
+        {
+            CommitRename();
+        }
+
+        if (isRenameJustInitiated) isRenameJustInitiated = false;
+    }
+
+    private void HandleFocusLossForValueEdit()
+    {
+        if (editingValueNode == null || isValueEditorJustInitiated) return;
+
+        Event e = Event.current;
+        if (e.type == EventType.KeyDown && GUI.GetNameOfFocusedControl() == valueEditorControlName)
+        {
+            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
+            {
+                CommitValueEdit();
+                e.Use();
+            }
+            else if (e.keyCode == KeyCode.Escape)
+            {
+                CancelValueEdit();
+                e.Use();
+            }
+        }
+        else if (GUI.GetNameOfFocusedControl() != valueEditorControlName)
+        {
+            CommitValueEdit();
+        }
+
+        if (isValueEditorJustInitiated) isValueEditorJustInitiated = false;
+    }
+
+    private void HandleMouseWheelScroll()
+    {
+        Event e = Event.current;
+        if (e.type != EventType.ScrollWheel) return;
+
+        Vector2 mousePos = e.mousePosition;
+        float currentX = 5f; // Start with a small offset for borders
+        const float columnWidth = 220f;
+
+        for (int i = 0; i < columns.Count; i++)
+        {
+            Rect columnRect = new Rect(currentX, 0, columnWidth, position.height);
+            if (columnRect.Contains(mousePos))
+            {
+                if (i < columnScrollPositions.Count)
+                {
+                    columnScrollPositions[i] += e.delta * 5f; // Adjust scroll speed
+                    e.Use();
+                    Repaint();
+                    break;
+                }
+            }
+            currentX += columnWidth + 4f; // Add spacing
+        }
+    }
+
+      #endregion
+
+      #region Data Logic (CRUD)
+
+    private void AddChildNode(PlistTreeNode parentNode, PlistNodeType type, string xmlType)
+    {
+        // --- 分支1：为 Dict 或 Root 添加子节点 ---
+        if (parentNode.NodeType == PlistNodeType.Dict || parentNode.NodeType == PlistNodeType.Root)
+        {
+            string name = GenerateUniqueKey(parentNode);
+            string value = "";
+
+            // 创建 XML 节点...
+            XmlElement keyElement = xmlDoc.CreateElement("key");
+            keyElement.InnerText = name;
+            XmlElement valueElement;
+            if (type == PlistNodeType.Dict || type == PlistNodeType.Array)
+            {
+                valueElement = xmlDoc.CreateElement(xmlType);
+            }
+            else
+            {
+                if (type == PlistNodeType.Boolean) value = "true";
+                else if (type == PlistNodeType.Integer) value = "0";
+                else value = "NewValue";
+                valueElement = xmlDoc.CreateElement(xmlType);
+                valueElement.InnerText = value;
+            }
+            parentNode.XmlValueNode?.AppendChild(keyElement);
+            parentNode.XmlValueNode?.AppendChild(valueElement);
+
+            // 创建 PlistTreeNode...
+            var newNode = new PlistTreeNode
+            {
+                Name = name,
+                NodeType = type,
+                Value = value,
+                XmlValueNode = valueElement,
+                XmlKeyNode = keyElement,
+                Parent = parentNode,
+                Path = $"{parentNode.Path}/{name}"
+            };
+            if (newNode.IsContainer) newNode.Children = new List<PlistTreeNode>();
+            parentNode.Children.Add(newNode);
+
+            ForceRefreshAndSelect(parentNode, newNode);
+            RenameNode(newNode); // 在刷新并选中后，立即进入重命名
+        }
+        // --- 分支2：为 Array 添加子节点 ---
+        else if (parentNode.NodeType == PlistNodeType.Array)
+        {
+            // (省略了对添加容器类型的警告)
+            string value = "";
+            if (type == PlistNodeType.Boolean) value = "true";
+            else if (type == PlistNodeType.Integer) value = "0";
+            else value = "NewValue";
+
+            XmlElement valueElement = xmlDoc.CreateElement(xmlType);
+            valueElement.InnerText = value;
+            parentNode.XmlValueNode?.AppendChild(valueElement);
+
+            string itemName = $"[{parentNode.Children.Count}]";
+            var newNode = new PlistTreeNode
+            {
+                Name = itemName,
+                NodeType = type,
+                Value = value,
+                XmlValueNode = valueElement,
+                Parent = parentNode,
+                Path = $"{parentNode.Path}[{parentNode.Children.Count}]"
+            };
+            parentNode.Children.Add(newNode);
+
+            ForceRefreshAndSelect(parentNode, newNode);
+        }
+    }
+
+    /// <summary>
+    /// 强制刷新UI，确保父节点被选中，并选中新创建的子节点。
+    /// </summary>
+    /// <param name="parentNode">刚刚被添加了子节点的父节点</param>
+    /// <param name="newlyAddedNode">新创建的子节点</param>
+    private void ForceRefreshAndSelect(PlistTreeNode parentNode, PlistTreeNode newlyAddedNode)
+    {
+        // 1. 找到父节点所在的列
+        int parentColIndex = columns.FindIndex(col => col.Contains(parentNode));
+        if (parentColIndex < 0) return; // 如果找不到父列，则不执行任何操作
+
+        // 2. 确保父节点在UI上是选中状态
+        selectedIndices[parentColIndex] = columns[parentColIndex].IndexOf(parentNode);
+
+        // 3. 移除父节点右侧所有“过时”的列
+        int childColIndex = parentColIndex + 1;
+        while (columns.Count > childColIndex)
+        {
+            columns.RemoveAt(columns.Count - 1);
+            selectedIndices.RemoveAt(selectedIndices.Count - 1);
+            columnScrollPositions.RemoveAt(columnScrollPositions.Count - 1);
+        }
+
+        // 4. 如果父节点有子节点，则创建或更新子节点列
+        if (parentNode.Children != null && parentNode.Children.Count > 0)
+        {
+            List<PlistTreeNode> newChildList = new List<PlistTreeNode>(parentNode.Children);
+            columns.Add(newChildList);
+            // 5. 在新的子节点列中，直接选中新添加的节点
+            selectedIndices.Add(newChildList.IndexOf(newlyAddedNode));
+            columnScrollPositions.Add(Vector2.zero);
+        }
+
+        // 6. 请求重绘以应用所有UI状态的更改
+        Repaint();
+    }
+
+    private void DeleteNode(PlistTreeNode node)
+    {
+        if (node == null || node.Parent == null) return;
+
+        if (!EditorUtility.DisplayDialog("Confirm Deletion", $"Are you sure you want to delete '{node.Name}'?", "Delete", "Cancel"))
+        {
+            return;
+        }
+
+        int colIndexOfParent = -1;
+        for (int i = 0; i < columns.Count; i++)
+        {
+            if (columns[i].Contains(node.Parent))
+            {
+                colIndexOfParent = i;
+                break;
+            }
+        }
+
+        node.Parent.Children.Remove(node);
+
+        if (node.XmlKeyNode != null) node.XmlKeyNode.ParentNode?.RemoveChild(node.XmlKeyNode);
+        if (node.XmlValueNode != null) node.XmlValueNode.ParentNode?.RemoveChild(node.XmlValueNode);
+
+        if (colIndexOfParent != -1)
+        {
+            HandleColumnClick(colIndexOfParent, selectedIndices[colIndexOfParent]);
+        }
+        else
+        {
+            InitializeColumns();
+        }
+    }
+
     private void RenameNode(PlistTreeNode node)
     {
-        if (node.XmlKeyNode == null) return;
+        if (node == null || node.XmlKeyNode == null) return;
 
+        // Find the node's position to generate a unique control name
         for (int col = 0; col < columns.Count; col++)
         {
             int idx = columns[col].IndexOf(node);
@@ -441,273 +594,115 @@ public class PlistColumnEditorWindow : EditorWindow
             {
                 renamingNode = node;
                 renamingInput = node.Name;
-                renamingColumnIndex = col;
-                renamingItemIndex = idx;
+                renameControlName = $"rename_{col}_{idx}";
+                isRenameJustInitiated = true;
 
-                //  下一帧自动聚焦并选中文本
                 EditorApplication.delayCall += () =>
                 {
-                    EditorGUI.FocusTextInControl($"rename_{col}_{idx}");
+                    EditorGUI.FocusTextInControl(renameControlName);
+                    var textEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+                    if (textEditor != null) textEditor.SelectAll();
                 };
                 break;
             }
         }
     }
 
-   private void AddChildNode(PlistTreeNode parentNode, PlistNodeType type, string xmlType)
+    private void CommitRename()
     {
-        string value = "";
+        if (renamingNode == null) return;
 
-        // 对于 dict/array，需要先添加 <key>，再添加值节点
-        if (type == PlistNodeType.Dict || type == PlistNodeType.Array)
+        if (string.IsNullOrWhiteSpace(renamingInput) || renamingInput == renamingNode.Name)
         {
-            // 调用异步方法，并把后续逻辑全部放入回调中
-            EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey", (name) =>
-            {
-                // -------------------------------------------------------------
-                // | 这个大括号内的代码，只会在用户点击确认后才会执行！ |
-                // -------------------------------------------------------------
-                if (string.IsNullOrEmpty(name)) return;
-
-                // 创建 <key> 节点
-                XmlElement keyElement = xmlDoc.CreateElement("key");
-                keyElement.InnerText = name;
-
-                // 创建值节点（dict/array）
-                XmlElement valueElement = xmlDoc.CreateElement(xmlType);
-
-                // 插入到父节点（必须是 dict）
-                if (parentNode.XmlValueNode?.Name == "dict")
-                {
-                    parentNode.XmlValueNode.AppendChild(keyElement);
-                    parentNode.XmlValueNode.AppendChild(valueElement);
-
-                    // 创建树节点
-                    var newNode = new PlistTreeNode
-                    {
-                        Name = name,
-                        NodeType = type,
-                        Children = new List<PlistTreeNode>(),
-                        XmlValueNode = valueElement,
-                        XmlKeyNode = keyElement,
-                        Parent = parentNode,
-                        Path = $"{parentNode.Path}/{name}"
-                    };
-
-                    parentNode.Children.Add(newNode);
-
-                    // 刷新并自动进入重命名
-                    int colIndex = columns.FindIndex(col => col.Contains(parentNode));
-                    if (colIndex >= 0)
-                    {
-                        RefreshColumnsFrom(colIndex);
-                        selectedIndices[colIndex] = parentNode.Children.Count - 1;
-                        RenameNode(newNode);
-                    }
-                }
-            });
-        }
-        else // 叶子节点：string/integer/boolean
-        {
-            if (parentNode.NodeType == PlistNodeType.Dict|| parentNode.NodeType == PlistNodeType.Root)
-            {
-                // 同样，调用异步方法，把后续逻辑放入回调
-                EditorUtils2.DisplayDialogEditText("添加子项", "输入键名：", "NewKey", (name) =>
-                {
-                    // -------------------------------------------------------------
-                    // | 这个大括号内的代码，也只会在用户点击确认后才会执行！ |
-                    // -------------------------------------------------------------
-                    if (string.IsNullOrEmpty(name)) return;
-
-                    if (type == PlistNodeType.Boolean) value = "true";
-                    else if (type == PlistNodeType.Integer) value = "0";
-                    else value = "NewValue";
-
-                    // 创建 <key> + <value> 节点
-                    XmlElement keyElement = xmlDoc.CreateElement("key");
-                    keyElement.InnerText = name;
-
-                    XmlElement valueElement = xmlDoc.CreateElement(xmlType);
-                    valueElement.InnerText = value;
-
-                    parentNode.XmlValueNode?.AppendChild(keyElement);
-                    parentNode.XmlValueNode?.AppendChild(valueElement);
-
-                    // 创建树节点
-                    var newNode = new PlistTreeNode
-                    {
-                        Name = name,
-                        NodeType = type,
-                        Value = value,
-                        XmlValueNode = valueElement,
-                        XmlKeyNode = keyElement,
-                        Parent = parentNode,
-                        Path = $"{parentNode.Path}/{name}"
-                    };
-
-                    parentNode.Children.Add(newNode);
-
-                    int colIndex = columns.FindIndex(col => col.Contains(parentNode));
-                    if (colIndex >= 0)
-                    {
-                        RefreshColumnsFrom(colIndex);
-                        selectedIndices[colIndex] = parentNode.Children.Count - 1;
-                        RenameNode(newNode);
-                    }
-                });
-            }
-            else if (parentNode.NodeType == PlistNodeType.Array)
-            {
-                // (数组部分不需要输入名称，所以逻辑不变)
-                value = type == PlistNodeType.Integer ? "0" : "NewValue";
-                if (type == PlistNodeType.Boolean) value = "true";
-
-
-                XmlElement valueElement = xmlDoc.CreateElement(xmlType);
-                valueElement.InnerText = value;
-
-                parentNode.XmlValueNode?.AppendChild(valueElement);
-
-                string itemName = $"[{parentNode.Children.Count}]";
-                var newNode = new PlistTreeNode
-                {
-                    Name = itemName,
-                    NodeType = type,
-                    Value = value,
-                    XmlValueNode = valueElement,
-                    Parent = parentNode,
-                    Path = $"{parentNode.Path}[{parentNode.Children.Count}]"
-                };
-                parentNode.Children.Add(newNode);
-
-                int colIndex = columns.FindIndex(col => col.Contains(parentNode));
-                if (colIndex >= 0)
-                {
-                    RefreshColumnsFrom(colIndex);
-                    if (columns.Count > colIndex + 1)
-                    {
-                        if (columnScrollPositions.Count <= colIndex + 1)
-                        {
-                            columnScrollPositions.Add(Vector2.zero);
-                        }
-                    }
-                    selectedIndices[colIndex] = parentNode.Children.Count - 1;
-                }
-            }
-        }
-    }
-
-    private void DeleteNode(PlistTreeNode node, int colIndex, int itemIndex)
-    {
-        if (EditorUtility.DisplayDialog("确认删除", $"确定要删除 '{node.Name}' 吗？", "删除", "取消"))
-        {
-            // 从父节点移除
-            if (node.Parent != null)
-            {
-                node.Parent.Children.Remove(node);
-
-                // 从 XML 移除（移除 key + value 节点）
-                if (node.XmlKeyNode != null && node.XmlValueNode != null)
-                {
-                    node.XmlKeyNode.ParentNode?.RemoveChild(node.XmlKeyNode);
-                    node.XmlKeyNode.ParentNode?.RemoveChild(node.XmlValueNode);
-                }
-                else if (node.XmlValueNode != null) // array item
-                {
-                    node.XmlValueNode.ParentNode?.RemoveChild(node.XmlValueNode);
-                }
-
-                // 刷新从当前列开始
-                RefreshColumnsFrom(colIndex);
-
-                // 清除当前选中
-                selectedIndices[colIndex] = -1;
-            }
-        }
-    }
-
-    // 从指定列开始刷新（重新构建该列及右侧所有列）
-    // 从指定列的“选择”开始，刷新后续所有列
-    private void RefreshColumnsFrom(int startColIndex)
-    {
-        // 1. 清除 startColIndex 右侧所有列的数据
-        while (columns.Count > startColIndex + 1)
-        {
-            columns.RemoveAt(columns.Count - 1);
-            selectedIndices.RemoveAt(selectedIndices.Count - 1);
-            columnScrollPositions.RemoveAt(columnScrollPositions.Count - 1);
-        }
-
-        // 2. 找到作为“父节点”的、在 startColIndex 列被选中的节点
-        int selectedIndexInSourceColumn = selectedIndices[startColIndex];
-    
-        // 如果当前列没有任何选中项，那就没有子内容可显示，直接返回
-        if (selectedIndexInSourceColumn < 0 || selectedIndexInSourceColumn >= columns[startColIndex].Count)
-        {
-            Repaint();
+            CancelRename();
             return;
         }
 
-        PlistTreeNode parentForNextColumn = columns[startColIndex][selectedIndexInSourceColumn];
-
-        // 3. 如果这个父节点是容器类型，并且确实有子节点，则更新或创建下一列
-        if (parentForNextColumn.IsContainer && parentForNextColumn.Children != null && parentForNextColumn.Children.Count > 0)
+        // Check for duplicate keys in the same parent
+        bool isDuplicate = false;
+        if (renamingNode.Parent != null && renamingNode.Parent.Children != null)
         {
-            // 如果下一列 (startColIndex + 1) 不存在，就创建它
-            if (columns.Count <= startColIndex + 1)
+            foreach (var sibling in renamingNode.Parent.Children)
             {
-                columns.Add(new List<PlistTreeNode>());
-                selectedIndices.Add(-1);
-                columnScrollPositions.Add(Vector2.zero);
+                if (sibling != renamingNode && sibling.Name == renamingInput)
+                {
+                    isDuplicate = true;
+                    break;
+                }
             }
-        
-            // 用父节点的子节点列表来填充下一列的内容
-            columns[startColIndex + 1] = new List<PlistTreeNode>(parentForNextColumn.Children);
         }
 
+        if (isDuplicate)
+        {
+            EditorUtility.DisplayDialog("Invalid Name", "Another item with the same name already exists at this level.", "OK");
+            // Do not cancel rename, let the user fix it
+        }
+        else
+        {
+            renamingNode.Name = renamingInput;
+            if (renamingNode.XmlKeyNode != null)
+            {
+                renamingNode.XmlKeyNode.InnerText = renamingInput;
+            }
+            CancelRename();
+        }
+    }
+
+    private void CancelRename()
+    {
+        renamingNode = null;
+        renamingInput = "";
+        renameControlName = "";
+        GUI.FocusControl(null);
         Repaint();
     }
 
-    // 获取某列的“父节点”——即上一列选中的节点
-    private PlistTreeNode GetParentNodeOfColumn(int colIndex)
+    private void StartValueEdit(PlistTreeNode node)
     {
-        if (colIndex <= 0) return rootNode;
+        if (node.NodeType == PlistNodeType.Boolean) return;
+        editingValueNode = node;
+        editingValueInput = node.Value;
+        isValueEditorJustInitiated = true;
 
-        for (int i = colIndex - 1; i >= 0; i--)
+        EditorApplication.delayCall += () =>
         {
-            int selectedIndex = selectedIndices[i];
-            if (selectedIndex >= 0 && selectedIndex < columns[i].Count)
+            GUI.FocusControl(valueEditorControlName);
+            var textEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+            if (textEditor != null) textEditor.SelectAll();
+        };
+    }
+
+    private void CommitValueEdit()
+    {
+        if (editingValueNode != null)
+        {
+            if (editingValueInput != editingValueNode.Value)
             {
-                return columns[i][selectedIndex];
+                editingValueNode.Value = editingValueInput;
             }
         }
-        return rootNode;
+        CancelValueEdit();
     }
 
-    private void HandleColumnClick(int colIndex, int itemIndex)
+    private void CancelValueEdit()
     {
-        selectedIndices[colIndex] = itemIndex;
-
-        while (columns.Count > colIndex + 1)
-        {
-            columns.RemoveAt(columns.Count - 1);
-            selectedIndices.RemoveAt(selectedIndices.Count - 1);
-        }
-
-        var clickedNode = columns[colIndex][itemIndex];
-
-        if (clickedNode.IsContainer && clickedNode.Children != null && clickedNode.Children.Count > 0)
-        {
-            columns.Add(new List<PlistTreeNode>(clickedNode.Children));
-            selectedIndices.Add(-1);
-        }
+        editingValueNode = null;
+        editingValueInput = "";
+        GUI.FocusControl(null);
+        Repaint();
     }
+
+      #endregion
+
+      #region File I/O and Parsing
 
     private void LoadPlist()
     {
         if (string.IsNullOrEmpty(xmlPath) || !File.Exists(xmlPath))
         {
-            EditorUtility.DisplayDialog("Error", "Invalid file path.", "OK");
+            xmlDoc = null;
+            rootNode = null;
+            InitializeColumns();
             return;
         }
 
@@ -715,8 +710,9 @@ public class PlistColumnEditorWindow : EditorWindow
         {
             xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
+            XmlNode plistDict = xmlDoc.SelectSingleNode("//plist/dict");
 
-            XmlNode plistDict = xmlDoc.SelectSingleNode("//plist/dict") ?? xmlDoc.DocumentElement;
+            if (plistDict == null) throw new System.Exception("Could not find <plist> -> <dict> root structure.");
 
             rootNode = new PlistTreeNode
             {
@@ -726,173 +722,83 @@ public class PlistColumnEditorWindow : EditorWindow
                 XmlValueNode = plistDict
             };
 
-            ParsePlistNode(plistDict, rootNode, "Root");
-
-            columns.Clear();
-            selectedIndices.Clear();
+            ParseDictChildren(plistDict, rootNode, "Root");
             InitializeColumns();
-
             Repaint();
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"LoadPlist Error: {ex}");
+            Debug.LogError($"Plist Load Error: {ex}");
             EditorUtility.DisplayDialog("Load Error", ex.Message, "OK");
+            xmlDoc = null;
+            rootNode = null;
         }
     }
 
-    private void ParsePlistNode(XmlNode xmlNode, PlistTreeNode parent, string path)
+    private void ParseDictChildren(XmlNode dictNode, PlistTreeNode parent, string parentPath)
     {
-        if (xmlNode.Name == "dict")
+        XmlNode keyNode = dictNode.FirstChild;
+        while (keyNode != null)
         {
-            ParseDict(xmlNode, parent, path);
-        }
-        else if (xmlNode.Name == "array")
-        {
-            ParseArray(xmlNode, parent, path);
-        }
-    }
-
-    private void ParseDict(XmlNode dictNode, PlistTreeNode parent, string parentPath)
-    {
-        for (int i = 0; i < dictNode.ChildNodes.Count; i++)
-        {
-            XmlNode child = dictNode.ChildNodes[i];
-            if (child.Name == "key")
+            if (keyNode.Name == "key")
             {
-                string key = child.InnerText;
-                XmlNode valueNode = GetNextSibling(child);
-                if (valueNode == null) continue;
+                string key = keyNode.InnerText;
+                XmlNode valueNode = keyNode.NextSibling;
+                if (valueNode == null) break;
 
-                string currentPath = $"{parentPath}/{key}";
-
-                if (IsValueNode(valueNode))
-                {
-                    string nodeValue = valueNode.Name == "true" || valueNode.Name == "false"
-                        ? valueNode.Name // 对 true/false，值就是节点名
-                        : valueNode.InnerText;
-
-                    var node = new PlistTreeNode
-                    {
-                        Name = key,
-                        NodeType = GetNodeType(valueNode.Name),
-                        Value = nodeValue,
-                        XmlValueNode = valueNode,
-                        XmlKeyNode = child,
-                        Parent = parent,
-                        Path = currentPath
-                    };
-                    parent.Children.Add(node);
-                }
-                else if (valueNode.Name == "dict" || valueNode.Name == "array")
-                {
-                    var containerNode = new PlistTreeNode
-                    {
-                        Name = key,
-                        NodeType = valueNode.Name == "dict" ? PlistNodeType.Dict : PlistNodeType.Array,
-                        Children = new List<PlistTreeNode>(),
-                        XmlValueNode = valueNode,
-                        XmlKeyNode = child,
-                        Parent = parent,
-                        Path = currentPath
-                    };
-                    parent.Children.Add(containerNode);
-                    ParsePlistNode(valueNode, containerNode, currentPath);
-                }
+                ParseNode(key, valueNode, keyNode, parent, parentPath);
+                keyNode = valueNode.NextSibling;
+            }
+            else
+            {
+                keyNode = keyNode.NextSibling;
             }
         }
     }
 
-    private void ParseArray(XmlNode arrayNode, PlistTreeNode parent, string parentPath)
+    private void ParseArrayChildren(XmlNode arrayNode, PlistTreeNode parent, string parentPath)
     {
         for (int i = 0; i < arrayNode.ChildNodes.Count; i++)
         {
             XmlNode itemNode = arrayNode.ChildNodes[i];
-            string currentPath = $"{parentPath}[{i}]";
-
-            if (IsValueNode(itemNode))
-            {
-                string nodeValue = itemNode.Name == "true" || itemNode.Name == "false"
-                    ? itemNode.Name
-                    : itemNode.InnerText;
-
-                var node = new PlistTreeNode
-                {
-                    Name = $"[{i}]",
-                    NodeType = GetNodeType(itemNode.Name),
-                    Value = nodeValue,
-                    XmlValueNode = itemNode,
-                    Parent = parent,
-                    Path = currentPath
-                };
-                parent.Children.Add(node);
-            }
-            else if (itemNode.Name == "dict")
-            {
-                var dictNode = new PlistTreeNode
-                {
-                    Name = $"[{i}]",
-                    NodeType = PlistNodeType.Dict,
-                    Children = new List<PlistTreeNode>(),
-                    XmlValueNode = itemNode,
-                    Parent = parent,
-                    Path = currentPath
-                };
-                parent.Children.Add(dictNode);
-                ParsePlistNode(itemNode, dictNode, currentPath);
-            }
+            string key = $"[{i}]";
+            ParseNode(key, itemNode, null, parent, parentPath);
         }
     }
 
-    private PlistNodeType GetNodeType(string xmlName)
+    private void ParseNode(string key, XmlNode valueNode, XmlNode keyNode, PlistTreeNode parent, string parentPath)
     {
-        switch (xmlName)
+        PlistNodeType type = GetNodeType(valueNode.Name);
+        string currentPath = (keyNode != null) ? $"{parentPath}/{key}" : $"{parentPath}{key}";
+
+        var node = new PlistTreeNode
         {
-            case "string": return PlistNodeType.String;
-            case "integer": return PlistNodeType.Integer;
-            case "real": return PlistNodeType.Real;
-            case "true":
-            case "false": return PlistNodeType.Boolean;
-            case "date": return PlistNodeType.Date;
-            case "dict": return PlistNodeType.Dict;
-            case "array": return PlistNodeType.Array;
-            default: return PlistNodeType.Unknown;
-        }
-    }
+            Name = key,
+            NodeType = type,
+            XmlValueNode = valueNode,
+            XmlKeyNode = keyNode,
+            Parent = parent,
+            Path = currentPath
+        };
 
-    private bool IsValueNode(XmlNode node)
-    {
-        return node.Name == "string" || node.Name == "integer" || node.Name == "real" ||
-            node.Name == "true" || node.Name == "false" || node.Name == "date";
-    }
-
-    private XmlNode GetNextSibling(XmlNode node)
-    {
-        if (node?.ParentNode == null) return null;
-
-        int index = -1;
-        for (int i = 0; i < node.ParentNode.ChildNodes.Count; i++)
+        if (type == PlistNodeType.Dict || type == PlistNodeType.Array)
         {
-            if (node.ParentNode.ChildNodes[i] == node)
-            {
-                index = i;
-                break;
-            }
+            node.Children = new List<PlistTreeNode>();
+            if (type == PlistNodeType.Dict) ParseDictChildren(valueNode, node, currentPath);
+            else ParseArrayChildren(valueNode, node, currentPath);
         }
-
-        if (index == -1 || index + 1 >= node.ParentNode.ChildNodes.Count)
+        else
         {
-            return null;
+            node.Value = (type == PlistNodeType.Boolean) ? valueNode.Name : valueNode.InnerText;
         }
-
-        return node.ParentNode.ChildNodes[index + 1];
+        parent.Children.Add(node);
     }
 
     private void SavePlist()
     {
         if (xmlDoc == null)
         {
-            EditorUtility.DisplayDialog("Error", "No plist loaded.", "OK");
+            EditorUtility.DisplayDialog("Error", "No plist loaded to save.", "OK");
             return;
         }
 
@@ -915,24 +821,16 @@ public class PlistColumnEditorWindow : EditorWindow
         {
             if (node.NodeType == PlistNodeType.Boolean)
             {
-                // 如果当前值不是 "true" 或 "false"，纠正它
-                if (node.Value != "true" && node.Value != "false")
-                {
-                    node.Value = "false"; // 默认设为 false
-                }
-
-                // 如果当前节点名不是期望的，需要替换节点
+                if (node.Value != "true" && node.Value != "false") node.Value = "false";
                 if (node.XmlValueNode.Name != node.Value)
                 {
                     XmlElement newElement = xmlDoc.CreateElement(node.Value);
                     node.XmlValueNode.ParentNode.ReplaceChild(newElement, node.XmlValueNode);
                     node.XmlValueNode = newElement;
                 }
-                // 注意：不要设置 InnerText！保持 <true/> 或 <false/> 空标签形式
             }
             else
             {
-                // 其他类型正常设置 InnerText
                 node.XmlValueNode.InnerText = node.Value;
             }
         }
@@ -946,62 +844,111 @@ public class PlistColumnEditorWindow : EditorWindow
         }
     }
 
-
     private void SaveWithPlistHeader()
     {
-        // 1. 检查并移除已存在的任何 DOCTYPE 节点，以防冲突
         if (xmlDoc.DocumentType != null)
         {
             xmlDoc.RemoveChild(xmlDoc.DocumentType);
         }
 
-        // 2. 创建一个正确、完整的 DOCTYPE 节点
-        // 参数: name, publicId, systemId, internalSubset
-        // 我们不需要 internalSubset，所以传入 null，这样就不会生成 "[]"
-        XmlDocumentType docType = xmlDoc.CreateDocumentType(
-            "plist", 
-            "-//Apple//DTD PLIST 1.0//EN", 
-            "http://www.apple.com/DTDs/PropertyList-1.0.dtd", 
-            null
-        );
-
-        // 3. 将新的 DOCTYPE 节点插入到文档中
-        // 它必须位于根元素 (DocumentElement) 之前
+        XmlDocumentType docType = xmlDoc.CreateDocumentType("plist", "-//Apple//DTD PLIST 1.0//EN", "http://www.apple.com/DTDs/PropertyList-1.0.dtd", null);
         xmlDoc.InsertBefore(docType, xmlDoc.DocumentElement);
 
-        // 4. 使用 XmlWriterSettings 来精确控制输出格式
         XmlWriterSettings settings = new XmlWriterSettings
         {
-            // 确保包含 XML 声明 <?xml version="1.0" encoding="UTF-8"?>
             OmitXmlDeclaration = false,
-            // 使用不带 BOM 的 UTF-8 编码，这是 plist 的标准格式
-            Encoding = new UTF8Encoding(false), 
-            // 设置缩进
+            Encoding = new UTF8Encoding(false),
             Indent = true,
             IndentChars = "\t",
-            // 确保换行符是 Unix 风格 (\n)
             NewLineChars = "\n"
         };
 
-        // 5. 使用 XmlWriter 来保存文档
         using (XmlWriter writer = XmlWriter.Create(xmlPath, settings))
         {
             xmlDoc.Save(writer);
         }
     }
+
+      #endregion
+
+      #region Helpers
+
+    private void InitializeColumns()
+    {
+        columns.Clear();
+        selectedIndices.Clear();
+        columnScrollPositions.Clear();
+        if (rootNode != null)
+        {
+            columns.Add(new List<PlistTreeNode>
+            {
+                rootNode
+            });
+            selectedIndices.Add(-1);
+            columnScrollPositions.Add(Vector2.zero);
+        }
+        Repaint();
+    }
+
+    private string GenerateUniqueKey(PlistTreeNode parentNode)
+    {
+        string baseName = "NewKey";
+        string newKey = baseName;
+        int counter = 1;
+
+        var existingKeys = new HashSet<string>();
+        if (parentNode.Children != null)
+        {
+            foreach (var child in parentNode.Children) existingKeys.Add(child.Name);
+        }
+
+        while (existingKeys.Contains(newKey))
+        {
+            newKey = $"{baseName} ({counter++})";
+        }
+        return newKey;
+    }
+
+    private string GetDisplayTypeLabel(PlistTreeNode node)
+    {
+        switch (node.NodeType)
+        {
+            case PlistNodeType.String: return "String";
+            case PlistNodeType.Integer: return "Integer";
+            case PlistNodeType.Real: return "Real";
+            case PlistNodeType.Boolean: return "Boolean";
+            case PlistNodeType.Date: return "Date";
+            case PlistNodeType.Dict: return "Dictionary";
+            case PlistNodeType.Array: return "Array";
+            case PlistNodeType.Root: return "Root";
+            default: return "Unknown";
+        }
+    }
+
+    private PlistNodeType GetNodeType(string xmlName)
+    {
+        switch (xmlName)
+        {
+            case "string": return PlistNodeType.String;
+            case "integer": return PlistNodeType.Integer;
+            case "real": return PlistNodeType.Real;
+            case "true":
+            case "false": return PlistNodeType.Boolean;
+            case "date": return PlistNodeType.Date;
+            case "dict": return PlistNodeType.Dict;
+            case "array": return PlistNodeType.Array;
+            default: return PlistNodeType.Unknown;
+        }
+    }
+
+      #endregion
 }
+
+  #region Data Structures
 
 public enum PlistNodeType
 {
-    Root,
-    Dict,
-    Array,
-    String,
-    Integer,
-    Real,
-    Boolean,
-    Date,
-    Unknown
+    Root, Dict, Array, String, Integer, Real, Boolean, Date, Unknown
 }
 
 [System.Serializable]
@@ -1011,10 +958,12 @@ public class PlistTreeNode
     public PlistNodeType NodeType;
     public string Value;
     public List<PlistTreeNode> Children;
-    public PlistTreeNode Parent; // 新增：指向父节点，便于删除和刷新
-    public XmlNode XmlValueNode; // 值节点：<string>, <dict>, <array> 等
-    public XmlNode XmlKeyNode; // key 节点（仅 dict 子项有）
+    public PlistTreeNode Parent;
+    public XmlNode XmlValueNode;
+    public XmlNode XmlKeyNode;
     public string Path;
 
     public bool IsContainer => NodeType == PlistNodeType.Dict || NodeType == PlistNodeType.Array || NodeType == PlistNodeType.Root;
 }
+
+  #endregion

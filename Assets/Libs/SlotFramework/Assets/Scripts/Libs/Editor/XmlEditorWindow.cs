@@ -204,7 +204,7 @@ public class PlistColumnEditorWindow : EditorWindow
 
             GUIStyle style = isSelected ? EditorStyles.label : GUI.skin.GetStyle("Label");
             Color defaultColor = GUI.color;
-            if (isSelected) GUI.color = new Color(0.8f, 0.9f, 1f);
+            if (isSelected) GUI.color = Color.green;
 
             Rect rect = EditorGUILayout.GetControlRect(false, 22);
 

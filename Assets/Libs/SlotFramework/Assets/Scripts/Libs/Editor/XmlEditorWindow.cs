@@ -188,6 +188,21 @@ public class PlistColumnEditorWindow : EditorWindow
 
     private void DrawRenameEditor(Rect rect)
     {
+        // 获取当前UI事件
+        Event e = Event.current;
+
+        // 检查：当此重命名输入框有焦点时，是否按下了回车键
+        if (GUI.GetNameOfFocusedControl() == renameControlName &&
+            e.type == EventType.KeyDown &&
+            (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
+        {
+            // 如果是，则提交重命名
+            CommitRename(); 
+            e.Use(); // (最关键) 消费掉此事件，输入框和其他逻辑就不会再处理它
+        }
+    
+        // 无论如何都绘制输入框，以便用户可以持续输入
+        // (在CommitRename被调用后的下一帧，因为renamingNode为null，此函数将不会被调用)
         GUI.SetNextControlName(renameControlName);
         renamingInput = EditorGUI.TextField(rect, renamingInput);
     }
@@ -208,8 +223,23 @@ public class PlistColumnEditorWindow : EditorWindow
         }
         else if (editingValueNode == node)
         {
-            GUI.SetNextControlName(valueEditorControlName);
-            editingValueInput = EditorGUILayout.TextField(editingValueInput);
+            Event e = Event.current;
+
+            // 检查：当此控件有焦点时，是否按下了回车键
+            if (GUI.GetNameOfFocusedControl() == valueEditorControlName &&
+                e.type == EventType.KeyDown && 
+                (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
+            {
+                // 如果是，执行提交并取消选中的逻辑
+                CommitValueAndDeselect();
+                e.Use(); // (最关键的一步) 消费掉此事件，输入框就不会再收到它了
+            }
+            else
+            {
+                // 如果不是回车，就正常绘制输入框
+                GUI.SetNextControlName(valueEditorControlName);
+                editingValueInput = EditorGUILayout.TextField(editingValueInput);
+            }
         }
         else
         {
@@ -220,6 +250,45 @@ public class PlistColumnEditorWindow : EditorWindow
         }
 
         EditorGUILayout.EndHorizontal();
+    }
+    
+    /// <summary>
+    /// 提交当前正在编辑的值，并取消对该节点的选中（通过重新选中其父节点实现）。
+    /// 这个函数专门由回车键事件触发。
+    /// </summary>
+    private void CommitValueAndDeselect()
+    {
+        if (editingValueNode == null || editingValueNode.Parent == null)
+        {
+            // 如果没有正在编辑的节点或它没有父节点，则只做常规提交
+            CommitValueEdit();
+            return;
+        }
+
+        // 1. 先保存必要的引用
+        PlistTreeNode parentNode = editingValueNode.Parent;
+        string newValue = editingValueInput;
+
+        // 2. 提交值的修改
+        if (newValue != editingValueNode.Value)
+        {
+            editingValueNode.Value = newValue;
+        }
+
+        // 3. 清理编辑状态（这会把 editingValueNode 设为 null）
+        CancelValueEdit();
+
+        // 4. 找到父节点在UI中的位置
+        for (int col = 0; col < columns.Count; col++)
+        {
+            int parentIdx = columns[col].IndexOf(parentNode);
+            if (parentIdx != -1)
+            {
+                // 5. 找到了！“重新点击”父节点，刷新UI到父节点状态
+                HandleColumnClick(col, parentIdx);
+                break; 
+            }
+        }
     }
 
     private void DrawSelectedPath()
@@ -485,17 +554,15 @@ public class PlistColumnEditorWindow : EditorWindow
         Event e = Event.current;
         if (e.type == EventType.KeyDown)
         {
-            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
-            {
-                CommitRename();
-                e.Use();
-            }
-            else if (e.keyCode == KeyCode.Escape)
+            // 回车键的逻辑已经被移到 DrawRenameEditor 中了
+            // 这里只处理 Escape 键
+            if (e.keyCode == KeyCode.Escape)
             {
                 CancelRename();
                 e.Use();
             }
         }
+        // 当焦点离开输入框时，提交重命名的逻辑保持不变
         else if (GUI.GetNameOfFocusedControl() != renameControlName)
         {
             CommitRename();
@@ -511,12 +578,8 @@ public class PlistColumnEditorWindow : EditorWindow
         Event e = Event.current;
         if (e.type == EventType.KeyDown && GUI.GetNameOfFocusedControl() == valueEditorControlName)
         {
-            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
-            {
-                CommitValueEdit();
-                e.Use();
-            }
-            else if (e.keyCode == KeyCode.Escape)
+            
+            if (e.keyCode == KeyCode.Escape)
             {
                 CancelValueEdit();
                 e.Use();

@@ -37,7 +37,7 @@ public class PlistColumnEditorWindow : EditorWindow
 
       #region Window Initialization
 
-    [MenuItem("Tools/Plist Column Editor")]
+    [MenuItem("Libs/GameConfig编辑器")]
     public static void ShowWindow()
     {
         var window = GetWindow<PlistColumnEditorWindow>("Plist Column Editor");

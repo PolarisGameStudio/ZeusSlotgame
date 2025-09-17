@@ -679,29 +679,60 @@ public class PlistColumnEditorWindow : EditorWindow
             return;
         }
 
-        int colIndexOfParent = -1;
+        
+        // 1. 找到父节点所在的列索引和行索引
+        int parentColIndex = -1;
+        int parentItemIndex = -1;
         for (int i = 0; i < columns.Count; i++)
         {
-            if (columns[i].Contains(node.Parent))
+            int foundIndex = columns[i].IndexOf(node.Parent);
+            if (foundIndex != -1)
             {
-                colIndexOfParent = i;
+                parentColIndex = i;
+                parentItemIndex = foundIndex;
                 break;
             }
         }
 
-        node.Parent.Children.Remove(node);
-
-        if (node.XmlKeyNode != null) node.XmlKeyNode.ParentNode?.RemoveChild(node.XmlKeyNode);
-        if (node.XmlValueNode != null) node.XmlValueNode.ParentNode?.RemoveChild(node.XmlValueNode);
-
-        if (colIndexOfParent != -1)
-        {
-            HandleColumnClick(colIndexOfParent, selectedIndices[colIndexOfParent]);
-        }
-        else
+        // 如果在UI上找不到父节点（理论上不应该发生），则完全重置界面以防万一
+        if (parentColIndex == -1)
         {
             InitializeColumns();
+            return;
         }
+
+        // 2. 从数据模型（树结构和XML）中移除节点
+        PlistTreeNode parentNode = node.Parent;
+        parentNode.Children.Remove(node);
+        node.XmlKeyNode?.ParentNode?.RemoveChild(node.XmlKeyNode);
+        node.XmlValueNode?.ParentNode?.RemoveChild(node.XmlValueNode);
+
+
+        // 3. 强制刷新UI，从父节点那一列开始
+        // 确保父节点在UI上是选中状态
+        selectedIndices[parentColIndex] = parentItemIndex;
+
+        // 4. (最关键的一步) 裁剪掉父节点右侧的所有列。
+        // 这样就强制清除了那个包含了已删除节点的旧的子列。
+        int childColIndex = parentColIndex + 1;
+        while (columns.Count > childColIndex)
+        {
+            columns.RemoveAt(columns.Count - 1);
+            selectedIndices.RemoveAt(selectedIndices.Count - 1);
+            columnScrollPositions.RemoveAt(columnScrollPositions.Count - 1);
+        }
+
+        // 5. 如果父节点还有子节点，则根据更新后的 Children 列表重新创建下一列
+        if (parentNode.IsContainer && parentNode.Children != null && parentNode.Children.Count > 0)
+        {
+            columns.Add(new List<PlistTreeNode>(parentNode.Children));
+            selectedIndices.Add(-1); // 在新的子列中，默认不选中任何项
+            columnScrollPositions.Add(Vector2.zero);
+        }
+
+        // 6. 请求重绘，让Unity根据我们刚刚更新好的UI状态来绘制界面
+        Repaint();
+        
     }
 
     private void RenameNode(PlistTreeNode node)

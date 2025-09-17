@@ -426,9 +426,9 @@ public class PlistColumnEditorWindow : EditorWindow
             menu.AddItem(new GUIContent("Add Item/String"), false, () => AddChildNode(node, PlistNodeType.String, "string"));
             menu.AddItem(new GUIContent("Add Item/Integer"), false, () => AddChildNode(node, PlistNodeType.Integer, "integer"));
             menu.AddItem(new GUIContent("Add Item/Boolean"), false, () => AddChildNode(node, PlistNodeType.Boolean, "true"));
+            menu.AddItem(new GUIContent("Add Item/Real"), false, () => AddChildNode(node, PlistNodeType.Real, "real"));
             menu.AddItem(new GUIContent("Add Item/Dictionary"), false, () => AddChildNode(node, PlistNodeType.Dict, "dict"));
             menu.AddItem(new GUIContent("Add Item/Array"), false, () => AddChildNode(node, PlistNodeType.Array, "array"));
-            menu.AddItem(new GUIContent("Add Item/Real"), false, () => AddChildNode(node, PlistNodeType.Real, "real"));
         }
         else
         {

@@ -428,6 +428,7 @@ public class PlistColumnEditorWindow : EditorWindow
             menu.AddItem(new GUIContent("Add Item/Boolean"), false, () => AddChildNode(node, PlistNodeType.Boolean, "true"));
             menu.AddItem(new GUIContent("Add Item/Dictionary"), false, () => AddChildNode(node, PlistNodeType.Dict, "dict"));
             menu.AddItem(new GUIContent("Add Item/Array"), false, () => AddChildNode(node, PlistNodeType.Array, "array"));
+            menu.AddItem(new GUIContent("Add Item/Real"), false, () => AddChildNode(node, PlistNodeType.Real, "real"));
         }
         else
         {
@@ -643,6 +644,7 @@ public class PlistColumnEditorWindow : EditorWindow
             {
                 if (type == PlistNodeType.Boolean) value = "true";
                 else if (type == PlistNodeType.Integer) value = "0";
+                else if (type == PlistNodeType.Real) value = "0.0"; 
                 else value = "NewValue";
                 valueElement = xmlDoc.CreateElement(xmlType);
                 valueElement.InnerText = value;
@@ -674,6 +676,7 @@ public class PlistColumnEditorWindow : EditorWindow
             string value = "";
             if (type == PlistNodeType.Boolean) value = "true";
             else if (type == PlistNodeType.Integer) value = "0";
+            else if (type == PlistNodeType.Real) value = "0.0";
             else value = "NewValue";
 
             XmlElement valueElement = xmlDoc.CreateElement(xmlType);

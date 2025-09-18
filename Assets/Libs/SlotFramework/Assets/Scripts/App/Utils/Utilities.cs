@@ -459,33 +459,51 @@ namespace Utils
 			return Convert.ToInt32(Math.Round(value, MidpointRounding.AwayFromZero));
 		}
 
-		public static string GetBigNumberShow(long num,bool needMultiple = true,float ignoreNumber = 1000,int saveDecimal=1)
+		public static string GetBigNumberShow(long num, bool needMultiple = true, float ignoreNumber = 1000, int saveDecimal = 1)
 		{
-			double tmp = Convert.ToUInt64(num);
-			if (needMultiple && (!Classic.UserManager.GetInstance().UserProfile().isOlderUser)) {
-				tmp = tmp * Core.ApplicationConfig.GetInstance ().ShowCoinsMultiplier;
+			// 是否为负数
+			bool isNegative = num < 0;
+			double tmp = Math.Abs((double)num); // 先取绝对值用于计算
+
+			if (needMultiple && (!Classic.UserManager.GetInstance().UserProfile().isOlderUser))
+			{
+				tmp = tmp * Core.ApplicationConfig.GetInstance().ShowCoinsMultiplier;
 			}
 
-            double thousand = tmp / 1000f;
-            if (tmp < ignoreNumber) {
-                return ThousandSeparator(tmp, false);
-            } else if (thousand < 1000) {
-                double thousandShow = Math.Round(thousand, saveDecimal); //thousand.ToString("F1"); //Math.Round( thousand ,1);
-                return thousandShow + "K";
-            } else if (thousand < 1000000) {
-                double million = Math.Round(thousand / 1000, saveDecimal);
-                return million + "M";
-            } else if (thousand < 1000000000) {
-                double billion = Math.Round(thousand / 1000000, saveDecimal);
-                return billion + "B";
-            } else  if(thousand < 1000000000000){
-				double billion = Math.Round(thousand / 1000000000, saveDecimal);
-				return billion + "T";
-		    }else {
-				double billion = Math.Round(thousand / 1000000000000, saveDecimal);
-				return billion + "Q";
+			// 如果原来是负数，加回负号
+			string prefix = isNegative ? "-" : "";
+
+			double thousand = tmp / 1000f;
+			if (tmp < ignoreNumber)
+			{
+				return prefix + ThousandSeparator(tmp, false);
 			}
-        }
+			else if (thousand < 1000)
+			{
+				double thousandShow = Math.Round(thousand, saveDecimal);
+				return prefix + thousandShow + "K";
+			}
+			else if (thousand < 1000000)
+			{
+				double million = Math.Round(thousand / 1000, saveDecimal);
+				return prefix + million + "M";
+			}
+			else if (thousand < 1000000000)
+			{
+				double billion = Math.Round(thousand / 1000000, saveDecimal);
+				return prefix + billion + "B";
+			}
+			else if (thousand < 1000000000000)
+			{
+				double trillion = Math.Round(thousand / 1000000000, saveDecimal);
+				return prefix + trillion + "T";
+			}
+			else
+			{
+				double quadrillion = Math.Round(thousand / 1000000000000, saveDecimal);
+				return prefix + quadrillion + "Q";
+			}
+		}
 		
 		/**
          * 金币缩写

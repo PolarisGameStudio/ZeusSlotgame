@@ -16,7 +16,10 @@ namespace Core
         public override void SaveData()
         {
             curRewardCount = OnLineEarningMgr.Instance.curRewardCount;
-            cash = OnLineEarningMgr.Instance.Cash();
+            if (!OnLineEarningMgr.UnLimitMoney)
+            {
+                cash = OnLineEarningMgr.Instance.Cash();
+            }
             StoreManager.Instance.SaveDataJson(fileName,this);
         }
 

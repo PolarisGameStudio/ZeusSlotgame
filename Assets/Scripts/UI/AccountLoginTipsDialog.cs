@@ -13,11 +13,13 @@ namespace Classic
       
         private Button _ensureBtn;
         private TextMeshProUGUI _time; 
+        private TextMeshProUGUI _tipsDes; 
         protected override void Awake()
         {
             base.Awake();
             _ensureBtn =  Utils.Utilities.RealFindObj<Button>(transform, "Anchor/ensureBtn");
             _time =  Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "Anchor/time");
+            _tipsDes = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "Anchor/platformTMP");
             _ensureBtn.onClick.AddListener(EnsureBtnClick);
         }
         
@@ -31,9 +33,19 @@ namespace Classic
                 localizedString.Arguments = new object[] {1,WithDrawManager.Instance.GetCoolTime()};
         
                 _time.text =  localizedString.GetLocalizedString();
+                
+                LocalizedString localizedString2 = new LocalizedString(LocalizationManager.Instance.tableName,"CumulativeLoginTips");
+                localizedString2.Arguments = new object[] {7};
+                _tipsDes.text =  localizedString2.GetLocalizedString();
             }
             else
             {
+                LocalizedString localizedString2 = new LocalizedString(LocalizationManager.Instance.tableName,"WithdrawalInProgress");
+                
+                _tipsDes.text =  localizedString2.GetLocalizedString();
+                
+                _time.text = "";
+                
                 var endTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
             
                 _countdown = CoroutineUtil.Instance.StartCoroutine(ShowCountDownText(endTime));

@@ -28,14 +28,16 @@ namespace Classic
         {
             if (WithDrawManager.Instance.NeedLoginDays)
             {
+
+                var needDay = WithDrawManager.Instance.GetCoolTime();
                 LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"ProgressNum");
         
-                localizedString.Arguments = new object[] {1,WithDrawManager.Instance.GetCoolTime()};
+                localizedString.Arguments = new object[] {1,needDay};
         
                 _time.text =  localizedString.GetLocalizedString();
                 
                 LocalizedString localizedString2 = new LocalizedString(LocalizationManager.Instance.tableName,"CumulativeLoginTips");
-                localizedString2.Arguments = new object[] {7};
+                localizedString2.Arguments = new object[] {needDay};
                 _tipsDes.text =  localizedString2.GetLocalizedString();
             }
             else

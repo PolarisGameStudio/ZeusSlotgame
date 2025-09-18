@@ -16,6 +16,7 @@ using Binding;
 public class TestBoardDataPanel : MonoBehaviour
 {
     public Toggle m_UseFunction;
+    public Toggle unLimitMoney;
     public Toggle m_AlwaysUseFunction;
     public Toggle m_IsFsTog;
     public Text TipsInfoTxt;
@@ -45,6 +46,13 @@ public class TestBoardDataPanel : MonoBehaviour
     private void Start()
     {
         gameObject.Bind(tipsInfo,TipsInfoTxt.For(v=>v.text));
+        
+        unLimitMoney.onValueChanged.AddListener(OnToggleValueChanged);
+    }
+    private void OnToggleValueChanged(bool isOn)
+    {
+        OnLineEarningMgr.UnLimitMoney = isOn;
+        Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
     }
 
     public void Close()

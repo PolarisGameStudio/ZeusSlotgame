@@ -87,13 +87,13 @@ namespace Activity
                 if (!ContinueSpinActivity.IsFirstPop)
                 {
                     PlayEffect(effect);
-                    PlayEffect(hand);
+                    //PlayEffect(hand);
                 }
             }
             else
             {
                 StopEffect(effect);
-                StopEffect(hand);
+                //StopEffect(hand);
             }
         }
 

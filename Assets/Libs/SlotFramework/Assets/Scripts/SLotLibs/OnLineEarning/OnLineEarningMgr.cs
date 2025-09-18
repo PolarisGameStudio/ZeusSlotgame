@@ -242,8 +242,14 @@ public class OnLineEarningMgr
     private static readonly string CASHSTATEINFREE = "cashStateInFree";
 
     private static readonly string GETGASHTIME = "getCashTime";
+
+    public static bool UnLimitMoney = false;
     public int Cash()
     {
+        if (UnLimitMoney)
+        {
+            return 999999999;
+        }
         return cash;
     }
     public int GetCashTime()

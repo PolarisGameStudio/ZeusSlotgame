@@ -153,7 +153,6 @@ namespace Activity
         {
             if(!CanOpen) return;
 
-            if(_canOpenSpinCount >= _autoPopCount) return;
             _canOpenSpinCount++;
             if (_canOpenSpinCount == _autoPopCount)
             {
@@ -172,13 +171,6 @@ namespace Activity
         {
             //停止自动spin
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
-            UIDialog dialog = UIManager.Instance.GetActiveDialog<ContinueSpinDialog>();
-            if (dialog!=null)
-            {
-                return;
-            }
-            Debug.Log("ShowContinueSpinDialog");
-            
             Messenger.Broadcast<int,Action>(GameDialogManager.OpenContinueSpinDialogMsg,id,()=>
             {
                 Debug.Log("ContinueSpinDialog closed");

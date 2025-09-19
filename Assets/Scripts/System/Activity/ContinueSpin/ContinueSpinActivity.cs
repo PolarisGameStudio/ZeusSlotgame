@@ -31,7 +31,6 @@ namespace Activity
         private static int _autoPopCount;
 
         private int _canOpenSpinCount = 0;//可以打开活动面板时，旋转的次数，需要自动打开
-        
         public ContinueSpinActivity(Dictionary<string, object> data) : base(data)
         {
             ParseTaskData();
@@ -154,9 +153,9 @@ namespace Activity
         {
             if(!CanOpen) return;
 
+            if(_canOpenSpinCount >= _autoPopCount) return;
             _canOpenSpinCount++;
-
-            if (_canOpenSpinCount >= _autoPopCount)
+            if (_canOpenSpinCount == _autoPopCount)
             {
                 ShowContinueSpinDialog();
             }
@@ -173,14 +172,18 @@ namespace Activity
         {
             //停止自动spin
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
-            _canOpenSpinCount = 0;
             UIDialog dialog = UIManager.Instance.GetActiveDialog<ContinueSpinDialog>();
             if (dialog!=null)
             {
                 return;
             }
             Debug.Log("ShowContinueSpinDialog");
-            Messenger.Broadcast<int>(GameDialogManager.OpenContinueSpinDialogMsg,id);
+            
+            Messenger.Broadcast<int,Action>(GameDialogManager.OpenContinueSpinDialogMsg,id,()=>
+            {
+                Debug.Log("ContinueSpinDialog closed");
+                _canOpenSpinCount = 0;
+            });
         }
 
         public int GetReward()

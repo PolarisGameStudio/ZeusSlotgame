@@ -192,7 +192,7 @@ public class GameDialogManager : MonoBehaviour
             Messenger.AddListener<int,int>(OpenAccountDialogMsg, OpenAccountDialog);
             Messenger.AddListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
             Messenger.AddListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
-            Messenger.AddListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
+            Messenger.AddListener<int,Action>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
             #endregion
 
             #region cardSystem
@@ -287,7 +287,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener<int,int>(OpenAccountDialogMsg, OpenAccountDialog);
 			Messenger.RemoveListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
 			Messenger.RemoveListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
-			Messenger.RemoveListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
+			Messenger.RemoveListener<int,Action>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
 			
 			#region cardSystem
 			Messenger.RemoveListener(OpenCardSystemCollectionDialogMsg, OpenCardSystemCollectionDialog);
@@ -637,7 +637,7 @@ public class GameDialogManager : MonoBehaviour
 		
 	}
 	
-	protected virtual void OpenContinueSpinDialog(int activityId)
+	protected virtual void OpenContinueSpinDialog(int activityId,Action callback)
 	{
 		
 	}

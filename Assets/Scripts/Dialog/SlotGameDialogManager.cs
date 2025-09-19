@@ -478,17 +478,6 @@ namespace Classic
                 }));
         }
         
-        protected override void OpenExtraAwardCashDialog(int cash)
-        {
-            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
-                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
-            UIManager.Instance.OpenSystemDialog(
-                new OpenConfigParam<ExtraRewardCashDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
-                {
-                    dialog.SetUIData(cash);
-                },maskAlpha:0f));
-        }
-        
         protected override void OpenContinueSpinDialog(int activityId,Action closeCallBack)
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&

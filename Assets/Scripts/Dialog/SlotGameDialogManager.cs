@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Core;
 using System.Collections.Generic;
 using Libs;
@@ -478,7 +478,18 @@ namespace Classic
                 }));
         }
         
-        protected override void OpenContinueSpinDialog(int activityId)
+        protected override void OpenExtraAwardCashDialog(int cash)
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<ExtraRewardCashDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
+                {
+                    dialog.SetUIData(cash);
+                },maskAlpha:0f));
+        }
+        
+        protected override void OpenContinueSpinDialog(int activityId,Action closeCallBack)
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
                 SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
@@ -486,7 +497,10 @@ namespace Classic
                 new OpenConfigParam<ContinueSpinDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
                 {
                     dialog.SetUIData(activityId);
-                },defaultResourcePath:"ContinueSpin/Prefab/ContinueSpinDialog"));
+                },dialogCloseCallBack:()=>
+            {
+                closeCallBack?.Invoke();
+            },defaultResourcePath:"ContinueSpin/Prefab/ContinueSpinDialog"));
         }
         
         protected override void OpenTipsDialog(string text)

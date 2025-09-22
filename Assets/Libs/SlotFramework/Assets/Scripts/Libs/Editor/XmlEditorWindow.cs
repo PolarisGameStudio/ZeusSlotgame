@@ -506,9 +506,16 @@ public class PlistColumnEditorWindow : EditorWindow
     /// <returns>一个新建的、与XML匹配的PlistTreeNode</returns>
     private PlistTreeNode RebuildTreeFromXml(XmlNode currentXmlNode, PlistTreeNode templateNode)
     {
+        // 如果模板节点本身就是null，直接中断此分支的重建并报错。
+        if (templateNode == null)
+        {
+            Debug.LogError("RebuildTreeFromXml 失败: templateNode 为 null。正在中止此分支的粘贴操作。");
+            return null; // 返回null，防止上层函数处理一个无效的节点
+        }
+
         var newNode = new PlistTreeNode
         {
-            Name = templateNode.Name, // Name将在PasteNode中被重写
+            Name = templateNode.Name,
             NodeType = templateNode.NodeType,
             Value = templateNode.Value,
             XmlValueNode = currentXmlNode,
@@ -519,17 +526,30 @@ public class PlistColumnEditorWindow : EditorWindow
             newNode.Children = new List<PlistTreeNode>();
             if (newNode.NodeType == PlistNodeType.Dict)
             {
-                // 对于字典，我们需要成对地处理key和value
                 for (int i = 0; i < currentXmlNode.ChildNodes.Count; i += 2)
                 {
                     XmlNode keyNode = currentXmlNode.ChildNodes[i];
                     XmlNode valueNode = currentXmlNode.ChildNodes[i + 1];
+                    
+                    // 查找对应的模板子节点
                     PlistTreeNode templateChild = templateNode.Children.Find(c => c.Name == keyNode.InnerText);
-
-                    var childNode = RebuildTreeFromXml(valueNode, templateChild);
-                    childNode.Parent = newNode;
-                    childNode.XmlKeyNode = keyNode;
-                    newNode.Children.Add(childNode);
+                    
+                    if (templateChild != null)
+                    {
+                        // 只有在找到模板时，才进行递归
+                        var childNode = RebuildTreeFromXml(valueNode, templateChild);
+                        if (childNode != null) // 确保递归调用没有失败
+                        {
+                            childNode.Parent = newNode;
+                            childNode.XmlKeyNode = keyNode;
+                            newNode.Children.Add(childNode);
+                        }
+                    }
+                    else
+                    {
+                        // 如果找不到，打印一个警告，然后跳过这个子节点，而不是让整个程序崩溃
+                        Debug.LogWarning($"在粘贴操作中，未能找到键为 '{keyNode.InnerText}' 的模板子节点。此子节点将被跳过。");
+                    }
                 }
             }
             else // Array
@@ -537,11 +557,22 @@ public class PlistColumnEditorWindow : EditorWindow
                 for (int i = 0; i < currentXmlNode.ChildNodes.Count; i++)
                 {
                     XmlNode valueNode = currentXmlNode.ChildNodes[i];
-                    PlistTreeNode templateChild = templateNode.Children[i];
                     
-                    var childNode = RebuildTreeFromXml(valueNode, templateChild);
-                    childNode.Parent = newNode;
-                    newNode.Children.Add(childNode);
+                    // 对数组也增加安全检查，防止索引越界
+                    if (i < templateNode.Children.Count)
+                    {
+                        PlistTreeNode templateChild = templateNode.Children[i];
+                        var childNode = RebuildTreeFromXml(valueNode, templateChild);
+                        if (childNode != null)
+                        {
+                            childNode.Parent = newNode;
+                            newNode.Children.Add(childNode);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"克隆的XML比模板节点有更多的子节点（索引：{i}）。此子节点将被跳过。");
+                    }
                 }
             }
         }
@@ -672,15 +703,27 @@ public class PlistColumnEditorWindow : EditorWindow
         // --- 分支2：为 Array 添加子节点 ---
         else if (parentNode.NodeType == PlistNodeType.Array)
         {
-            // (省略了对添加容器类型的警告)
-            string value = "";
-            if (type == PlistNodeType.Boolean) value = "true";
-            else if (type == PlistNodeType.Integer) value = "0";
-            else if (type == PlistNodeType.Real) value = "0.0";
-            else value = "NewValue";
+            string value = ""; // 默认值为空字符串
+            XmlElement valueElement;
 
-            XmlElement valueElement = xmlDoc.CreateElement(xmlType);
-            valueElement.InnerText = value;
+            // --- 关键修复：区分容器和值类型 ---
+            if (type == PlistNodeType.Dict || type == PlistNodeType.Array)
+            {
+                // 如果是添加容器，只创建空的XML元素
+                valueElement = xmlDoc.CreateElement(xmlType);
+            }
+            else
+            {
+                // 如果是添加值类型，才设置默认值并写入InnerText
+                if (type == PlistNodeType.Boolean) value = "true";
+                else if (type == PlistNodeType.Integer) value = "0";
+                else if (type == PlistNodeType.Real) value = "0.0";
+                else value = "NewValue";
+
+                valueElement = xmlDoc.CreateElement(xmlType);
+                valueElement.InnerText = value;
+            }
+
             parentNode.XmlValueNode?.AppendChild(valueElement);
 
             string itemName = $"[{parentNode.Children.Count}]";
@@ -688,13 +731,19 @@ public class PlistColumnEditorWindow : EditorWindow
             {
                 Name = itemName,
                 NodeType = type,
-                Value = value,
+                Value = value, // 对于容器，这里的value是""，是正确的
                 XmlValueNode = valueElement,
                 Parent = parentNode,
                 Path = $"{parentNode.Path}[{parentNode.Children.Count}]"
             };
-            parentNode.Children.Add(newNode);
 
+            // 为新创建的容器初始化Children列表（这是上一个问题的修复）
+            if (newNode.IsContainer)
+            {
+                newNode.Children = new List<PlistTreeNode>();
+            }
+
+            parentNode.Children.Add(newNode);
             ForceRefreshAndSelect(parentNode, newNode);
         }
     }

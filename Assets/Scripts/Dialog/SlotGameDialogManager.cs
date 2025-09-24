@@ -490,7 +490,7 @@ namespace Classic
                 },maskAlpha:0f));
         }
         
-        protected override void OpenContinueSpinDialog(int activityId)
+        protected override void OpenContinueSpinDialog(int activityId,Action closeCallBack)
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
                 SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
@@ -498,7 +498,10 @@ namespace Classic
                 new OpenConfigParam<ContinueSpinDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
                 {
                     dialog.SetUIData(activityId);
-                },defaultResourcePath:"ContinueSpin/Prefab/ContinueSpinDialog"));
+                },dialogCloseCallBack:()=>
+            {
+                closeCallBack?.Invoke();
+            },defaultResourcePath:"ContinueSpin/Prefab/ContinueSpinDialog"));
         }
         
         protected override void OpenWheelLucyDialog(int activityId)

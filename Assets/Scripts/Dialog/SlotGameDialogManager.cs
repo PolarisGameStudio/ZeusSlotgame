@@ -501,6 +501,45 @@ namespace Classic
                 },defaultResourcePath:"ContinueSpin/Prefab/ContinueSpinDialog"));
         }
         
+        protected override void OpenWheelLucyDialog(int activityId)
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<WheelLuckDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
+                {
+                    dialog.SetUIData(activityId);
+                },defaultResourcePath:"WheelLuck/Prefab/WheelLuckDialog"));
+        }
+            
+        protected override void OpenWheelLucyGetRewardDialog(int activityId)
+        {
+            UIDialog dialog = UIManager.Instance.GetActiveDialog();
+            OpenType type = dialog == null ? OpenType.Normal : OpenType.FrontOfHead;
+            int eid = dialog == null ? 0 : dialog.eId;
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<WheelLuckGetRewardDialog>(isPortrait,eid,openType:type,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog1) =>
+                {
+                    dialog1.SetUIData(activityId);
+                },defaultResourcePath:"WheelLuck/Prefab/WheelLuckGetRewardDialog"));
+        }
+        
+        protected override void OpenWheelLuckReceiveCardDialog(int activityId,bool isMultiple)
+        {
+            UIDialog dialog = UIManager.Instance.GetActiveDialog();
+            OpenType type = dialog == null ? OpenType.Normal : OpenType.FrontOfHead;
+            int eid = dialog == null ? 0 : dialog.eId;
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<WheelLuckReceiveCardDialog>(isPortrait,eid,openType:type,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog1) =>
+                {
+                    dialog1.SetUIData(activityId,isMultiple);
+                },defaultResourcePath:"WheelLuck/Prefab/WheelLuckReceiveCardDialog"));
+        }
+        
         protected override void OpenTipsDialog(string text)
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&

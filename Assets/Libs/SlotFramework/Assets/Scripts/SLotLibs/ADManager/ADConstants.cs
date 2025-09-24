@@ -25,6 +25,9 @@ namespace Ads
         
         public const string PlayContinueSpinAD = "PlayContinueSpinAD";
         public const string PlayContinueSpinADFailed = "PlayContinueSpinADFailed";
+        
+        public const string PlayWheelLuckAD = "PlayWheelLuckAD";
+        public const string PlayWheelLuckADFailed = "PlayWheelLuckADFailed";
 
         public const string Time = "time";
     

@@ -40,6 +40,11 @@ MonoBehaviour:
     m_Address: ContinueSpin
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 2a3c828b08a600246812455489d29889
+    m_Address: WheelLuck
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Activity
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

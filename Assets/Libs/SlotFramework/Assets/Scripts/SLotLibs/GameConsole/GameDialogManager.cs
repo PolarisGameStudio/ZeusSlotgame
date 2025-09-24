@@ -80,6 +80,9 @@ public class GameDialogManager : MonoBehaviour
 	public const string OpenSpinWithDrawEndDialogMsg = "OpenSpinWithDrawEndDialog";
 	public const string OpenRewardCashDialogMsg = "OpenRewardCashDialogMsg";
 	public const string OpenContinueSpinDialogMsg = "OpenContinueSpinDialogMsg";
+	public const string OpenWheelLucyDialogMsg = "OpenWheelLucyDialogMsg";
+	public const string OpenWheelLucyGetRewardDialogMsg = "OpenWheelLucyGetRewardDialogMsg";
+	public const string OpenWheelLuckReceiveCardDialogMsg = "OpenWheelLuckReceiveCardDialogMsg";
 	public const string OpenExtraAwardCashDialogMsg = "OpenExtraAwardCashDialogMsg";
 
 	public const string OpenNewUserGuidDialogMsg = "OpenNewUserGuidDialog";
@@ -193,6 +196,9 @@ public class GameDialogManager : MonoBehaviour
             Messenger.AddListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
             Messenger.AddListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
             Messenger.AddListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
+            Messenger.AddListener<int>(OpenWheelLucyDialogMsg, OpenWheelLucyDialog);
+            Messenger.AddListener<int>(OpenWheelLucyGetRewardDialogMsg, OpenWheelLucyGetRewardDialog);
+            Messenger.AddListener<int,bool>(OpenWheelLuckReceiveCardDialogMsg, OpenWheelLuckReceiveCardDialog);
             #endregion
 
             #region cardSystem
@@ -288,7 +294,9 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
 			Messenger.RemoveListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
 			Messenger.RemoveListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
-			
+			Messenger.RemoveListener<int>(OpenWheelLucyDialogMsg, OpenWheelLucyDialog);
+			Messenger.RemoveListener<int>(OpenWheelLucyGetRewardDialogMsg, OpenWheelLucyGetRewardDialog);
+			Messenger.RemoveListener<int,bool>(OpenWheelLuckReceiveCardDialogMsg, OpenWheelLuckReceiveCardDialog);
 			#region cardSystem
 			Messenger.RemoveListener(OpenCardSystemCollectionDialogMsg, OpenCardSystemCollectionDialog);
 			Messenger.RemoveListener<int,GameObject>(OpenCardSystemGetCardDialogMsg, OpenCardSystemGetCardDialog);
@@ -638,6 +646,21 @@ public class GameDialogManager : MonoBehaviour
 	}
 	
 	protected virtual void OpenContinueSpinDialog(int activityId)
+	{
+		
+	}
+	
+	protected virtual void OpenWheelLucyDialog(int activityId)
+	{
+		
+	}
+	
+	protected virtual void OpenWheelLucyGetRewardDialog(int activityId)
+	{
+		
+	}
+	
+	protected virtual void OpenWheelLuckReceiveCardDialog(int activityId,bool isMultiple)
 	{
 		
 	}

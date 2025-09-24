@@ -645,7 +645,7 @@ public class GameDialogManager : MonoBehaviour
 		
 	}
 	
-	protected virtual void OpenContinueSpinDialog(int activityId,Action callback)
+	protected virtual void OpenContinueSpinDialog(int activityId)
 	{
 		
 	}

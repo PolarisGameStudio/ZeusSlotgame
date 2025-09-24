@@ -8,6 +8,7 @@ namespace Ads
         public const string REWARD_VIDEO_ENTRANCE_SPINWIN = "SpinWin";
         public const string REWARD_VIDEO_ENTRANCE_CARDLOTTERY = "CardLottery";
         public const string REWARD_VIDEO_CONTINUE_SPIN = "ContinueSpin";
+        public const string REWARD_VIDEO_WHEELLUCK_SPIN = "WheelLuckSpin";
 
         public const string REWARD_VIDEO_ENTRANCE_FREESPINSTART = "FreeSpinStart";
         public const string REWARD_VIDEO_ENTRANCE_FREESPINEND= "FreeSpinEnd";
@@ -27,6 +28,7 @@ namespace Ads
         public const string Interstitial_Entrance_JACKPOTSTART = "JackpotStart";
         public const string Interstitial_Entrance_JACKPOTEND = "JackpotEnd";
         public const string Interstitial_Entrance_CLOSECONTINUESPIN = "CloseContinueSpin";
+        public const string Interstitial_Entrance_WHEELLUCKBubble = "WheelLuckBubble";
 
     }
 }

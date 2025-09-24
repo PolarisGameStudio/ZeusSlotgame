@@ -71,6 +71,9 @@ namespace Activity
                 case (int)ActivityType.ContinueSpin:
                     activity = new ContinueSpinActivity(data);
                     break;
+                case (int)ActivityType.WheelLucy:
+                    activity = new WheelLuckActivity(data);
+                    break;
             }
 
             return activity;

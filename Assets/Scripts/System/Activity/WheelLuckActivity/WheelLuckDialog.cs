@@ -12,6 +12,7 @@ namespace Activity
     {
         
         public GameObject shopItemPrefab;
+        public GameObject parent;
         
         private Text _cashCount;
         private Button _adButton;
@@ -45,7 +46,7 @@ namespace Activity
             {
                 if(shopItemData.Key == WheelLuckActivity.RandomShopItemId) continue;
                 if(shopItemData.Key == WheelLuckActivity.MoneyShopItemId) continue;
-                var shopItemObj = Instantiate(shopItemPrefab,shopItemPrefab.transform.parent);
+                var shopItemObj = Instantiate(shopItemPrefab,parent.transform);
                 shopItemObj.SetActive(true);
                 shopItemObj.transform.localPosition = Vector3.zero;
                 var shopItem = shopItemObj.AddComponent<ShopItem>();

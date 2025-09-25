@@ -43,9 +43,10 @@ namespace Activity
         
         public const string RefreshShopItemCurrentCount = "RefreshShopItemCurrentCount";
         
-        public const string WheelShowAD1Count = "WheelShowAD1Count";
-        public const string WheelShowAD2Count = "WheelShowAD2Count";
-        public const string WheelShowAD3Count = "WheelShowAD3Count";
+        public const string WheelShowADCount = "ShopAD";
+        public const string WheelShowAD1Count = "ShopAD1";
+        public const string WheelShowAD2Count = "ShopAD2";
+        public const string WheelShowAD3Count = "ShopAD3";
         
         private readonly Dictionary<int, ShopItemData> _shopItems = new Dictionary<int, ShopItemData>();
 
@@ -378,8 +379,14 @@ namespace Activity
         {
             var count = SharedPlayerPrefs.GetPlayerPrefsIntValue(key);
             count++;
-            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "ShopAD1", count);
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, key, count);
             SharedPlayerPrefs.SetPlayerPrefsIntValue(key,count);
+            
+            var allCount = SharedPlayerPrefs.GetPlayerPrefsIntValue(WheelShowADCount);
+            allCount++;
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, WheelShowADCount, allCount);
+            SharedPlayerPrefs.SetPlayerPrefsIntValue(WheelShowADCount,allCount);
+            
         }
 
     }

@@ -42,7 +42,11 @@ namespace Activity
         private const string ShopItemCurrentSpinCount = "SHOPITEM_CURRENR_SPIN_COUNT";
         
         public const string RefreshShopItemCurrentCount = "RefreshShopItemCurrentCount";
-
+        
+        public const string WheelShowAD1Count = "WheelShowAD1Count";
+        public const string WheelShowAD2Count = "WheelShowAD2Count";
+        public const string WheelShowAD3Count = "WheelShowAD3Count";
+        
         private readonly Dictionary<int, ShopItemData> _shopItems = new Dictionary<int, ShopItemData>();
 
         private readonly List<SpinItemData> _spinItems = new List<SpinItemData>(8);
@@ -368,6 +372,14 @@ namespace Activity
         public int GetRandomReward()
         {
             return Random.Range(_minReward,_maxReward);
+        }
+
+        public void BuryPoint(string key)
+        {
+            var count = SharedPlayerPrefs.GetPlayerPrefsIntValue(key);
+            count++;
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "ShopAD1", count);
+            SharedPlayerPrefs.SetPlayerPrefsIntValue(key,count);
         }
 
     }

@@ -16,7 +16,7 @@ namespace Activity
             base.Awake();
             _btnCollect = Util.FindObject<Button>(transform, "Anchor/btn_collect");
             _btnClaim = Util.FindObject<Button>(transform, "Anchor/btn_claim");
-            _imageCard = Util.FindObject<Image>(transform, "Anchor/item_card/Icon");
+            _imageCard = Util.FindObject<Image>(transform, "Anchor/content/Icon");
             _btnCollect.onClick.AddListener(OnClickMutCountBtn);
             _btnClaim.onClick.AddListener(OnClickClaimBtn);
             _activity = ActivityManager.Instance.GetActivityByID(WheelLuckActivity.ActiveId) as WheelLuckActivity;
@@ -49,9 +49,11 @@ namespace Activity
         {
             if( WheelLuckActivity.AdType != WheelLuckAdType.MultipleReward) return;
             
+            Close();
+            
             Messenger.Broadcast(GameDialogManager.OpenWheelLuckReceiveCardDialogMsg,_shopItemId,true);
             
-            Close();
+            _activity.BuryPoint(WheelLuckActivity.WheelShowAD2Count);
         }
         
         public void SetUIData(int shopItemId)

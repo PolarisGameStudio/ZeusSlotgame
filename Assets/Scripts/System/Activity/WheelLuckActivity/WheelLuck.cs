@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using Ads;
 using CardSystem;
 using Libs;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.UI;
 namespace Activity
 {
@@ -48,24 +50,17 @@ namespace Activity
             {
                 GameObject go = _wheelItems[i];
                 Transform imgUnSelect = Util.FindObject<Transform>(go.transform, "img_cardpack");
+                TextMeshProUGUI txt = Util.FindObject<TextMeshProUGUI>(go.transform, "name");
                 var icon = imgUnSelect.GetComponent<Image>();
 
                 var shopItemData = _activity.ShopItems[spinItems[i].ShopItemId];
                 
-                string path = "WheelLuck/Shop/"+shopItemData.Icon;
-                AddressableManager.Instance.LoadAsset<Sprite>(path, (asset) =>
-                {
-                    if (asset != null)
-                    {
-                        icon.sprite = asset;
-                    }
-                    else
-                    {
-                        Debug.LogError($"Failed to load card sprite for CardId: {shopItemData.Id}, Path: {path}");
-                    }
-                });
+                _activity.LoadIcon(shopItemData.Id,icon);
+                
+                var localizedString = new LocalizedString(LocalizationManager.Instance.tableName, shopItemData.Name);
+                
+                txt.text = localizedString.GetLocalizedString();
             }
-            //string cashInfo = OnLineEarningMgr.Instance.GetCashStr(CardSystemManager.Instance.GetCurCollectionCoins(), needIcon: false);
         }
 
         protected void OnEnable()
@@ -81,6 +76,7 @@ namespace Activity
                 btnSpin.interactable = false; // 禁用按钮，防止重复点击
             }
             OnDoSpin();
+            _activity.BuryPoint(WheelLuckActivity.WheelShowAD1Count);
         }
 
         protected void OnDisable()

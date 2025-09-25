@@ -27,7 +27,7 @@ namespace Activity
         {
             _activity = ActivityManager.Instance.GetActivityByID(WheelLuckActivity.ActiveId) as WheelLuckActivity;
             _icon =  Util.FindObject<Image>(transform, "Icon");
-            _button = Util.FindObject<Button>(transform, "img_bg");
+            _button = GetComponent<Button>();
             _button.onClick.AddListener(OnButtonClick);
             StartFloating();
             RefreshIcon();
@@ -56,6 +56,8 @@ namespace Activity
             Messenger.Broadcast(GameDialogManager.OpenWheelLuckReceiveCardDialogMsg,_curShopItemId,false);
             //这个必须放在广播后面，因为RefreshShopItemCurrentCount广播会刷新_curShopItemId，导致获奖界面显示错误
             RefreshIcon();
+            
+            _activity.BuryPoint(WheelLuckActivity.WheelShowAD3Count);
         }
 
         protected void OnDisable()
@@ -132,7 +134,6 @@ namespace Activity
         
         void OnDestroy()
         {
-            // 良好习惯：在对象销毁时杀死Tween，防止内存泄漏
             _floatTweener?.Kill();
             
             if (WheelLuckActivity.OnClickBubble == gameObject)

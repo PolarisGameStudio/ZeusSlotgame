@@ -347,7 +347,7 @@ namespace Activity
             });
         }
 
-        private const int MaxMultipleCount = 3;
+        private const int MaxCardMultipleCount = 4;
         
         public int GetMultipleCount(int shopItemId)
         {
@@ -362,7 +362,7 @@ namespace Activity
 
             if (leftCount > 2)
             {
-                var count = Random.Range(2,Mathf.Min(MaxMultipleCount + 1, leftCount));
+                var count = Random.Range(2,Mathf.Min(MaxCardMultipleCount + 1, leftCount));
                 return count;
             }
             

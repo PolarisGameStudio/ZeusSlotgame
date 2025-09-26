@@ -476,9 +476,13 @@ public class PlistColumnEditorWindow : EditorWindow
         // 3. 处理粘贴到不同容器类型的逻辑
         if (destinationParent.NodeType == PlistNodeType.Dict || destinationParent.NodeType == PlistNodeType.Root)
         {
-            // 粘贴到字典时，需要生成一个新的、唯一的Key
-            pastedNode.Name = GenerateUniqueKey(destinationParent);
-            
+            // --- MODIFIED START ---
+            // 粘贴到字典时，尝试保留原始名称，但如果冲突则确保其唯一性
+            // pastedNode.Name 已经从 RebuildTreeFromXml 中获得了原始名称
+            string uniqueName = GenerateUniqueKeyFromName(destinationParent, pastedNode.Name);
+            pastedNode.Name = uniqueName; // 更新为唯一名称
+            // --- MODIFIED END ---
+
             XmlElement keyElement = xmlDoc.CreateElement("key");
             keyElement.InnerText = pastedNode.Name;
             pastedNode.XmlKeyNode = keyElement;
@@ -1161,6 +1165,19 @@ public class PlistColumnEditorWindow : EditorWindow
     private string GenerateUniqueKey(PlistTreeNode parentNode)
     {
         string baseName = "NewKey";
+        return GenerateUniqueKeyFromName(parentNode, baseName);
+    }
+
+    /// <summary>
+    /// --- NEW ---
+    /// Generates a unique key for a new node within a parent, starting with a desired base name.
+    /// If the base name is already taken, it appends a counter (e.g., "baseName (1)").
+    /// </summary>
+    /// <param name="parentNode">The parent node where the key must be unique.</param>
+    /// <param name="baseName">The desired starting name for the key.</param>
+    /// <returns>A unique key string.</returns>
+    private string GenerateUniqueKeyFromName(PlistTreeNode parentNode, string baseName)
+    {
         string newKey = baseName;
         int counter = 1;
 

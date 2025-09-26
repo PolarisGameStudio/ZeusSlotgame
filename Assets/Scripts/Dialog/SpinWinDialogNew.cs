@@ -147,12 +147,25 @@ public class SpinWinDialogNew : UIDialog
         }
         else
         {
-            Debug.Log("SpinWinDialogNew OnStart isThirdTime");
-            //第三次之后有广告和插屏
-            WatchAdBtn.gameObject.SetActive(true);
-            //显示免费的收集按钮
-            CollectBtn.gameObject.SetActive(false);
-            DelayShowCloseOnAdBtn();
+            //Debug.Log("SpinWinDialogNew OnStart isThirdTime");
+            //第三次之后有广告和插屏的按钮，此时插屏的广告进度并未累计完毕，所以不能看插屏
+            //增加插屏广告的检测进度
+            Messenger.Broadcast(ADConstants.CloseSpinWinMsg);
+            //若不满足间隔，并且配置有不显示广告
+            if (ADManager.Instance.CheckHideSpinWin())
+            {
+                WatchAdBtn.gameObject.SetActive(false);
+                //显示免费的收集按钮
+                CollectBtn.gameObject.SetActive(true);
+                CloseBtnOnAd.gameObject.SetActive(false);
+            }
+            else
+            {
+                WatchAdBtn.gameObject.SetActive(true);
+                //显示免费的收集按钮
+                CollectBtn.gameObject.SetActive(false);
+                DelayShowCloseOnAdBtn();
+            }
         }
     }
     void DelayShowCloseOnAdBtn()
@@ -366,7 +379,7 @@ public class SpinWinDialogNew : UIDialog
         HasClicked = true;
         OnClickStopUpdate();
         //广告时机
-        Messenger.Broadcast(ADConstants.CloseSpinWinMsg);
+        // Messenger.Broadcast(ADConstants.CloseSpinWinMsg);
         //检查是否可以播放广告
         Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_CLOSESPINWIN);
         SendMsg(spinWinType);

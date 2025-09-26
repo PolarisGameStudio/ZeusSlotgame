@@ -33,9 +33,19 @@ public class PlistColumnEditorWindow : EditorWindow
 
     // --- 新增：用于复制/粘贴功能的剪贴板 ---
     private static PlistTreeNode clipboardNode;
-      #endregion
 
-      #region Window Initialization
+    #region Drag and Drop State
+    private bool isDragging = false;
+    private int dragSourceCol = -1;
+    private int dragSourceIndex = -1;
+    private PlistTreeNode draggedNode = null;
+    private int dropTargetCol = -1;
+    private int dropTargetIndex = -1;
+    #endregion
+
+    #endregion
+
+    #region Window Initialization
 
     [MenuItem("Libs/GameConfig编辑器")]
     public static void ShowWindow()
@@ -52,8 +62,13 @@ public class PlistColumnEditorWindow : EditorWindow
 
     private void OnGUI()
     {
-        // --- Focus Loss Detection ---
-        // Must be at the top of OnGUI to work reliably
+        Event e = Event.current;
+        if (isDragging && e.rawType == EventType.MouseUp && e.button == 0)
+        {
+            HandleDrop();
+            e.Use();
+        }
+        
         HandleFocusLossForRename();
         HandleFocusLossForValueEdit();
 
@@ -86,6 +101,12 @@ public class PlistColumnEditorWindow : EditorWindow
 
         // Handle mouse wheel scrolling over columns
         HandleMouseWheelScroll();
+        
+        if (isDragging)
+        {
+            EditorGUIUtility.AddCursorRect(new Rect(e.mousePosition.x - 10, e.mousePosition.y - 10, 20, 20), MouseCursor.MoveArrow);
+            Repaint();
+        }
     }
 
     private void DrawTopBar()
@@ -133,7 +154,20 @@ public class PlistColumnEditorWindow : EditorWindow
             // Get a rect for the list item
             Rect itemRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
 
-            // Draw selection background if selected but not renaming
+            HandleItemInteractions(colIndex, i, itemRect, node);
+            
+            if (isDragging && dropTargetCol == colIndex && dropTargetIndex == i)
+            {
+                Rect indicatorRect = new Rect(itemRect.x, itemRect.y - 1, itemRect.width, 2);
+                EditorGUI.DrawRect(indicatorRect, new Color(0.24f, 0.48f, 0.9f));
+            }
+            
+            if (i == column.Count - 1 && isDragging && dropTargetCol == colIndex && dropTargetIndex == column.Count)
+            {
+                Rect indicatorRect = new Rect(itemRect.x, itemRect.yMax - 1, itemRect.width, 2);
+                EditorGUI.DrawRect(indicatorRect, new Color(0.24f, 0.48f, 0.9f));
+            }
+            
             if (isSelected && !isRenamingThisNode)
             {
                 GUI.Box(itemRect, "");
@@ -149,8 +183,18 @@ public class PlistColumnEditorWindow : EditorWindow
             }
             else
             {
-                DrawItemLabel(itemRect, node, isSelected);
-                HandleItemEvents(colIndex, i, itemRect);
+                bool isBeingDragged = (isDragging && draggedNode == node);
+                if (isBeingDragged)
+                {
+                    var oldColor = GUI.color;
+                    GUI.color = new Color(1f, 1f, 1f, 0.5f);
+                    DrawItemLabel(itemRect, node, isSelected);
+                    GUI.color = oldColor;
+                }
+                else
+                {
+                    DrawItemLabel(itemRect, node, isSelected);
+                }
             }
 
             // If this item is a selected leaf node, draw its value editor below it
@@ -251,46 +295,6 @@ public class PlistColumnEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
     }
-    
-    /// <summary>
-    /// 提交当前正在编辑的值，并取消对该节点的选中（通过重新选中其父节点实现）。
-    /// 这个函数专门由回车键事件触发。
-    /// </summary>
-    private void CommitValueAndDeselect()
-    {
-        if (editingValueNode == null || editingValueNode.Parent == null)
-        {
-            // 如果没有正在编辑的节点或它没有父节点，则只做常规提交
-            CommitValueEdit();
-            return;
-        }
-
-        // 1. 先保存必要的引用
-        PlistTreeNode parentNode = editingValueNode.Parent;
-        string newValue = editingValueInput;
-
-        // 2. 提交值的修改
-        if (newValue != editingValueNode.Value)
-        {
-            editingValueNode.Value = newValue;
-        }
-
-        // 3. 清理编辑状态（这会把 editingValueNode 设为 null）
-        CancelValueEdit();
-
-        // 4. 找到父节点在UI中的位置
-        for (int col = 0; col < columns.Count; col++)
-        {
-            int parentIdx = columns[col].IndexOf(parentNode);
-            if (parentIdx != -1)
-            {
-                // 5. 找到了！“重新点击”父节点，刷新UI到父节点状态
-                HandleColumnClick(col, parentIdx);
-                break; 
-            }
-        }
-    }
-
     private void DrawSelectedPath()
     {
         List<string> pathParts = new List<string>();
@@ -328,17 +332,57 @@ public class PlistColumnEditorWindow : EditorWindow
             EditorGUILayout.LabelField(fullPath, pathStyle);
         }
     }
+    
+    #endregion
 
-      #endregion
-
-      #region Event Handling
-
-    private void HandleItemEvents(int colIndex, int itemIndex, Rect itemRect)
+    #region Event Handling
+    
+    private void HandleItemInteractions(int colIndex, int itemIndex, Rect itemRect, PlistTreeNode node)
     {
         Event e = Event.current;
-        if (e.type == EventType.MouseDown && itemRect.Contains(e.mousePosition))
+        bool canDrag = (node.Parent != null);
+
+        if (canDrag)
         {
-            if (e.button == 0) // Left click
+            if (e.type == EventType.MouseDown && e.button == 0 && itemRect.Contains(e.mousePosition))
+            {
+                dragSourceCol = colIndex;
+                dragSourceIndex = itemIndex;
+                draggedNode = node;
+            }
+            
+            if (e.type == EventType.MouseDrag && draggedNode == node)
+            {
+                if (!isDragging)
+                {
+                    isDragging = true;
+                    GUI.FocusControl(null);
+                    CancelRename();
+                    CancelValueEdit();
+                }
+                e.Use();
+            }
+            
+            if (isDragging && itemRect.Contains(e.mousePosition))
+            {
+                if (dragSourceCol == colIndex)
+                {
+                    dropTargetCol = colIndex;
+                    if (e.mousePosition.y < itemRect.y + itemRect.height / 2)
+                    {
+                        dropTargetIndex = itemIndex;
+                    }
+                    else
+                    {
+                        dropTargetIndex = itemIndex + 1;
+                    }
+                }
+            }
+        }
+        
+        if (e.type == EventType.MouseDown && itemRect.Contains(e.mousePosition) && !isDragging)
+        {
+            if (e.button == 0)
             {
                 HandleColumnClick(colIndex, itemIndex);
                 e.Use();
@@ -353,6 +397,112 @@ public class PlistColumnEditorWindow : EditorWindow
         }
     }
 
+    private void HandleDrop()
+    {
+        if (!isDragging) return;
+
+        bool reordered = false;
+        if (dropTargetCol != -1 && dropTargetIndex != -1 && dragSourceCol == dropTargetCol)
+        {
+            // 在拖拽过程中，目标索引可能会因为被拖拽项的移除而改变
+            // 例如 [A, B, C], 拖B到C后 (index 2 -> 3), toIndex是3
+            // 但B移除后列表为[A, C], toIndex应为2.
+            int finalToIndex = dropTargetIndex;
+            if (dragSourceIndex < dropTargetIndex)
+            {
+                finalToIndex--;
+            }
+
+            if (dragSourceIndex != finalToIndex)
+            {
+                PerformReorder(dragSourceCol, dragSourceIndex, finalToIndex);
+                reordered = true;
+            }
+        }
+        
+        isDragging = false;
+        draggedNode = null;
+        dragSourceCol = -1;
+        dragSourceIndex = -1;
+        dropTargetCol = -1;
+        dropTargetIndex = -1;
+
+        if (reordered) Repaint();
+    }
+    
+    private void PerformReorder(int colIndex, int fromIndex, int toIndex)
+    {
+        var listInUI = columns[colIndex];
+        if (fromIndex < 0 || fromIndex >= listInUI.Count || toIndex < 0 || toIndex > listInUI.Count)
+        {
+             Debug.LogError($"Reorder failed: Invalid indices. from: {fromIndex}, to: {toIndex}");
+             return;
+        }
+
+        var nodeToMove = listInUI[fromIndex];
+        var parentNode = nodeToMove.Parent;
+
+        if (parentNode == null) return;
+
+        // --- 1. PREPARE: 确定所有需要的节点，并且不修改任何东西 ---
+        
+        // 要移动的XML节点
+        XmlNode parentXml = parentNode.XmlValueNode;
+        XmlNode valueXml = nodeToMove.XmlValueNode;
+        XmlNode keyXml = nodeToMove.XmlKeyNode;
+
+        // 关键修复：在修改任何列表之前，先确定好参考节点（要插入的位置）
+        // 如果 toIndex 是列表末尾，则 referenceNode 为 null，这会让 InsertBefore 表现为 AppendChild
+        XmlNode referenceNode = null;
+        if (toIndex < parentNode.Children.Count)
+        {
+            PlistTreeNode nodeAtTargetPosition = parentNode.Children[toIndex];
+            referenceNode = nodeAtTargetPosition.XmlKeyNode ?? nodeAtTargetPosition.XmlValueNode;
+        }
+
+        // --- 2. VALIDATE ---
+        // 执行健壮性检查，确保XML节点确实是预期的父节点的子节点
+        if ((keyXml != null && keyXml.ParentNode != parentXml) || (valueXml.ParentNode != parentXml))
+        {
+            Debug.LogError("Reorder failed: XML parent mismatch. The internal data might be out of sync.");
+            return;
+        }
+
+        // --- 3. EXECUTE ---
+        // 现在所有引用都已安全获取，开始执行修改
+        
+        // a. 从XML文档中分离节点
+        if (keyXml != null) parentXml.RemoveChild(keyXml);
+        parentXml.RemoveChild(valueXml);
+
+        // b. 修改内存中的C#列表顺序
+        parentNode.Children.RemoveAt(fromIndex);
+        parentNode.Children.Insert(toIndex, nodeToMove);
+
+        // c. 将分离的XML节点重新插入到正确的位置
+        // InsertBefore(newNode, null) 的行为等同于 AppendChild(newNode)
+        if (keyXml != null)
+        {
+            parentXml.InsertBefore(keyXml, referenceNode);
+        }
+        parentXml.InsertBefore(valueXml, referenceNode);
+
+        // --- 4. FINALIZE ---
+        
+        // 如果是数组，更新其显示名称（例如 "[0]", "[1]"）
+        if (parentNode.NodeType == PlistNodeType.Array)
+        {
+            for (int i = 0; i < parentNode.Children.Count; i++)
+            {
+                parentNode.Children[i].Name = $"[{i}]";
+            }
+        }
+
+        // 更新UI列表并选中移动后的项
+        columns[colIndex] = new List<PlistTreeNode>(parentNode.Children);
+        selectedIndices[colIndex] = toIndex;
+    }
+    
     private void HandleColumnClick(int colIndex, int itemIndex)
     {
         // If clicking the same item, do nothing
@@ -387,8 +537,33 @@ public class PlistColumnEditorWindow : EditorWindow
         GUI.FocusControl(null);
         Repaint();
     }
-
-        private void ShowContextMenu(int colIndex, int itemIndex)
+    
+    // ... The rest of the file (CRUD, File I/O, Helpers) remains unchanged ...
+    private void CommitValueAndDeselect()
+    {
+        if (editingValueNode == null || editingValueNode.Parent == null)
+        {
+            CommitValueEdit();
+            return;
+        }
+        PlistTreeNode parentNode = editingValueNode.Parent;
+        string newValue = editingValueInput;
+        if (newValue != editingValueNode.Value)
+        {
+            editingValueNode.Value = newValue;
+        }
+        CancelValueEdit();
+        for (int col = 0; col < columns.Count; col++)
+        {
+            int parentIdx = columns[col].IndexOf(parentNode);
+            if (parentIdx != -1)
+            {
+                HandleColumnClick(col, parentIdx);
+                break;
+            }
+        }
+    }
+    private void ShowContextMenu(int colIndex, int itemIndex)
     {
         var node = columns[colIndex][itemIndex];
         GenericMenu menu = new GenericMenu();

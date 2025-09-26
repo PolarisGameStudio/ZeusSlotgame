@@ -30,6 +30,7 @@ namespace Ads
         
         public int SpinCount = 0; //SpinCount
         public int SpinInterval = 0;
+        public bool HideSpinWinAdButton = false; //是否在不播插屏时隐藏spinwin上的广告按钮
         public Dictionary<string, BaseAdNode> AdNodes = new Dictionary<string, BaseAdNode>();
 
         public Dictionary<string, ADCondition> ADConditions = new Dictionary<string, ADCondition>(); //广告节点
@@ -82,7 +83,7 @@ namespace Ads
             }
             
             SpinInterval = Utils.Utilities.GetInt(ADConfig, ADConstants.SpinInterval, 0);
-
+            HideSpinWinAdButton= Utils.Utilities.GetBool(ADConfig, ADConstants.HideSpinWinAdButtonKey, false);
             Dictionary<string, object> rewardConfig =
                 CSharpUtil.GetValue<Dictionary<string, object>>(ADConfig, ADConstants.RewardVideo, null);
             if (rewardConfig == null)
@@ -272,9 +273,17 @@ namespace Ads
 
             return true;
         }
+        public bool CheckHideSpinWin()
+        {
+            if (AdNodes.ContainsKey(ADEntrances.Interstitial_Entrance_CLOSESPINWIN))
+            {
+                BaseAdNode adNode = AdNodes[ADEntrances.Interstitial_Entrance_CLOSESPINWIN];
+                return !adNode.IsMeetCondition() && HideSpinWinAdButton;
+            }
+            return false;
+        }
         void PlayADByEntrance(string entranceName)
         {
-            Debug.Log("ADManager PlayADByEntrance entranceName:" + entranceName);
             if (string.IsNullOrEmpty(entranceName))
             {
                 Debug.LogError("PlayADByEntrance entranceName is null or empty.");
@@ -286,7 +295,7 @@ namespace Ads
                 BaseAdNode adNode = AdNodes[entranceName];
                 if (adNode != null && adNode.IsMeetCondition())
                 {
-                    Debug.Log($"ADManager PlayADByEntrance entranceName:{entranceName}");
+                    // Debug.Log($"ADManager PlayADByEntrance entranceName:{entranceName}");
                     //播放广告的前置操作
                     adNode.DoAction();
                     adNode.PlayAd();
@@ -296,7 +305,7 @@ namespace Ads
                 else
                 {
                     Messenger.Broadcast<string>(ADConstants.NotMeetConditionMsg,entranceName);
-                    Debug.LogWarning($"ADNode {entranceName} is not meet condition.");
+                    // Debug.LogWarning($"ADNode {entranceName} is not meet condition.");
                 }
             }
             else

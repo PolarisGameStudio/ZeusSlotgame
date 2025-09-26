@@ -610,7 +610,8 @@ public class OnLineEarningMgr
     {
         string str = "";
         double money = ConvertMoneyToDouble(amount, decimalPlace);
-        if (money<0.01&& money>=0&&!isInfiniteOpen())
+        //在300和区间模式下，金钱最少显示0.01
+        if (cash>0 && money < 0.01 && money>=0 && !isInfiniteOpen())
         {
             money = 0.01;
         }

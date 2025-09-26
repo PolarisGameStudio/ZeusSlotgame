@@ -126,7 +126,7 @@ public class SpinWinDialogNew : UIDialog
         isSecondTime = popCount==2;
         if (isFirstTime)
         {
-            Debug.Log("SpinWinDialogNew OnStart isFirstTime");
+            // Debug.Log("SpinWinDialogNew OnStart isFirstTime");
             //第一次免费，不显示广告按钮
             WatchAdBtn.gameObject.SetActive(false);
             CloseBtnOnAd.gameObject.SetActive(false);
@@ -134,7 +134,7 @@ public class SpinWinDialogNew : UIDialog
             CollectBtn.gameObject.SetActive(true);
         }else if (isSecondTime)
         {
-            Debug.Log("SpinWinDialogNew OnStart isSecondTime");
+            // Debug.Log("SpinWinDialogNew OnStart isSecondTime");
             //第一次免费，不显示广告按钮
             WatchAdBtn.gameObject.SetActive(false);
             CloseBtnOnAd.gameObject.SetActive(false);
@@ -404,7 +404,7 @@ public class SpinWinDialogNew : UIDialog
         {
             //奖励乘以倍数
             RewardADIsPlaySuccess();
-        }else if (isFirstTime)
+        }else
         {
             //免费领奖不翻倍
             DoneADCallBack();

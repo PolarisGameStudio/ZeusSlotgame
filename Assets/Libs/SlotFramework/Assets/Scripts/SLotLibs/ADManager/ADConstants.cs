@@ -42,6 +42,7 @@ namespace Ads
         public const string Target ="target";
         public const string Type ="type";
         public const string SpinInterval ="SpinInterval";
+        public const string HideSpinWinAdButtonKey ="HideSpinWinAdButton";
 
 
         #region message

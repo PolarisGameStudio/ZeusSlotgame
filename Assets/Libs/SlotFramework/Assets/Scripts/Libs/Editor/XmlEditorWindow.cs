@@ -598,12 +598,21 @@ public class PlistColumnEditorWindow : EditorWindow
         // --- 添加 ---
         if (node.IsContainer)
         {
-            menu.AddItem(new GUIContent("Add Item/String"), false, () => AddChildNode(node, PlistNodeType.String, "string"));
-            menu.AddItem(new GUIContent("Add Item/Integer"), false, () => AddChildNode(node, PlistNodeType.Integer, "integer"));
-            menu.AddItem(new GUIContent("Add Item/Boolean"), false, () => AddChildNode(node, PlistNodeType.Boolean, "true"));
-            menu.AddItem(new GUIContent("Add Item/Real"), false, () => AddChildNode(node, PlistNodeType.Real, "real"));
-            menu.AddItem(new GUIContent("Add Item/Dictionary"), false, () => AddChildNode(node, PlistNodeType.Dict, "dict"));
-            menu.AddItem(new GUIContent("Add Item/Array"), false, () => AddChildNode(node, PlistNodeType.Array, "array"));
+            // If it's a non-empty array, provide a simple "Add Item" that clones the first element
+            if (node.NodeType == PlistNodeType.Array && node.Children != null && node.Children.Count > 0)
+            {
+                menu.AddItem(new GUIContent("Add Item"), false, () => AddClonedChildToArray(node));
+            }
+            // Otherwise (for Dicts, Root, and empty Arrays), show the full type list
+            else
+            {
+                menu.AddItem(new GUIContent("Add Item/String"), false, () => AddChildNode(node, PlistNodeType.String, "string"));
+                menu.AddItem(new GUIContent("Add Item/Integer"), false, () => AddChildNode(node, PlistNodeType.Integer, "integer"));
+                menu.AddItem(new GUIContent("Add Item/Boolean"), false, () => AddChildNode(node, PlistNodeType.Boolean, "true"));
+                menu.AddItem(new GUIContent("Add Item/Real"), false, () => AddChildNode(node, PlistNodeType.Real, "real"));
+                menu.AddItem(new GUIContent("Add Item/Dictionary"), false, () => AddChildNode(node, PlistNodeType.Dict, "dict"));
+                menu.AddItem(new GUIContent("Add Item/Array"), false, () => AddChildNode(node, PlistNodeType.Array, "array"));
+            }
         }
         else
         {
@@ -631,6 +640,67 @@ public class PlistColumnEditorWindow : EditorWindow
         if (node == null) return;
         clipboardNode = node;
         Debug.Log($"Copied '{node.Name}' to clipboard.");
+    }
+    
+    /// <summary>
+    /// --- NEW ---
+    /// Adds a new child to a non-empty array by cloning its first element.
+    /// </summary>
+    private void AddClonedChildToArray(PlistTreeNode parentArray)
+    {
+        if (parentArray == null || parentArray.NodeType != PlistNodeType.Array || parentArray.Children == null || parentArray.Children.Count == 0)
+        {
+            Debug.LogError("AddClonedChildToArray called on an invalid or empty array.");
+            return;
+        }
+
+        PlistTreeNode templateNode = parentArray.Children[0];
+        
+        XmlNode clonedXmlValueNode = xmlDoc.ImportNode(templateNode.XmlValueNode, true);
+        
+        PlistTreeNode newNode = RebuildTreeFromXml(clonedXmlValueNode, templateNode);
+
+        if (newNode == null) 
+        {
+            Debug.LogError("Failed to rebuild PlistTreeNode from cloned XML.");
+            return;
+        }
+        
+        newNode.Parent = parentArray;
+        newNode.Name = $"[{parentArray.Children.Count}]";
+        
+        RecursivelyUpdatePaths(newNode, parentArray.Path);
+        
+        parentArray.XmlValueNode.AppendChild(clonedXmlValueNode);
+        parentArray.Children.Add(newNode);
+        
+        ForceRefreshAndSelect(parentArray, newNode);
+    }
+    
+    /// <summary>
+    /// --- NEW ---
+    /// Recursively updates the Path property for a node and all its children.
+    /// </summary>
+    private void RecursivelyUpdatePaths(PlistTreeNode node, string parentPath)
+    {
+        if (node == null) return;
+
+        if (node.Parent != null && node.Parent.NodeType == PlistNodeType.Array)
+        {
+            node.Path = $"{parentPath}{node.Name}"; // e.g., "Root/MyArray[1]"
+        }
+        else
+        {
+            node.Path = $"{parentPath}/{node.Name}"; // e.g., "Root/MyDict/NewKey"
+        }
+
+        if (node.IsContainer && node.Children != null)
+        {
+            foreach (var child in node.Children)
+            {
+                RecursivelyUpdatePaths(child, node.Path);
+            }
+        }
     }
 
     /// <summary>

@@ -269,7 +269,7 @@ namespace Ads
             {
                 return false;
             }
-            SpinCount = 0; //重置SpinCount
+
             return true;
         }
         void PlayADByEntrance(string entranceName)
@@ -290,6 +290,8 @@ namespace Ads
                     //播放广告的前置操作
                     adNode.DoAction();
                     adNode.PlayAd();
+                    //重置计数条件
+                    SpinCount = 0;
                 }
                 else
                 {

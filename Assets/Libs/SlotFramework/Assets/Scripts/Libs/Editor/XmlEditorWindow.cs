@@ -494,7 +494,11 @@ public class PlistColumnEditorWindow : EditorWindow
         {
             for (int i = 0; i < parentNode.Children.Count; i++)
             {
-                parentNode.Children[i].Name = $"[{i}]";
+                var child = parentNode.Children[i];
+                child.Name = $"[{i}]";
+                // --- BUG FIX ---
+                // Also update the path for the child and all its descendants
+                RecursivelyUpdatePaths(child, parentNode.Path); 
             }
         }
 
@@ -1071,6 +1075,17 @@ public class PlistColumnEditorWindow : EditorWindow
         node.XmlKeyNode?.ParentNode?.RemoveChild(node.XmlKeyNode);
         node.XmlValueNode?.ParentNode?.RemoveChild(node.XmlValueNode);
 
+        // --- BUG FIX ---
+        // If the parent is an array, re-index the remaining items
+        if (parentNode.NodeType == PlistNodeType.Array)
+        {
+            for (int i = 0; i < parentNode.Children.Count; i++)
+            {
+                var child = parentNode.Children[i];
+                child.Name = $"[{i}]";
+                RecursivelyUpdatePaths(child, parentNode.Path);
+            }
+        }
 
         // 3. 强制刷新UI，从父节点那一列开始
         // 确保父节点在UI上是选中状态

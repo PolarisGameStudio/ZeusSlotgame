@@ -370,7 +370,7 @@ namespace Libs
                     task is CollectSpinCountTask || task is CollectADCountTask ||
                     task is CollectCashFromZeroTask || task is CollectCardTypeCountTask|| task is AccumulateTotalCashTask
                         ? "FF0000"
-                        : "FDFF2F",
+                        : "FF0000",
                     value);
             }
 
@@ -384,7 +384,7 @@ namespace Libs
                 task is CollectBonusGameCountTask)
             {
                 key = task.GetDesc();
-                arg1 = string.Format("<color=#29f706>{0}</color>", task.TargetNum);
+                arg1 = string.Format("<color=#118D1D>{0}</color>", task.TargetNum);
             }
             else
             {
@@ -413,7 +413,7 @@ namespace Libs
             var localizedString = new LocalizedString(LocalizationManager.Instance.tableName, key);
             if (localizedString == null) return string.Empty;
 
-            localizedString.Arguments = task is CollectSpinCountTask || task is CollectADCountTask ||
+            localizedString.Arguments = task is CollectSpinCountTask || task is CollectADCountTask || task is CollectNewCardCountTask ||task is CollectNewCardTypeCountTask ||
                                         task is CollectCashFromZeroTask || task is CollectCardTypeCountTask || task is AccumulateTotalCashTask
                 ? new object[] { arg1 }
                 : new object[] { arg1, arg2 };

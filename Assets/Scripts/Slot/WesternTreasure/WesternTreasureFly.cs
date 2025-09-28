@@ -1,4 +1,5 @@
 ﻿using System;
+using System.BuffSystem;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -41,47 +42,76 @@ public class WesternTreasureFly : MonoBehaviour
     {
         for (int i = 0; i < sourcePosition.Count; i++)
         {
-            AudioManager.Instance.AsyncPlayEffectAudio("W01_collect");
-            GameObject go = null;
-            if (m_ImagePool.Count > 0)
+            // 生成原始物体（无延迟）
+            CreateFlyObject(sourcePosition[i], 0f);
+
+            // 生成额外物体（间隔0.2s）
+            int extraCount = GetBuffExtraCount();
+            for (int j = 1; j <= extraCount; j++)
             {
-                go = this.m_ImagePool.Pop();
+                float delay = 0.2f * j; // 计算延时
+                CreateFlyObject(sourcePosition[i], delay);
             }
-            else
-            {
-                go =  Instantiate(Fly, this.transform) as GameObject; 
-            }
-            
-            
-            go.transform.position = sourcePosition[i];
-           
-            go.gameObject.SetActive(true);
-            go.transform.localScale = Vector3.one;
-            
-            Sequence seq = DOTween.Sequence();
-            seq.Append(go.transform.DOMove(DestinationGO.transform.position, 1.2f).OnComplete(delegate
-            {
-                go.SetActive(false);
-                m_ImagePool.Push(go);
-                if (treeManager.isFreespinBonus)
-                {
-                    treeManager.spinResult.wildNum += treeManager.spinResult.treeGrow.freeWild;
-                }
-                else
-                {
-                    treeManager.spinResult.wildNum += treeManager.spinResult.treeGrow.baseWild;
-                }
-            
-            
-                ChangeTreeState();
-             
-            }));
-            //sequence.Join(go.transform.DOScale(0.1f, 1.2f));
-            seq.SetUpdate(true);
-            seq.Play();
         }  
     }
 
+    // 封装生成物体和飞行的公共逻辑
+    private void CreateFlyObject(Vector3 startPos, float delay)
+    {
+        AudioManager.Instance.AsyncPlayEffectAudio("W01_collect");
+    
+        // 从对象池获取或创建新物体
+        GameObject go = (m_ImagePool.Count > 0) ? 
+            m_ImagePool.Pop() : Instantiate(Fly, transform);
+    
+        go.transform.position = startPos;
+        go.SetActive(true);
+        go.transform.localScale = Vector3.one;
+
+        // 创建带延时的动画Sequence
+        Sequence seq = DOTween.Sequence();
+        if (delay > 0)
+        {
+            seq.AppendInterval(delay); // 添加延时
+        }
+        seq.Append(go.transform.DOMove(DestinationGO.transform.position, 1.2f)
+                .OnComplete(() => OnFlyComplete(go)) // 动画完成回调
+        );
+        seq.SetUpdate(true);
+        seq.Play();
+    }
+    
+    // 飞行完成的公共回调
+    private void OnFlyComplete(GameObject go)
+    {
+        go.SetActive(false);
+        m_ImagePool.Push(go);
+    
+        // 根据状态更新数值
+        if (treeManager.isFreespinBonus)
+        {
+            treeManager.spinResult.wildNum += treeManager.spinResult.treeGrow.freeWild;
+        }
+        else
+        {
+            treeManager.spinResult.wildNum += treeManager.spinResult.treeGrow.baseWild;
+        }
+    
+        ChangeTreeState();
+    }
+    
+    private int GetBuffExtraCount()
+    {
+        int extraCount = 0;
+        List<BaseBuff> activeBuffs = BuffManager.Instance.GetActiveBuffByType(BuffConstant.MultipleWildSymbolBuff);
+        foreach (var buff in activeBuffs)
+        {
+            extraCount += buff.GetExtraCount();
+        }
+        // Debug.Log($"WesternTreasureFly GetBuffExtraCount: {extraCount}");
+        return extraCount;
+    }
+    
     private void ChangeTreeState()
     {
         int level = ChargeTreeLevel(treeManager.spinResult.wildNum);

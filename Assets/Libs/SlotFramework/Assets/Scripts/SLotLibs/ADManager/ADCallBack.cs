@@ -131,6 +131,14 @@ namespace Ads
                     //点击 小屋按钮给钱
                     Messenger.Broadcast<int>(ADConstants.PlayContinueSpinAD, 1);
                     break;
+                case ADEntrances.REWARD_VIDEO_ROTATION_BUFF:
+                    //点击 小屋按钮给钱
+                    Messenger.Broadcast<int>(ADConstants.PlayRotationBuffAD, 0);
+                    break;
+                case ADEntrances.Interstitial_Entrance_CLOSEROTATIONBUFF:
+                    //点击 小屋按钮给钱
+                    Messenger.Broadcast<int>(ADConstants.PlayRotationBuffAD, 1);
+                    break;
                 case ADEntrances.REWARD_VIDEO_WHEELLUCK_SPIN:
                     //兑换商店播广告
                     Messenger.Broadcast<int>(ADConstants.PlayWheelLuckAD, 0);
@@ -215,6 +223,14 @@ namespace Ads
                 case ADEntrances.Interstitial_Entrance_CLOSECONTINUESPIN:
                     //点击 小屋按钮给钱
                     Messenger.Broadcast<int>(ADConstants.PlayContinueSpinADFailed, 1);
+                    break;
+                case ADEntrances.REWARD_VIDEO_ROTATION_BUFF:
+                    //点击RotationBuff
+                    Messenger.Broadcast<int>(ADConstants.PlayRotationBuffADFailed, 0);
+                    break;
+                case ADEntrances.Interstitial_Entrance_CLOSEROTATIONBUFF:
+                    //点击 小屋按钮给钱
+                    Messenger.Broadcast<int>(ADConstants.PlayRotationBuffADFailed, 1);
                     break;
                 case ADEntrances.REWARD_VIDEO_WHEELLUCK_SPIN:
                     //兑换商店播广告

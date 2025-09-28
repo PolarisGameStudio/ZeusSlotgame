@@ -33,6 +33,7 @@ public class WithDrawPanel : MonoBehaviour
     public LocalizedString _localizedString;
     public float tipIdleTime= 5f;
     public float tipShowTime=0.3f;
+    public TextMeshProUGUI scoreText;
     public void Awake()
     {
         withDrawPanelBtn = GetComponent<Button>();
@@ -234,11 +235,67 @@ public class WithDrawPanel : MonoBehaviour
                     }).SetUpdate(true);
             });
             tweenAction.Play();
+            if (scoreText!=null)
+            {
+                //播放score分数飞行动画
+                scoreText.text = "+" + OnLineEarningMgr.Instance.GetMoneyStr(number - initNum,needIcon:false);
+                DoScoreAnim();
+            }
         }
         else
         {
             CompleteShow(number);
         }
+    }
+
+    public virtual void DoScoreAnim(System.Action onComplete = null)
+    {
+        if (scoreText == null) return;
+
+        scoreText.gameObject.SetActive(true);
+        scoreText.color = new Color(scoreText.color.r, scoreText.color.g, scoreText.color.b, 1);
+
+        // 记录初始状态
+        Vector3 initialPos = scoreText.transform.localPosition;
+        Vector3 initialScale = scoreText.transform.localScale; // 保存初始缩放值
+
+        // 创建动画序列
+        Sequence sequence = DOTween.Sequence();
+
+        // 第一阶段：向上移动 + 同步放大
+        sequence.Append(
+            scoreText.transform.DOLocalMoveY(initialPos.y + 20, 0.5f)
+                .SetEase(Ease.OutCubic)
+        );
+        sequence.Join(
+            scoreText.transform.DOScale(initialScale * 1.2f, 0.5f) // 放大到120%
+                .From(initialScale * 0.8f) // 从80%开始缩放
+                .SetEase(Ease.OutBack) // 带弹性效果的缓动
+        );
+
+        // 停留1.5秒
+        sequence.AppendInterval(1.5f);
+
+        // 第二阶段：继续上移 + 淡出
+        sequence.Append(
+            scoreText.transform.DOLocalMoveY(initialPos.y + 40, 0.5f) // 总上移40单位
+                .SetEase(Ease.InCubic)
+        );
+        sequence.Join(
+            scoreText.DOFade(0, 0.5f)
+        );
+
+        // 动画完成回调
+        sequence.OnComplete(() =>
+        {
+            scoreText.gameObject.SetActive(false);
+            scoreText.transform.localPosition = new Vector3(initialPos.x, initialPos.y, initialPos.z);
+            scoreText.transform.localScale = initialScale; // 恢复初始缩放
+            scoreText.color = new Color(scoreText.color.r, scoreText.color.g, scoreText.color.b, 1);
+            onComplete?.Invoke();
+        });
+
+        sequence.Play();
     }
     
     public virtual void CompleteShow(int coins)

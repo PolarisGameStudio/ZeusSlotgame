@@ -88,9 +88,13 @@ public class LuckyCashDialog : UIDialog
             SetCoins();
         }
     }
+    private int RewardAdMultiple = 1;
     public void SetUIData(int money)
     {
         this.totalCash = money;
+        RewardAdMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_LUCKYCASH);
+        Text adMultiple = Util.FindObject<Text>(BtnWatch.transform, "num");
+        adMultiple.text = "" + RewardAdMultiple;
         CashRollUp();
     }
 
@@ -132,7 +136,7 @@ public class LuckyCashDialog : UIDialog
         int multiple = 1;
         if (type == (int)ADType.RewardAD)
         {
-            multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_LUCKYCASH);
+            multiple = RewardAdMultiple;
         }else if (type == (int)ADType.InterstitialAD)
         {
             multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);

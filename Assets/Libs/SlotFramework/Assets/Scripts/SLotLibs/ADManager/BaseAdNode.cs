@@ -97,6 +97,11 @@ namespace Ads
         {
             ADManager.Instance.StartPlayAD(Name, AdType);
         }
+        
+        public virtual int GetMultiple()
+        {
+            return _multiple;
+        }
     }
 }
    

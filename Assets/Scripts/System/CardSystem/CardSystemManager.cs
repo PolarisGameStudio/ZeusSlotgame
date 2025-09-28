@@ -286,20 +286,20 @@ namespace CardSystem
                 {
                     Debug.LogError("CardSystemManager CreateCardActivity lotteryData is null");
                 }
-                Dictionary<string,object> packData = Utils.Utilities.GetValue<Dictionary<string,object>>(activityData, CardSystemConstants.CardPack, null);
-                if (packData != null && packData.Count > 0)
-                {
-                    cardPackActivity = ActivityManager.Instance.RegisterActivity(packData) as CardPackActivity;
-                    if (cardPackActivity == null)
-                    {
-                        Debug.LogError("CardSystemManager CreateCardActivity cardPackActivity is null");
-                       
-                    }    
-                }
-                else
-                {
-                    Debug.LogError("CardSystemManager CreateCardActivity packData is null");
-                }
+                // Dictionary<string,object> packData = Utils.Utilities.GetValue<Dictionary<string,object>>(activityData, CardSystemConstants.CardPack, null);
+                // if (packData != null && packData.Count > 0)
+                // {
+                //     cardPackActivity = ActivityManager.Instance.RegisterActivity(packData) as CardPackActivity;
+                //     if (cardPackActivity == null)
+                //     {
+                //         Debug.LogError("CardSystemManager CreateCardActivity cardPackActivity is null");
+                //        
+                //     }    
+                // }
+                // else
+                // {
+                //     Debug.LogError("CardSystemManager CreateCardActivity packData is null");
+                // }
             }
             catch (Exception e)
             {
@@ -411,10 +411,10 @@ namespace CardSystem
             {
                 cardLotteryActivity.CheckShowIcon();
             }
-            if (cardPackActivity!=null)
-            {
-                cardPackActivity.CheckShowIcon();
-            }
+            // if (cardPackActivity!=null)
+            // {
+            //     cardPackActivity.CheckShowIcon();
+            // }
         }
         
         public override void Dispose()

@@ -14,5 +14,10 @@ namespace Ads
             //重置OnLineEarning模块LuckyCash弹出的条件计数
             Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
         }
+        public override int GetMultiple()
+        {
+            int multiple = ADManager.Instance.GetMultipleADBuff();
+            return multiple>Multiple?multiple:Multiple;
+        }
     }
 }

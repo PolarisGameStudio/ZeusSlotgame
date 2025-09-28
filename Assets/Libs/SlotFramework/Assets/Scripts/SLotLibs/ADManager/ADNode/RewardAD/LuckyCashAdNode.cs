@@ -7,5 +7,10 @@ namespace Ads
         public LuckyCashAdNode(string name, Dictionary<string, object> data, ADCondition adCondition) : base(name, data, adCondition)
         {
         }
+        public override int GetMultiple()
+        {
+            int multiple = ADManager.Instance.GetMultipleADBuff();
+            return multiple>Multiple?multiple:Multiple;
+        }
     }
 }

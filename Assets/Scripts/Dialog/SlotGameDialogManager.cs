@@ -3,6 +3,7 @@ using Core;
 using System.Collections.Generic;
 using Libs;
 using System;
+using System.BuffSystem;
 using Activity;
 using CardSystem;
 using Core.UI;
@@ -578,6 +579,16 @@ namespace Classic
                 uiPopupStrategy: new MachineUIPopupStrategy(),dialogInitCallBack: (dialog) => { dialog.RefreshInfo(sprite, taskType); },
                 animationIn: UIAnimation.NOAnimation, animationOut: UIAnimation.NOAnimation,
                 queueId: Constants.UI_TIPS_EVENT_KEY));
+        }
+        protected override void OpenRotationBuffDialog(Dictionary<string,object> data,BaseBuff buff)
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<RotationBuffDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
+                {
+                    dialog.SetUIData(data,buff);
+                },defaultResourcePath:"RotationBuff/Prefab/RotationBuffDialog"));
         }
     }
 }

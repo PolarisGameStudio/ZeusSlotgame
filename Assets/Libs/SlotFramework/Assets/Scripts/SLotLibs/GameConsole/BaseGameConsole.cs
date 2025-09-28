@@ -1,6 +1,7 @@
 #define ASYNC_LOAD_BUG_EXISTS
 using UnityEngine;
 using System;
+using System.BuffSystem;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -281,6 +282,8 @@ public class BaseGameConsole :MonoBehaviour
 		TaskManager.Instance.OnInit();
 		//卡牌系统初始化
 		CardSystemManager.Instance.OnInit();
+		//buff系统初始化
+		BuffManager.Instance.OnInit();
 		//提现系统初始化
 		WithDrawManager.Instance.OnInit();
 		
@@ -318,6 +321,7 @@ public class BaseGameConsole :MonoBehaviour
 		}
 		if (paused)
 		{
+			Time.timeScale = 0;
 			CommandManager.Instance.SaveAckingCommand();
 			UserManager.GetInstance().UserProfile().LastExitGameTime = DateTime.Now;
 			TaskManager.Instance.SaveProgressData();
@@ -359,9 +363,11 @@ public class BaseGameConsole :MonoBehaviour
 			UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 			TimeUtils.SetPauseDataTime();
 			CardSystemManager.Instance.SaveProgressData();
+			BuffManager.Instance.SaveProgressData();
 		}
 		else
 		{
+			Time.timeScale = 1;
 			SkySreenUtils.SetScreenResolutions(true);
 
 			
@@ -426,7 +432,9 @@ public class BaseGameConsole :MonoBehaviour
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 		ADManager.Instance.SaveADProgressData();
+		ActivityManager.Instance.SaveData();
 		CardSystemManager.Instance.SaveProgressData();
+		BuffManager.Instance.SaveProgressData(); 
 	}
 	
 	void Update()

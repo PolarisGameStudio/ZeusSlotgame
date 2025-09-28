@@ -1,4 +1,5 @@
 using System;
+using System.BuffSystem;
 using System.Collections.Generic;
 using Classic;
 using UnityEngine;
@@ -179,8 +180,7 @@ public class OnLineEarningMgr
             new DelayAction(1.3f,null, () =>
             {
                 int newUserCash = GetRewardsByName(OnLineEarningConstants.REWARD_NewUser);
-                //加钱动画播放完毕
-                IncreaseCash(newUserCash);
+                
                 ShowRewardCashDialog(newUserCash);
             }).Play();
         }
@@ -339,13 +339,14 @@ public class OnLineEarningMgr
     {
         if (needMultiple)
         {
-            newCash = newCash * _baseOnlineEarningModel.CashMultiple();
+            newCash *= _baseOnlineEarningModel.CashMultiple();
         }
+        newCash *= GetCashBuffMultiple();
         int totalCash = cash + newCash;
         if (!isInfiniteOpen()&&totalCash>=GetMaxValue()*GetCashMultiple())
         {
             totalCash= (int)Math.Floor(GetMaxValue()*GetCashMultiple()*0.98f);
-            newCash = totalCash - cash;
+            newCash = totalCash-cash;
         }
         if (newCash>0)
         {
@@ -353,8 +354,23 @@ public class OnLineEarningMgr
         }
         SetCash(totalCash);
     }
-    //金钱汇率 以美元为基数转换
+
+    //获取金钱的加倍buff数值
+    public int GetCashBuffMultiple()
+    {
+        List<BaseBuff> buffs = BuffManager.Instance.GetBuffByType(BuffConstant.MoreCashBuff);
+        int multiple = 0;
+        for (int i = 0; i < buffs.Count; i++)
+        {
+            if (buffs[i].isActive)
+            {
+                multiple += buffs[i].GetExtraCount();
+            }
+        }
+        return multiple>0?multiple:1;
+    }
     
+    //金钱汇率 以美元为基数转换
     public double ExchangeRate(int v){
         double money= 0;
         if(country == "br"){//巴西

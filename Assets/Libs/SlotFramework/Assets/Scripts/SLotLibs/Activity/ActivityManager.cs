@@ -71,6 +71,9 @@ namespace Activity
                 case (int)ActivityType.ContinueSpin:
                     activity = new ContinueSpinActivity(data);
                     break;
+                case (int)ActivityType.RotationBuff:
+                    activity = new RotationBuffActivity(data);
+                    break;
                 case (int)ActivityType.WheelLucy:
                     activity = new WheelLuckActivity(data);
                     break;
@@ -152,6 +155,14 @@ namespace Activity
         {
             BaseActivity activity = GetActivityByID(id);
             activity.OnClickIcon();
+        }
+        
+        public void SaveData()
+        {
+            foreach (var item in Activities)
+            {
+                item.Value.SaveData();
+            }
         }
     }
 }

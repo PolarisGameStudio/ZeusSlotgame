@@ -1,4 +1,5 @@
 using System;
+using System.BuffSystem;
 using Classic;
 using Libs;
 using System.Collections.Generic;
@@ -211,6 +212,9 @@ namespace Ads
                 case ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH:
                     adNode = new CloseLuckyCashAdNode(entranceName, data, adCondition);
                     break;
+                case ADEntrances.REWARD_VIDEO_ROTATION_BUFF:
+                    adNode = new RotationBuffAdNode(entranceName, data, adCondition);
+                    break;
                 default:
                     adNode = new BaseAdNode(entranceName, data, adCondition);
                     break;
@@ -338,7 +342,7 @@ namespace Ads
         {
             if (AdNodes.ContainsKey(entranceName))
             {
-                return AdNodes[entranceName].Multiple;
+                return AdNodes[entranceName].GetMultiple();
             }
             return 1;        
         }
@@ -479,6 +483,20 @@ namespace Ads
                 msg = "Loading ADs";
             }
             UIManager.ShowLoadingUI(duration, msg, endCB: endCallBack);
+        }
+
+        public int GetMultipleADBuff()
+        {
+            int extraCount = 0;
+            List<BaseBuff> activeBuffs = BuffManager.Instance.GetActiveBuffByType(BuffConstant.ChangeADMultipleBuff);
+            foreach (var buff in activeBuffs)
+            {
+                extraCount += buff.GetExtraCount();
+                //广播buff触发的消息
+                Messenger.Broadcast<int>(BuffConstant.OnBuffTrigger, buff.buffId);
+            }
+            Debug.Log($"WesternTreasureFly GetBuffExtraCount: {extraCount}");
+            return extraCount;
         }
     }
 }

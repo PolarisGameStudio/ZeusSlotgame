@@ -27,7 +27,7 @@ namespace CardSystem.Activity
         {
             icon = go.AddComponent<CardPackIcon>();
             icon.OnInit(id, iconData);
-            CheckShowIcon();
+            // CheckShowIcon();
             return icon;
         }
         

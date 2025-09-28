@@ -54,20 +54,22 @@ public class FreeGameEndDialog : UIDialog
         Messenger.AddListener<int>(ADConstants.PlayFreeSpinEndAD,AdIsPlaySuccessful);
         Messenger.AddListener<int>(ADConstants.PlayFreeSpinEndADFailed,AdIsPlayFailed);
         Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
-
     }
     void OnDisable()
     {
         Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinEndAD,AdIsPlaySuccessful);
         Messenger.RemoveListener<int>(ADConstants.PlayFreeSpinEndADFailed,AdIsPlayFailed);
         Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
-
     }
-    
+
+    private int RewardAdMultiple = 1;
     protected override void Start()
     {
         base.Start();
         DelayShowClaimBtn();
+        RewardAdMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
+        Text adMultiple = Util.FindObject<Text>(WatchADBtn.transform, "num");
+        adMultiple.text = "" + RewardAdMultiple;
     }
 
     void DelayShowClaimBtn()
@@ -167,10 +169,9 @@ public class FreeGameEndDialog : UIDialog
     
     void RewardADIsPlaySuccess()
     {
-        int multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-        totalCash *= multiple;
+        totalCash *= RewardAdMultiple;
         //钱已经加过一次了，所以需要倍数减1
-        totalCoins *= (multiple-1);
+        totalCoins *= (RewardAdMultiple-1);
         DoneADCallBack();
     }
     

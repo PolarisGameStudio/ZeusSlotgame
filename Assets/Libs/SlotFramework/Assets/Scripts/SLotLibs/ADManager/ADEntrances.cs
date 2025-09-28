@@ -15,6 +15,8 @@ namespace Ads
         public const string REWARD_VIDEO_ENTRANCE_FREESPINEXTA = "FreeSpinExta";
         public const string REWARD_VIDEO_ENTRANCE_BONUSGAMEWIN = "BonusGameWin";
         public const string REWARD_VIDEO_ENTRANCE_JACKPOT = "Jackpot";
+        public const string REWARD_VIDEO_ROTATION_BUFF = "RotationBuff";
+
 
         //全屏广告入口
         public const string Interstitial_Entrance_CLOSEFREESPINSTART = "CloseFreeSpinStart";
@@ -28,6 +30,7 @@ namespace Ads
         public const string Interstitial_Entrance_JACKPOTSTART = "JackpotStart";
         public const string Interstitial_Entrance_JACKPOTEND = "JackpotEnd";
         public const string Interstitial_Entrance_CLOSECONTINUESPIN = "CloseContinueSpin";
+        public const string Interstitial_Entrance_CLOSEROTATIONBUFF = "CloseRotationBuff";
         public const string Interstitial_Entrance_WHEELLUCKBubble = "WheelLuckBubble";
         public const string Interstitial_Entrance_WITHDRAWCLOSE = "WithDrawClose";
 

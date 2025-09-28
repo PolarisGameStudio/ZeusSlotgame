@@ -29,6 +29,7 @@ public class WesternTreasureMiniDialog : UIDialog
     private TaskTipPanel _taskTipPanel;
     public Transform cashFlyPosition;
     public Transform coinFlyPosition;
+    private int RewardADMultiple = 1;
     protected override void Awake()
     {
         base.Awake();
@@ -61,6 +62,9 @@ public class WesternTreasureMiniDialog : UIDialog
         // {
         //     BonusGameWinCash.SetText(OnLineEarningMgr.Instance.GetMoneyStr(totalCash));
         // }
+        RewardADMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_JACKPOT);
+        Text adMultiple = Util.FindObject<Text>(WatchADBtn.transform, "num");
+        adMultiple.text = "" + RewardADMultiple;
         
         AudioEntity.Instance.PlayRollUpEffect();
         tween = Utils.Utilities.AnimationTo(this.curCoins, coins, time, UpdateTextUI, null, () =>
@@ -121,7 +125,6 @@ public class WesternTreasureMiniDialog : UIDialog
         Messenger.RemoveListener<int>(ADConstants.PlayJackPotGameAD,AdIsPlaySuccessful);
         Messenger.RemoveListener<int>(ADConstants.PlayJackPotGameADFailed,AdIsPlayFailed);
         Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
-
     }
     void AdIsPlaySuccessful(int type)
     {
@@ -151,10 +154,9 @@ public class WesternTreasureMiniDialog : UIDialog
     }
     void RewardADIsPlaySuccess()
     {
-        int multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_JACKPOT);
-        totalCash *= multiple;
+        totalCash *= RewardADMultiple;
         //钱已经加过一次了，所以需要倍数减1
-        totalCoins *= (multiple-1);
+        totalCoins *= (RewardADMultiple-1);
         DoneADCallBack();
     }
     private void DoneADCallBack()
@@ -165,7 +167,6 @@ public class WesternTreasureMiniDialog : UIDialog
             //加钱动画
             FlyCash(needFly);
         }
-        
         //加金币动画
         FlyCoins(false);
         Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
@@ -279,7 +280,6 @@ public class WesternTreasureMiniDialog : UIDialog
         this.curCoins = num;
         FreeGameWinCoins.SetText(string.Format("<sprite name=\"coin\">{0}",Utils.Utilities.ThousandSeparatorNumber(curCoins)));
     }
-
     
     public void OnClickStopUpdate()
     {

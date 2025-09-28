@@ -1,4 +1,5 @@
 using System;
+using System.BuffSystem;
 using UnityEngine;
 using System.Collections.Generic;
 using Beebyte.Obfuscator;
@@ -98,6 +99,9 @@ public class GameDialogManager : MonoBehaviour
 	//Tips
 	public const string OpenTipsDialogMsg = "OpenTipsDialogMsg";
 	public const string OpenTaskTipsDialogMsg = "OpenTaskTipsDialogMsg";
+	
+	public const string OpenRotationBuffDialogMsg = "OpenRotationBuffDialogMsg";
+
 
 	public static bool QuestDialogShowed { get; set; }
 
@@ -214,7 +218,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.AddListener<Sprite,int>(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
 
             #endregion
-            
+            Messenger.AddListener<Dictionary<string,object>,BaseBuff>(OpenRotationBuffDialogMsg, OpenRotationBuffDialog);
         }
 	}
 
@@ -310,6 +314,8 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener<string>(OpenTipsDialogMsg, OpenTipsDialog);
 			Messenger.RemoveListener<Sprite,int>(OpenTaskTipsDialogMsg, OpenTaskTipsDialog);
 			#endregion
+			
+			Messenger.RemoveListener<Dictionary<string,object>,BaseBuff>(OpenRotationBuffDialogMsg, OpenRotationBuffDialog);
 		}
 	}
 
@@ -683,6 +689,10 @@ public class GameDialogManager : MonoBehaviour
 		
 	}
 	protected virtual void OpenAccountLoginTipsDialog(int cash)
+	{
+		
+	}
+	protected virtual void OpenRotationBuffDialog(Dictionary<string,object> data,BaseBuff baseBuff)
 	{
 		
 	}

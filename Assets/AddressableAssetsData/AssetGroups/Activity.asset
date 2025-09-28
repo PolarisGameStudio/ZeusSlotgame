@@ -40,6 +40,10 @@ MonoBehaviour:
     m_Address: ContinueSpin
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 44c1222abeeed4448bb3e4a4f58d3768
+    m_Address: RotationBuff
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: 2a3c828b08a600246812455489d29889
     m_Address: WheelLuck
     m_ReadOnly: 0

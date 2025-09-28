@@ -15,7 +15,7 @@ namespace Activity
         WithDrawTask=3,
         H5RewardActivity=4,
         ContinueSpin=5,
-        WheelLucy=6
+        RotationBuff=6
     }
 
     public enum ActivityState
@@ -155,6 +155,11 @@ namespace Activity
         public virtual string GetProgressText()
         {
             return string.Empty;
+        }
+
+        public virtual void SaveData()
+        {
+            
         }
     }
 }

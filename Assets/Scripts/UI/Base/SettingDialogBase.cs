@@ -40,6 +40,10 @@ namespace Classic
           this.BtnClose = Util.FindObject<UnityEngine.UI.Button>(transform,"Anchor/BtnClose/");
           UGUIEventListener.Get(this.BtnClose.gameObject).onClick = this.BtnCloseClick;
         }
+#if UNITY_IOS
+      TermsButton.gameObject.SetActive(false);
+#endif
+      
     }
   }
 }

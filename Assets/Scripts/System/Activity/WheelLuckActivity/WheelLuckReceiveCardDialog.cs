@@ -14,11 +14,13 @@ namespace Activity
         private Image _imgIcon;
         private WheelLuckActivity _activity;
         private TextMeshProUGUI _tips;
+        private TextMeshProUGUI _name;
         private Transform _cardImage;
         protected override void Awake()
         {
             base.Awake();
             _tips = Util.FindObject<TextMeshProUGUI>(transform, "Anchor/Tips");
+            _name = Util.FindObject<TextMeshProUGUI>(transform, "Anchor/Name");
             _btnCollect = Util.FindObject<Button>(transform, "Anchor/btn_collect");
             _imgIcon = Util.FindObject<Image>(transform, "Anchor/content/Icon");
             _cardImage = Util.FindObject<Transform>(transform, "Anchor/content/Card");
@@ -51,7 +53,7 @@ namespace Activity
             {
                 _cardImage.gameObject.SetActive(true);
                 
-                var localizedString = new LocalizedString(LocalizationManager.Instance.tableName, "ReceivedCard")
+                var localizedString = new LocalizedString(LocalizationManager.Instance.tableName, "ReceivedCard2")
                 {
                     Arguments =  new object[]{multiple}
                 };
@@ -60,6 +62,11 @@ namespace Activity
                 
                 _activity.AddShopItemCount(_shopItemId,multiple);
             }
+            var data = _activity.ShopItems[_shopItemId];
+            
+            var localizedString2 = new LocalizedString(LocalizationManager.Instance.tableName, data.Name);
+
+            _name.text = localizedString2.GetLocalizedString();
             
             _activity?.LoadIcon(_shopItemId, _imgIcon);
         }

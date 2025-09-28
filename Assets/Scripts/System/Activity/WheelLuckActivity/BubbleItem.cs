@@ -37,7 +37,7 @@ namespace Activity
             WheelLuckActivity.AdType = WheelLuckAdType.Bubble;
             WheelLuckActivity.OnClickBubble = gameObject;
             _button.interactable = false; // 禁用按钮，防止重复点击
-            Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_WHEELLUCKBubble);
+            Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_WHEELLUCK_SPIN);
         }
         
         protected void OnEnable()

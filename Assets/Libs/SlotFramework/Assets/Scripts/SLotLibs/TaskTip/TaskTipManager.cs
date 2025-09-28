@@ -248,7 +248,7 @@ namespace Libs
             if (!isShow)
             {
                 BaseTask task = TaskManager.Instance.GetTaskByType(taskType);
-                if (task.IsConditionOK())
+                if (task==null||task.IsConditionOK())
                 {
                     return false;
                 }

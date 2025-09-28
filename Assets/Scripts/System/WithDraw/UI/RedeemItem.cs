@@ -123,8 +123,8 @@ public class RedeemItem : MonoBehaviour
                 break;
             //进行中满足领取条件
             case RedeemItemState.Complete:
-                // ShowCompleteUI2();
-                ShowCompleteUI();
+                ShowCompleteUI2();
+                //ShowCompleteUI();
                 break;
             //进行中已点击领取按钮
             case RedeemItemState.Wait:

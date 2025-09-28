@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 using System.Xml;
@@ -12,6 +13,10 @@ public class PlistColumnEditorWindow : EditorWindow
     private string _xmlPath = "";
     private XmlDocument _xmlDoc;
     private PlistTreeNode _rootNode;
+    
+    // --- 新增：用于缓存GUI样式的变量，以提高性能 ---
+    private GUIStyle _nameLabelStyle;
+    private GUIStyle _typeLabelStyle;
 
     // UI State
     private Vector2 _mainScrollPos;
@@ -36,6 +41,12 @@ public class PlistColumnEditorWindow : EditorWindow
 
     // --- 新增：用于复制/粘贴功能的剪贴板 ---
     private static PlistTreeNode _clipboardNode;
+    
+    // --- Search Functionality ---
+    private string _searchQuery = "";
+    private List<PlistTreeNode> _searchResults = new List<PlistTreeNode>();
+    private int _currentSearchIndex = -1; // 当前选中的搜索结果索引（0-based）
+    private bool _isSearchActive = false;
 
     #region Drag and Drop State
 
@@ -113,16 +124,174 @@ public class PlistColumnEditorWindow : EditorWindow
             Repaint();
         }
     }
+    
+    /// <summary>
+    /// 初始化用于绘制列表项的GUI样式，避免在OnGUI中重复创建。
+    /// </summary>
+    private void InitializeStyles()
+    {
+        // 如果样式已创建，则无需任何操作
+        if (_nameLabelStyle != null) return;
+
+        // 创建名称标签的样式
+        _nameLabelStyle = new GUIStyle(EditorStyles.label)
+        {
+            // 垂直居中对齐，让文字看起来更舒服
+            alignment = TextAnchor.MiddleLeft 
+        };
+
+        // 创建类型标签的样式
+        _typeLabelStyle = new GUIStyle(EditorStyles.miniLabel)
+        {
+            alignment = TextAnchor.MiddleRight,
+            // 增加一点内边距，让它不至于贴着右边缘
+            padding = new RectOffset(0, 5, 0, 0) 
+        };
+    }
 
     private void DrawTopBar()
     {
         EditorGUILayout.Space();
+
+        // Plist 路径
+        EditorGUILayout.BeginHorizontal();
         _xmlPath = EditorGUILayout.TextField("Plist Path:", _xmlPath);
-        if (GUILayout.Button("Save to Plist"))
+        if (GUILayout.Button("Save to Plist", GUILayout.Width(120)))
         {
             SavePlist();
         }
+        EditorGUILayout.EndHorizontal();
+
+        // === 搜索功能：所有控件紧凑排列在一行 ===
+        EditorGUILayout.BeginHorizontal();
+
+        GUILayout.Label("Search:", GUILayout.Width(50));
+    
+        GUI.SetNextControlName("SearchField");
+        string newQuery = EditorGUILayout.TextField(_searchQuery, GUILayout.ExpandWidth(true), GUILayout.Width(200));
+
+        // 回车搜索
+        if (GUI.GetNameOfFocusedControl() == "SearchField" && Event.current.isKey &&
+            (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter))
+        {
+            _searchQuery = newQuery;
+            PerformSearch();
+            Event.current.Use();
+        }
+
+        _searchQuery = newQuery;
+
+        // 搜索按钮
+        if (GUILayout.Button("Search", GUILayout.Width(60)))
+        {
+            PerformSearch();
+        }
+
+        // 清空按钮（仅当有内容时显示）
+        if (!string.IsNullOrEmpty(_searchQuery))
+        {
+            if (GUILayout.Button("×", GUILayout.Width(24), GUILayout.Height(18)))
+            {
+                ClearSearch();
+            }
+        }
+        
+        if (_isSearchActive)
+        {
+            if (_searchResults.Count > 0)
+            {
+                if (GUILayout.Button("<", GUILayout.Width(30)))
+                {
+                    NavigateSearchResult(-1);
+                }
+
+                GUILayout.Label($"{_currentSearchIndex + 1}/{_searchResults.Count}", GUILayout.ExpandWidth(false));
+
+                if (GUILayout.Button(">", GUILayout.Width(30)))
+                {
+                    NavigateSearchResult(1);
+                }
+            }
+            else
+            {
+                // 无结果时显示简短提示（可选）
+                GUILayout.Label("No matches", EditorStyles.miniLabel, GUILayout.ExpandWidth(false));
+            }
+        }
+
+        EditorGUILayout.EndHorizontal();
+
         EditorGUILayout.Space();
+    }
+    
+    private void PerformSearch()
+    {
+        if (string.IsNullOrWhiteSpace(_searchQuery) || _rootNode == null)
+        {
+            ClearSearch();
+            return;
+        }
+
+        _searchResults.Clear();
+        _currentSearchIndex = -1;
+        _isSearchActive = true;
+
+        // 递归搜索所有节点（包括容器名和叶子值）
+        SearchNodeRecursive(_rootNode, _searchQuery.Trim());
+
+        if (_searchResults.Count > 0)
+        {
+            _currentSearchIndex = 0;
+            HighlightSearchResult(_currentSearchIndex);
+        }
+        else
+        {
+            ClearSearchHighlights();
+        }
+
+        Repaint();
+    }
+
+    private void SearchNodeRecursive(PlistTreeNode node, string query)
+    {
+        if (node == null) return;
+
+        // 匹配名称（Key）或值（如果是叶子）
+        bool matches = node.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+        if (!node.IsContainer)
+        {
+            matches |= node.Value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        if (matches)
+        {
+            _searchResults.Add(node);
+        }
+
+        // 递归子节点
+        if (node.IsContainer && node.Children != null)
+        {
+            foreach (var child in node.Children)
+            {
+                SearchNodeRecursive(child, query);
+            }
+        }
+    }
+
+    private void ClearSearch()
+    {
+        _searchQuery = "";
+        _searchResults.Clear();
+        _currentSearchIndex = -1;
+        _isSearchActive = false;
+        ClearSearchHighlights();
+        Repaint();
+    }
+
+    private void ClearSearchHighlights()
+    {
+        _searchResults.Clear();
+        _currentSearchIndex = -1;
     }
 
     private void DrawColumn(int colIndex)
@@ -172,10 +341,17 @@ public class PlistColumnEditorWindow : EditorWindow
                 Rect indicatorRect = new Rect(itemRect.x, itemRect.yMax - 1, itemRect.width, 2);
                 EditorGUI.DrawRect(indicatorRect, new Color(0.24f, 0.48f, 0.9f));
             }
-
-            if (isSelected && !isRenamingThisNode)
+            
+            // 1. (新增) 在这里也计算出 isSearchHighlight 状态
+            bool isSearchHighlight = _isSearchActive && 
+                _currentSearchIndex >= 0 && 
+                _currentSearchIndex < _searchResults.Count &&
+                _searchResults[_currentSearchIndex] == node;
+            // 1. 如果当前项被选中，并且不是正在重命名的那一项，就绘制自定义的背景色
+            if (isSelected && !isRenamingThisNode&&!isSearchHighlight)
             {
-                GUI.Box(itemRect, "");
+                Color selectionColor = new Color(0.15f, 0.35f, 0.7f, 1f); // 一个比默认更深的蓝色
+                EditorGUI.DrawRect(itemRect, selectionColor);
             }
 
             GUI.backgroundColor = Color.white;
@@ -214,25 +390,138 @@ public class PlistColumnEditorWindow : EditorWindow
         EditorGUILayout.EndScrollView();
         GUILayout.EndVertical();
     }
+    
+    private void NavigateSearchResult(int direction)
+    {
+        if (_searchResults.Count == 0) return;
 
+        _currentSearchIndex += direction;
+        if (_currentSearchIndex < 0)
+            _currentSearchIndex = _searchResults.Count - 1;
+        else if (_currentSearchIndex >= _searchResults.Count)
+            _currentSearchIndex = 0;
+
+        HighlightSearchResult(_currentSearchIndex);
+        Repaint();
+    }
+
+    private void HighlightSearchResult(int index)
+    {
+        if (index < 0 || index >= _searchResults.Count) return;
+
+        var targetNode = _searchResults[index];
+        NavigateToNode(targetNode);
+    }
+
+    private void NavigateToNode(PlistTreeNode node)
+    {
+        // 从根开始，逐级展开路径
+        List<PlistTreeNode> path = new List<PlistTreeNode>();
+        PlistTreeNode current = node;
+        while (current != null)
+        {
+            path.Add(current);
+            current = current.Parent;
+        }
+        path.Reverse(); // 现在 path[0] 是根，path[^1] 是目标节点
+
+        // 重置列
+        _columns.Clear();
+        _selectedIndices.Clear();
+        _columnScrollPositions.Clear();
+
+        _columns.Add(new List<PlistTreeNode>(_rootNode.Children));
+        _selectedIndices.Add(-1);
+        _columnScrollPositions.Add(Vector2.zero);
+
+        // 逐级展开
+        for (int i = 1; i < path.Count; i++)
+        {
+            var parentNode = path[i - 1];
+            var currentNode = path[i];
+            int idx = parentNode.Children.IndexOf(currentNode);
+            if (idx >= 0)
+            {
+                HandleColumnClick(i - 1, idx);
+            }
+            else
+            {
+                break; // 路径断裂
+            }
+        }
+    }
+    
+    private static Texture2D _highlightTexture;
+
+
+   
+    /// <summary>
+    /// 绘制列表中的单个项目，经过视觉和性能优化。
+    /// </summary>
     private void DrawItemLabel(Rect rect, PlistTreeNode node, bool isSelected)
     {
-        GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
-        labelStyle.normal.textColor = isSelected ? Color.white : EditorStyles.label.normal.textColor;
+        // 在第一次绘制时初始化所有需要的样式
+        InitializeStyles();
 
-        // Draw left-aligned name
-        GUI.Label(new Rect(rect.x, rect.y, rect.width - 60, rect.height), node.Name, labelStyle);
-
-        // Draw right-aligned type
-        GUIStyle typeStyle = new GUIStyle(EditorStyles.miniLabel)
+        // --- 1. 确定当前项是否是搜索结果中正在高亮的那一项 ---
+        bool isSearchHighlight = _isSearchActive && 
+                                 _currentSearchIndex >= 0 && 
+                                 _currentSearchIndex < _searchResults.Count &&
+                                 _searchResults[_currentSearchIndex] == node;
+        
+        if (isSearchHighlight)
         {
-            alignment = TextAnchor.MiddleRight,
-            normal =
-            {
-                textColor = isSelected ? new Color(0.8f, 0.8f, 0.8f) : Color.gray
-            }
-        };
-        GUI.Label(new Rect(rect.x + rect.width - 60, rect.y, 60, rect.height), GetDisplayTypeLabel(node), typeStyle);
+            // 对于搜索高亮的项，我们绘制一个半透明的黄色背景
+            // 使用 EditorGUI.DrawRect 比 GUI.DrawTexture 更高效
+            EditorGUI.DrawRect(rect, new Color(1f, 0.9f, 0.4f, 0.3f)); // 更柔和的黄色
+        }
+        else if(isSelected)
+        {
+            // 对于选中的项，我们使用Unity默认的蓝色高亮背景
+            // 注意：isSelected 的背景是在 DrawColumn 方法中通过 GUI.Box(itemRect, ""); 绘制的
+            // 所以这里不需要再画了。
+        }
+
+        // --- 3. 确定文字颜色 ---
+        // 默认颜色
+        Color nameColor;
+        Color typeColor;
+
+        if (isSearchHighlight) 
+        {
+            // 搜索高亮时，使用更醒目的颜色
+            // 在浅黄色背景上，深色文字更易读
+            nameColor = EditorGUIUtility.isProSkin ? new Color(0.9f, 0.9f, 0.9f) : Color.black; 
+            typeColor = EditorGUIUtility.isProSkin ? new Color(0.8f, 0.7f, 0.3f) : new Color(0.4f, 0.4f, 0.4f);
+        }
+        else
+        {
+            // 选中时，所有文字都变白色，以在蓝色背景上保持清晰
+            nameColor = Color.white;
+            typeColor = new Color(0.85f, 0.85f, 0.85f); // 类型的颜色稍微暗一点，以示区分
+        }
+
+        // --- 4. 绘制标签 ---
+
+        // 设置名称颜色并绘制
+        _nameLabelStyle.normal.textColor = nameColor;
+        // 为“剪切”的节点提供视觉反馈
+        bool isCut = _isClipboardCutMode && _clipboardNode == node;
+        if (isCut)
+        {
+            var oldColor = GUI.color;
+            GUI.color = new Color(1f, 1f, 1f, 0.5f); // 使其半透明
+            GUI.Label(new Rect(rect.x + 3, rect.y, rect.width - 60, rect.height), node.Name, _nameLabelStyle);
+            GUI.color = oldColor;
+        }
+        else
+        {
+            GUI.Label(new Rect(rect.x + 3, rect.y, rect.width - 60, rect.height), node.Name, _nameLabelStyle);
+        }
+
+        // 设置类型颜色并绘制
+        _typeLabelStyle.normal.textColor = typeColor;
+        GUI.Label(new Rect(rect.x + rect.width - 60, rect.y, 60, rect.height), GetDisplayTypeLabel(node), _typeLabelStyle);
     }
 
     private void DrawRenameEditor(Rect rect)

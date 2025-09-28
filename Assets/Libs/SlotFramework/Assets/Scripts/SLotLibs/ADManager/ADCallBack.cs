@@ -121,7 +121,7 @@ namespace Ads
                     break;
                 case ADEntrances.REWARD_VIDEO_ENTRANCE_CARDLOTTERY:
                     //点击 luckyCash按钮给出的金钱奖励翻倍
-                    Messenger.Broadcast<int>(ADConstants.PlayCardLotteryAD, 0);
+                    Messenger.Broadcast<int>(ADConstants.PlayCardLotteryAD, 2);
                     break;
                 case ADEntrances.REWARD_VIDEO_CONTINUE_SPIN:
                     //点击 小屋按钮给钱
@@ -213,8 +213,8 @@ namespace Ads
                     Messenger.Broadcast<int>(ADConstants.PlayCardLotteryADFailed, 1);
                     break;
                 case ADEntrances.REWARD_VIDEO_ENTRANCE_CARDLOTTERY:
-                    //点击 luckyCash按钮给出的金钱奖励翻倍
-                    Messenger.Broadcast<int>(ADConstants.PlayCardLotteryADFailed, 0);
+                    //点击cardLottery按钮给出的金钱奖励翻倍
+                    Messenger.Broadcast<int>(ADConstants.PlayCardLotteryADFailed, 2);
                     break;
                 case ADEntrances.REWARD_VIDEO_CONTINUE_SPIN:
                     //点击 小屋按钮给钱

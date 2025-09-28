@@ -17,6 +17,7 @@ namespace Ads
     {
         RewardAD = 0,       //激励视频广告
         InterstitialAD = 1, //插屏广告
+        AdMob = 2,        //AdMob广告
     }
     public class ADManager
     {
@@ -332,8 +333,11 @@ namespace Ads
             }
             else if (type == (int)ADType.InterstitialAD) //全屏广告
             {
-                Debug.Log($"ADManager StartPlayAD entranceName:{entranceName}.");
                 PlayInterstitialAd(entranceName);
+            } 
+            else if (type == (int)ADType.AdMob) //全屏广告
+            {
+                PlayAdMobAd(entranceName);
             }
         }
 
@@ -439,6 +443,56 @@ namespace Ads
                 return;
             }
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.ShowVideo,1);
+#endif
+        }
+
+        #endregion
+
+        #region AdMob
+
+        /// <summary>
+        /// 根据入口判定播放广告是否OK
+        /// </summary>
+        /// <param name="entranceName">
+        /// 广告入口名称
+        /// </param>
+        /// <returns> true 表示有广告，false 无广告
+        /// </returns>
+        public bool AdMobAdIsOk(string entranceName)
+        {
+            return PlatformManager.Instance.IsADReady(2);
+        }
+
+        /// <summary>
+        /// 播放全屏广告
+        /// </summary>
+        /// <param name="entranceName"> 广告入口名称 </param>
+        /// <param name="callBack"> 播放结果回调，参数为true表示成功 </param>
+        /// <param name="para"> ES需要的额外参数，默认为空 </param>
+        public void PlayAdMobAd(string entranceName, Action callBack = null)
+        {
+            if (string.IsNullOrEmpty(entranceName))
+            {
+                return;
+            }
+            
+            this.requestEntranceName = entranceName;
+            
+#if UNITY_EDITOR
+            ShowLoadingADsUI(2f,() =>
+            {
+                HandlePlayVideoResult(1);
+            },"play AdMob ad:"+requestEntranceName);
+#else
+            if (!AdMobAdIsOk(entranceName))
+            {
+                ShowLoadingADsUI(endCallBack:()=>
+                {
+                    HandlePlayVideoFailedResult(2);
+                });
+                return;
+            }
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.ShowVideo,2);
 #endif
         }
 

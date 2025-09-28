@@ -34,10 +34,10 @@ namespace Libs
     }
     
 #if UNITY_IOS || UNITY_TVOS
-    public class NativeAPI {
-        [DllImport("__Internal")]
-        public static extern string callNative(string msg);
-    }
+    // public class NativeAPI {
+    //     [DllImport("__Internal")]
+    //     public static extern string callNative(string msg);
+    // }
 #endif
     public class PlatformManager : MonoSingleton<PlatformManager>
     {
@@ -356,7 +356,7 @@ namespace Libs
             }
             msg = _androidJavaObject.Call<string>(androidMethodName,jsonData);
 #elif UNITY_IOS
-            return true;
+            return false;
             // msg = NativeAPI.callNative(jsonData);
 #endif
             bool isReady  = false;

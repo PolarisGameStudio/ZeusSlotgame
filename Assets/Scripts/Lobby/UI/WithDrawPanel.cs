@@ -48,6 +48,14 @@ public class WithDrawPanel : MonoBehaviour
         {
             GuideBtn.onClick.AddListener(OnWithDrawBtnClick);
         }
+#if UNITY_IOS
+        if (withDrawPanelBtn!=null)
+        {
+            withDrawPanelBtn.enabled = false;
+        }
+        withDrawBtn.gameObject.SetActive(false);
+        GuideBtn.enabled = false;
+#endif
     }
 
     public void OnEnable()
@@ -66,16 +74,23 @@ public class WithDrawPanel : MonoBehaviour
 
     public void OnSpinEnd()
     {
+
         //首次登录
         if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
         {
+#if !UNITY_IOS
             showGuideCor = StartCoroutine(ShowGuide());
+#endif
             Messenger.RemoveListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
         }
     }
 
     public void OnShowTip()
     {
+#if UNITY_IOS
+        return;
+#endif
+
         if (tweenerTip!=null && tip.activeInHierarchy)
         {
             return;

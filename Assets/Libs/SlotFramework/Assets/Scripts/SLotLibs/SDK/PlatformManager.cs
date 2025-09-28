@@ -180,7 +180,8 @@ namespace Libs
             msg = _androidJavaObject.Call<string>(androidMethodName,jsonData);
            
 #elif UNITY_IOS
-            msg = NativeAPI.callNative(jsonData);
+            return;
+            // msg = NativeAPI.callNative(jsonData);
 #endif
             if (!string.IsNullOrEmpty(msg))
             {
@@ -355,7 +356,8 @@ namespace Libs
             }
             msg = _androidJavaObject.Call<string>(androidMethodName,jsonData);
 #elif UNITY_IOS
-            msg = NativeAPI.callNative(jsonData);
+            return true;
+            // msg = NativeAPI.callNative(jsonData);
 #endif
             bool isReady  = false;
             if (!string.IsNullOrEmpty(msg))

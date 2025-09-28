@@ -359,7 +359,9 @@ namespace Activity
         public override void OnClickIcon()
         {
             base.OnClickIcon();
-            WithDrawManager.Instance.ShowWithDrawDialog();
+#if !UNITY_IOS
+            WithDrawManager.Instance.ShowWithDrawDialog();    
+#endif
         }
     }
 }

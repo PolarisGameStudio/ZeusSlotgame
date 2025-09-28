@@ -30,6 +30,9 @@ public class PlistColumnEditorWindow : EditorWindow
     private string _editingValueInput = "";
     private readonly string _valueEditorControlName = "ValueTextField";
     private bool _isValueEditorJustInitiated = false;
+    
+    // 在类的成员变量区域（靠近 _clipboardNode）添加：
+    private static bool _isClipboardCutMode = false;
 
     // --- 新增：用于复制/粘贴功能的剪贴板 ---
     private static PlistTreeNode _clipboardNode;
@@ -577,6 +580,17 @@ public class PlistColumnEditorWindow : EditorWindow
         // --- 复制 ---
         // 任何节点都可以被复制
         menu.AddItem(new GUIContent("Copy"), false, () => CopyNode(node));
+        
+        // --- 剪切 ---
+        // 不能剪切根节点
+        if (node != _rootNode)
+        {
+            menu.AddItem(new GUIContent("Cut"), false, () => CutNode(node));
+        }
+        else
+        {
+            menu.AddDisabledItem(new GUIContent("Cut"));
+        }
 
         // --- 粘贴 ---
         // 只有当剪贴板里有东西，并且当前节点是容器时，才允许粘贴
@@ -636,6 +650,53 @@ public class PlistColumnEditorWindow : EditorWindow
         }
 
         menu.ShowAsContext();
+    }
+    
+    /// <summary>
+    /// 剪切一个节点：复制到剪贴板并从父节点中删除。
+    /// </summary>
+    private void CutNode(PlistTreeNode node)
+    {
+        if (node == null || node == _rootNode)
+        {
+            Debug.LogWarning("Cannot cut root node.");
+            return;
+        }
+
+        // 先复制（用于粘贴）
+        _clipboardNode = node;
+        _isClipboardCutMode = true; // 标记为剪切模式（可选，当前逻辑不需要，但留作扩展）
+
+        // 从父节点中删除
+        var parent = node.Parent;
+        if (parent == null)
+        {
+            Debug.LogError("Cut node has no parent.");
+            return;
+        }
+
+        // 1. 从 XML 中移除 key 和 value 节点
+        if (node.XmlKeyNode != null)
+            parent.XmlValueNode.RemoveChild(node.XmlKeyNode);
+        parent.XmlValueNode.RemoveChild(node.XmlValueNode);
+
+        // 2. 从 C# 列表中移除
+        parent.Children.Remove(node);
+
+        // 3. 如果父节点是数组，更新后续子项的名称（如 [0], [1]...）
+        if (parent.NodeType == PlistNodeType.Array)
+        {
+            for (int i = 0; i < parent.Children.Count; i++)
+            {
+                parent.Children[i].Name = $"[{i}]";
+                RecursivelyUpdatePaths(parent.Children[i], parent.Path);
+            }
+        }
+
+        // 4. 刷新 UI：回到父节点层级
+        ForceRefreshAndSelect(parent, null);
+
+        Debug.Log($"Cut node '{node.Name}' to clipboard.");
     }
 
     /// <summary>
@@ -751,6 +812,7 @@ public class PlistColumnEditorWindow : EditorWindow
         // 4. 更新数据模型并刷新UI
         destinationParent.Children.Add(pastedNode);
         ForceRefreshAndSelect(destinationParent, pastedNode);
+        _isClipboardCutMode = false;
     }
 
     /// <summary>

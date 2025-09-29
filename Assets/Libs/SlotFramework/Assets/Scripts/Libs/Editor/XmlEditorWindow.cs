@@ -633,6 +633,10 @@ public class PlistColumnEditorWindow : EditorWindow
 
     private void HandleItemInteractions(int colIndex, int itemIndex, Rect itemRect, PlistTreeNode node)
     {
+        // 如果正在重命名或编辑值，跳过所有交互
+        if (_renamingNode != null || _editingValueNode != null)
+            return;
+        
         Event e = Event.current;
         bool canDrag = (node.Parent != null);
 
@@ -803,6 +807,10 @@ public class PlistColumnEditorWindow : EditorWindow
 
     private void HandleColumnClick(int colIndex, int itemIndex)
     {
+        // 如果正在编辑，不处理点击
+        if (_renamingNode != null || _editingValueNode != null)
+            return;
+        
         // If clicking the same item, do nothing
         if (_selectedIndices.Count > colIndex && _selectedIndices[colIndex] == itemIndex)
         {

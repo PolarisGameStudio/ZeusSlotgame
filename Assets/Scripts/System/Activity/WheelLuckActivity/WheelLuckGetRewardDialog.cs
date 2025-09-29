@@ -23,13 +23,13 @@ namespace Activity
         }
         private void OnClickClaimBtn()
         {
-            Messenger.Broadcast(GameDialogManager.OpenWheelLuckReceiveCardDialogMsg,_shopItemId,false);
-            Close();
+            WheelLuckActivity.AdType = WheelLuckAdType.Spin;
+            Messenger.Broadcast(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_WHEELLUCKBubble);
         }
         private void OnClickMutCountBtn()
         {
             WheelLuckActivity.AdType = WheelLuckAdType.MultipleReward;
-            Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_WHEELLUCK_SPIN);
+            Messenger.Broadcast(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_WHEELLUCK_SPIN);
         }
         
         protected override void OnDisable()
@@ -47,13 +47,16 @@ namespace Activity
         
         private void ShowVideoCallBack(int arg0)
         {
-            if( WheelLuckActivity.AdType != WheelLuckAdType.MultipleReward) return;
-            
+            if (WheelLuckActivity.AdType == WheelLuckAdType.MultipleReward)
+            {
+                Messenger.Broadcast(GameDialogManager.OpenWheelLuckReceiveCardDialogMsg,_shopItemId,true);
+                _activity.BuryPoint(WheelLuckActivity.WheelShowAD2Count);
+            }else if (WheelLuckActivity.AdType == WheelLuckAdType.Spin)
+            {
+                Messenger.Broadcast(GameDialogManager.OpenWheelLuckReceiveCardDialogMsg,_shopItemId,false);
+                _activity.BuryPoint(WheelLuckActivity.WheelShowAD1Count);
+            }
             Close();
-            
-            Messenger.Broadcast(GameDialogManager.OpenWheelLuckReceiveCardDialogMsg,_shopItemId,true);
-            
-            _activity.BuryPoint(WheelLuckActivity.WheelShowAD2Count);
         }
         
         public void SetUIData(int shopItemId)

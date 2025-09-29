@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Activity;
+using Ads;
 using DG.Tweening;
 using Libs;
 using MarchingBytes;
@@ -21,7 +22,8 @@ public class WithDrawDialog : UIDialog
     public TextMeshProUGUI money;
     public ToggleGroup panelToggleGroup;
     public Toggle redeemToggle, recordToggle;
-
+    public Button closeBtn;
+    
     public GameObject panelRedeem;
     public GameObject panelRecord;
     public GameObject tip;
@@ -38,6 +40,19 @@ public class WithDrawDialog : UIDialog
         if (withDrawTaskActivity!=null)
         {
             taskInfo.text = withDrawTaskActivity.GetIconTaskInfo();
+        }
+        
+        closeBtn.onClick.AddListener(OnCloseBtnClick);
+    }
+    private void OnCloseBtnClick()
+    {
+        if (WithDrawManager.Instance.CanPlayAd)
+        {
+            Messenger.Broadcast(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_WITHDRAWCLOSE);
+        }
+        else
+        {
+            Close();
         }
     }
 
@@ -69,7 +84,16 @@ public class WithDrawDialog : UIDialog
         Messenger.AddListener(GameDialogManager.CloseWithDrawDialog,Close);
         Messenger.AddListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateCashNum);
         Messenger.AddListener(WithDrawConstants.ShowTipMsg,ShowTip);
+        Messenger.AddListener<int>(ADConstants.PlayWithDrawCloseAD,ShowVideoCallBack);
+        Messenger.AddListener<int>(ADConstants.PlayWithDrawCloseADFailed,ShowVideoCallBack);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
         WithDrawManager.WithDrawUIShow = true;
+    }
+    private void ShowVideoCallBack(int res)
+    {
+        Close();
+        WithDrawManager.Instance.CanPlayAd = false;
+        WithDrawManager.Instance.StartCountdown();
     }
 
     protected override void OnDisable()
@@ -78,7 +102,14 @@ public class WithDrawDialog : UIDialog
         Messenger.RemoveListener(GameDialogManager.CloseWithDrawDialog,Close);
         Messenger.RemoveListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateCashNum);
         Messenger.RemoveListener(WithDrawConstants.ShowTipMsg,ShowTip);
+        Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseAD,ShowVideoCallBack);
+        Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseADFailed,ShowVideoCallBack);
+        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
         WithDrawManager.WithDrawUIShow = false;
+    }
+    private void HandleNotMeetConditionMsg(string arg0)
+    {
+        Close();
     }
 
     public void UpdateCashNum()

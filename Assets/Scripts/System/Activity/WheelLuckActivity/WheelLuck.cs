@@ -62,29 +62,6 @@ namespace Activity
                 txt.text = localizedString.GetLocalizedString();
             }
         }
-
-        protected void OnEnable()
-        {
-            Messenger.AddListener<int>(ADConstants.PlayWheelLuckAD, ShowVideoCallBack);
-            Messenger.AddListener<int>(ADConstants.PlayWheelLuckADFailed, ShowVideoCallBack);
-        }
-        private void ShowVideoCallBack(int arg0)
-        {
-            if( WheelLuckActivity.AdType != WheelLuckAdType.Spin) return;
-            if(btnSpin!=null)
-            {
-                btnSpin.interactable = false; // 禁用按钮，防止重复点击
-            }
-            OnDoSpin();
-            _activity.BuryPoint(WheelLuckActivity.WheelShowAD1Count);
-        }
-
-        protected void OnDisable()
-        {
-            Messenger.RemoveListener<int>(ADConstants.PlayWheelLuckAD, ShowVideoCallBack);
-            Messenger.RemoveListener<int>(ADConstants.PlayWheelLuckADFailed, ShowVideoCallBack);
-        }
-        
         
         private void SetItemAni(GameObject go, string trigger = "idle")
         {
@@ -103,13 +80,16 @@ namespace Activity
                 Debug.LogWarning("Already spinning, please wait.");
                 return;
             }
-            WheelLuckActivity.AdType = WheelLuckAdType.Spin;
-            Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_WHEELLUCK_SPIN);
+            OnDoSpin();
         }
 
         private int _targetPosition;
         void OnDoSpin()
         {
+            if(btnSpin!=null)
+            {
+                btnSpin.interactable = false; // 禁用按钮，防止重复点击
+            }
             _spinState = SpinState.Spinning;
             //cardIndex = weightCondition.GetResultByWeight();
 

@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Classic;
+using DG.Tweening;
 using Libs;
 using UnityEngine;
 using Utils;
@@ -16,12 +18,20 @@ namespace System
         private const string TaskFinishTime = "TaskFinishTime";
         private const string LoginDays = "LoginDays";
         
+        private const string CurrentSpinTimes = "BASE_RESULT_CHANGE_SPIN_TIMES";
+        
         //用于区分当前点击的是哪一个任务绑定的UI
         public int CurSelectTaskId = 0;
         public bool haveClickShowAccount = false;
         public bool IsInWithDrawProgress = false;
         //提现的公共冷却时间(单位秒),配置为负数的话代表“需要累计登录的天数”，如-7，代表要累计登录7天
         private int coolTime = 0;
+        
+        private int _adCoolTime = 0;//关闭提现界面是否有广告的冷却时间
+        private int _activeAdSpinCount;//激活广告所需的spin次数
+        private bool _isActiveCloseAd;//是否激活提现界面关闭广告
+        public bool CanPlayAd;//是否激活提现界面关闭广告
+        
         public static bool WithDrawUIShow = false;
         public bool NeedLoginDays = false;
         public static WithDrawManager Instance{
@@ -52,6 +62,56 @@ namespace System
                 Debug.LogError("WithDrawManager OnInit isConfigReady is false");
                 return;
             }
+            CheckActive();
+
+            if (_isActiveCloseAd)
+            {
+                StartCountdown();
+            }
+            else
+            {
+                Messenger.AddListener(GameConstants.DO_SPIN,UpdateSpinCount);
+            }
+        }
+        private void UpdateSpinCount()
+        {
+            CheckActive();
+            if (_isActiveCloseAd)
+            {
+                Messenger.RemoveListener(GameConstants.DO_SPIN,UpdateSpinCount);
+                StartCountdown();
+            }
+        }
+        private Tweener _countDownTweener;
+        public void StartCountdown()
+        {
+            _countDownTweener?.Kill();
+
+            float startTime = _adCoolTime;
+            
+            _countDownTweener = DOVirtual.Float(startTime, 0, _adCoolTime,PrintLog)
+                .SetEase(Ease.Linear)
+                .OnComplete(OnCountdownFinished);
+        }
+        private void PrintLog(float value)
+        {
+            Debug.Log("广告冷却时间为"+value);
+        }
+        
+        void OnCountdownFinished()
+        {
+            CanPlayAd = true;
+        }
+
+        private void CheckActive()
+        {
+            var allSpinCount =  SharedPlayerPrefs.GetPlayerPrefsIntValue(CurrentSpinTimes,0);
+            _isActiveCloseAd =  allSpinCount >= _activeAdSpinCount;
+            if (!_isActiveCloseAd)
+            {
+                Debug.Log("激活广告剩余spin次数为为"+(allSpinCount - _activeAdSpinCount));
+            }
+           
         }
         
         #region LoadAndSaveData
@@ -136,6 +196,11 @@ namespace System
                 return;
             }
             coolTime  = Utilities.GetInt(config,WithDrawConstants.CoolTimeKey,0);
+            
+            _adCoolTime  = Utilities.GetInt(config,WithDrawConstants.AdCoolTimeKey,0);
+            
+            _activeAdSpinCount = Utilities.GetInt(config,WithDrawConstants.ActiveAdSpinCount,0);
+            
             if (coolTime < 0)
             {
                 NeedLoginDays = true;

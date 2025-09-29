@@ -29,6 +29,7 @@ namespace Ads
         public const string Interstitial_Entrance_JACKPOTEND = "JackpotEnd";
         public const string Interstitial_Entrance_CLOSECONTINUESPIN = "CloseContinueSpin";
         public const string Interstitial_Entrance_WHEELLUCKBubble = "WheelLuckBubble";
+        public const string Interstitial_Entrance_WITHDRAWCLOSE = "WithDrawClose";
 
     }
 }

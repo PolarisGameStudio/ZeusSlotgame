@@ -139,6 +139,10 @@ namespace Ads
                     //兑换商店播广告
                     Messenger.Broadcast<int>(ADConstants.PlayWheelLuckAD, 1);
                     break;
+                case ADEntrances.Interstitial_Entrance_WITHDRAWCLOSE:
+                    //提现商店关闭广告
+                    Messenger.Broadcast<int>(ADConstants.PlayWithDrawCloseAD, 1);
+                    break;
                 default:
                     break;
             }
@@ -219,6 +223,10 @@ namespace Ads
                 case ADEntrances.Interstitial_Entrance_WHEELLUCKBubble:
                     //兑换商店播广告
                     Messenger.Broadcast<int>(ADConstants.PlayWheelLuckADFailed, 1);
+                    break;
+                case ADEntrances.Interstitial_Entrance_WITHDRAWCLOSE:
+                    //提现商店关闭广告
+                    Messenger.Broadcast<int>(ADConstants.PlayWithDrawCloseADFailed, 1);
                     break;
                 default:
                     break;

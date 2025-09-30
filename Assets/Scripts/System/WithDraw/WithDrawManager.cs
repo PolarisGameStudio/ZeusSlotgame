@@ -95,7 +95,7 @@ namespace System
         }
         private void PrintLog(float value)
         {
-            Debug.Log("广告冷却时间为"+value);
+            //Debug.Log("广告冷却时间为"+value);
         }
         
         void OnCountdownFinished()

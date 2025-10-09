@@ -4,6 +4,9 @@ namespace CardSystem
     {
         public static string CardSystem = "CardSystem";
         public static string LotteryConfig = "LotteryConfig";
+        public static string CardProgressConfig = "CardProgressConfig";
+        public static string CardCurrentProgress = "CardCurrentProgress";
+        
         public static string EndTime = "EndTime";
         public static string Icons = "Icons";
         public static string Open = "Open";
@@ -37,7 +40,8 @@ namespace CardSystem
         public static string UIConfig = "UIConfig";
         
         public static string GetCardNewTypeCountMsg = "GetCardNewTypeCountMsg";
-        public static string RefreshLotteryMsg = "RefreshLotteryMsg";
+        public static string RefreshLotteryMsg = "RefreshLotteryMsg"; 
+        public static string RefreshCardScoreProgress = "RefreshCardScoreProgress";
         public static string GetCardNewCountMsg = "GetCardNewCountMsg";
 
         public static string PrefabPath = "CardSystem/Prefab";

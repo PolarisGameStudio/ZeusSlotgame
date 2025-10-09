@@ -21,6 +21,13 @@ namespace CardSystem
         public LoopVerticalScrollRect loopScrollRect;
         public Transform content;
         public GameObject itemPrefab;
+        
+        public Image cardScoreProgress;
+        public TextMeshProUGUI cardScoreTips;
+        public GameObject cardGiftDiable;
+        public TextMeshProUGUI cardScoreText;
+        private Button _giftBtn;
+        
         // public LocalizedString tmp_Info_Str;
         public TextMeshProUGUI tmp_cardInfo;
         private string poolName = "CardSystemCardItem";
@@ -54,6 +61,16 @@ namespace CardSystem
             loopScrollRect.dataSource = this;
             loopScrollRect.totalCount = Cards.Count;
             loopScrollRect.RefillCells();
+
+            _giftBtn = cardGiftDiable.transform.parent.GetComponent<Button>();
+            _giftBtn.onClick.AddListener(GiftBtnOnClick);
+        }
+        private void GiftBtnOnClick()
+        {
+            //throw new System.NotImplementedException();
+            Messenger.Broadcast(GameDialogManager.OpenCardSystemGetGiftDialogMsg);
+            CardSystemManager.Instance.ResetProgress();
+            RefreshCardScoreProgress();
         }
 
         public override void Refresh()
@@ -64,6 +81,7 @@ namespace CardSystem
             // // Debug.Log("CardSystemCollectionDialog tmp_Info_Str"+tmp_Info_Str.GetLocalizedString());
             // tmp_info.text = tmp_Info_Str.GetLocalizedString();
             tmp_cardInfo.text = $"{CardSystemManager.Instance.GetHaveCardTypeCount()}/{CardSystemManager.Instance.GetTotalCardTypeCount()}";
+            RefreshCardScoreProgress();
         }
 
         protected override void BtnCloseClick(GameObject closeBtnObject)
@@ -71,6 +89,28 @@ namespace CardSystem
             base.BtnCloseClick(closeBtnObject);
             CardSystemManager.Instance.ClearNewCardIndex();
 
+        }
+        
+        
+        private void RefreshCardScoreProgress()
+        {
+            var childCount = CardSystemManager.Instance.currentScore;
+            var parentCount = CardSystemManager.Instance.progressMaxScore;
+            if (childCount >= parentCount)
+            {
+                cardScoreProgress.fillAmount = 1;
+                cardGiftDiable.SetActive(false);
+                _giftBtn.interactable = true;
+            }
+            else
+            {
+                cardScoreProgress.fillAmount = (float)childCount / parentCount;
+                cardGiftDiable.SetActive(true);
+                _giftBtn.interactable = false;
+            }
+
+            cardScoreText.text = $"{childCount}/{parentCount}";
+            cardScoreTips.text = $"Collect {parentCount} card to receive cash reward";
         }
         private void BtnCollectClick(GameObject closeBtnObject)
         {

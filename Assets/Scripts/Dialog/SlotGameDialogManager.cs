@@ -467,6 +467,21 @@ namespace Classic
             UIManager.Instance.OpenSystemDialog(
                 new OpenConfigParam<CardSystemLotteryDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),defaultResourcePath:"CardSystem/Prefab/CardSystemLotteryDialog"));
         }     
+        
+        protected override void OpenCardSystemGetGiftDialog()
+        {
+            UIDialog dialog = UIManager.Instance.GetActiveDialog();
+            OpenType type = dialog == null ? OpenType.Normal : OpenType.FrontOfHead;
+            int eid = dialog == null ? 0 : dialog.eId;
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<CardSystemGetGiftDialog>(isPortrait,eid,openType:type,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog1) =>
+                {
+                    dialog1.SetUIData();
+                },defaultResourcePath:"CardSystem/Prefab/CardSystemGetGiftDialog"));
+        }   
+        
         protected override void OpenRewardCashDialog(int cash)
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&

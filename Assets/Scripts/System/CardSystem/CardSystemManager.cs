@@ -5,6 +5,8 @@ using Activity;
 using CardSystem.Activity;
 using Libs;
 using UnityEngine;
+using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 namespace CardSystem
 {
@@ -78,12 +80,60 @@ namespace CardSystem
                 
                 //创建活动，注册活动入口
                 CreateCardActivity(plist);
+                
+                //解析卡牌进度条配置
+                ParseCardProgressConfig(plist);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
+        }
+        
+        public int progressMaxScore;
+        public int currentScore;
+        private readonly List<int> _cardScoreList = new List<int>(4);
+        private int _maxMoneyReward;
+        private int _minMoneyReward;
+        private void ParseCardProgressConfig(Dictionary<string, object> plist)
+        {
+            Dictionary<string, object> cardProgressConfig = Utils.Utilities.GetValue<Dictionary<string,object>>(plist, CardSystemConstants.CardProgressConfig, null);
+            
+            currentScore = SharedPlayerPrefs.GetPlayerPrefsIntValue(CardSystemConstants.CardCurrentProgress, 0);
+                
+            progressMaxScore =  Utils.Utilities.GetValue(cardProgressConfig,"ProgressMaxScore",0);
+            
+            var cardBaseScore =  Utils.Utilities.GetValue(cardProgressConfig,"CardBaseScore",0);
+            
+            _cardScoreList.Add(cardBaseScore);
+            
+            var cardLv1Score =  Utils.Utilities.GetValue(cardProgressConfig,"CardLv1Score",0);
+            
+            _cardScoreList.Add(cardLv1Score);
+            
+            var cardLv2Score =  Utils.Utilities.GetValue(cardProgressConfig,"CardLv2Score",0);
+            
+            _cardScoreList.Add(cardLv2Score);
+            
+            var cardLv3Score =  Utils.Utilities.GetValue(cardProgressConfig,"CardLv3Score",0);
+            
+            _cardScoreList.Add(cardLv3Score);
+            
+            _maxMoneyReward = Utils.Utilities.GetValue(cardProgressConfig,"MaxMoneyReward",0);
+            
+            _minMoneyReward = Utils.Utilities.GetValue(cardProgressConfig,"MinMoneyReward",0);
+            
+        }
+        public int GetRandomMoneyReward()
+        {
+            return Random.Range(_minMoneyReward, _maxMoneyReward);
+        }
+
+        public void ResetProgress()
+        {
+            currentScore -= progressMaxScore;
+            SharedPlayerPrefs.SetPlayerPrefsIntValue(CardSystemConstants.CardCurrentProgress, currentScore);
         }
 
         void ParseCards(Dictionary<string, object> config)
@@ -427,15 +477,20 @@ namespace CardSystem
                 Debug.LogError("CollectCard cardId is invalid");
                 return;
             }
+            currentScore += _cardScoreList[0];//基础分；
             if (currentCards.ContainsKey(cardId))
             {
-                currentCards[cardId]++;
+                //currentCards[cardId]++;
+                var level = GetCardLevel(cardId);
+                currentScore += _cardScoreList[level];//卡牌等级得分
+                Messenger.Broadcast(CardSystemConstants.RefreshCardScoreProgress);
             }
             else
             {
                 collectnew = true;
                 currentCards[cardId] = 1;
             }
+            SharedPlayerPrefs.SetPlayerPrefsIntValue(CardSystemConstants.CardCurrentProgress, currentScore);
             // 保存进度数据
             SaveProgressData();
             //广播收集到新卡牌

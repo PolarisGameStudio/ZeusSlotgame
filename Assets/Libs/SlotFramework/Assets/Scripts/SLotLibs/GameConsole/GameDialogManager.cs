@@ -93,6 +93,7 @@ public class GameDialogManager : MonoBehaviour
 	public const string OpenCardSystemCollectionDialogMsg = "OpenCardSystemCollectionDialog";
 	public const string OpenCardSystemGetCardDialogMsg = "OpenCardSystemGetCardDialogMsg";
 	public const string OpenCardSystemLuckyDrawDialogMsg = "OpenCardSystemLuckyDrawDialogMsg";
+	public const string OpenCardSystemGetGiftDialogMsg = "OpenCardSystemGetGiftDialogMsg";
 	
 	//Tips
 	public const string OpenTipsDialogMsg = "OpenTipsDialogMsg";
@@ -204,6 +205,7 @@ public class GameDialogManager : MonoBehaviour
             Messenger.AddListener(OpenCardSystemCollectionDialogMsg, OpenCardSystemCollectionDialog);
             Messenger.AddListener<int,GameObject>(OpenCardSystemGetCardDialogMsg, OpenCardSystemGetCardDialog);
             Messenger.AddListener(OpenCardSystemLuckyDrawDialogMsg, OpenCardSystemLuckyDrawDialog);
+            Messenger.AddListener(OpenCardSystemGetGiftDialogMsg, OpenCardSystemGetGiftDialog);
             #endregion
 			
 			#region tips
@@ -299,6 +301,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener(OpenCardSystemCollectionDialogMsg, OpenCardSystemCollectionDialog);
 			Messenger.RemoveListener<int,GameObject>(OpenCardSystemGetCardDialogMsg, OpenCardSystemGetCardDialog);
 			Messenger.RemoveListener(OpenCardSystemLuckyDrawDialogMsg, OpenCardSystemLuckyDrawDialog);
+			Messenger.RemoveListener(OpenCardSystemGetGiftDialogMsg, OpenCardSystemGetGiftDialog);
 			#endregion
 			
 			#region tips
@@ -630,6 +633,11 @@ public class GameDialogManager : MonoBehaviour
 		
 	}
 	protected virtual void OpenCardSystemLuckyDrawDialog()
+	{
+		
+	}
+	
+	protected virtual void OpenCardSystemGetGiftDialog()
 	{
 		
 	}

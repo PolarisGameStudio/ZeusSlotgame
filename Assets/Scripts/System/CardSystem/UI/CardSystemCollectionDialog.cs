@@ -27,6 +27,7 @@ namespace CardSystem
         public GameObject cardGiftDiable;
         public TextMeshProUGUI cardScoreText;
         private Button _giftBtn;
+        private GiftShake _giftShake;
         
         // public LocalizedString tmp_Info_Str;
         public TextMeshProUGUI tmp_cardInfo;
@@ -64,6 +65,8 @@ namespace CardSystem
 
             _giftBtn = cardGiftDiable.transform.parent.GetComponent<Button>();
             _giftBtn.onClick.AddListener(GiftBtnOnClick);
+            _giftShake = _giftBtn.GetComponent<GiftShake>();
+            _giftShake.CreateShakeSequence();
         }
         private void GiftBtnOnClick()
         {
@@ -101,12 +104,14 @@ namespace CardSystem
                 cardScoreProgress.fillAmount = 1;
                 cardGiftDiable.SetActive(false);
                 _giftBtn.interactable = true;
+                _giftShake.StartShaking();
             }
             else
             {
                 cardScoreProgress.fillAmount = (float)childCount / parentCount;
                 cardGiftDiable.SetActive(true);
                 _giftBtn.interactable = false;
+                _giftShake.StopShaking();
             }
 
             cardScoreText.text = $"{childCount}/{parentCount}";

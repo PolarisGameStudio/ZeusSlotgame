@@ -51,6 +51,11 @@ namespace CardSystem
         public LocalizedString localizeString;
         public TextMeshProUGUI tmp_bottom;
         public LocalizedString bottomString;
+        
+        public Image giftProgress;
+        public TextMeshProUGUI giftProgressTxt;
+        public Button giftBtn;
+        
         // 这里可以添加特定于CardSystemLuckyDrawDialog的逻辑
         protected override void Awake()
         {
@@ -76,6 +81,16 @@ namespace CardSystem
                 new Keyframe(1, 1, 0, 0)           // 缓慢停止
             );
             UpdateSelection(0);
+            
+            giftBtn.onClick.AddListener(GiftBtnOnClick);
+            RefreshCardScoreProgress();
+        }
+        private void GiftBtnOnClick()
+        {
+            //throw new System.NotImplementedException();
+            Messenger.Broadcast(GameDialogManager.OpenCardSystemGetGiftDialogMsg);
+            CardSystemManager.Instance.ResetProgress();
+            RefreshCardScoreProgress();
         }
 
         protected override void Start()
@@ -99,6 +114,24 @@ namespace CardSystem
             Messenger.AddListener(CardSystemConstants.RefreshLotteryMsg, Refresh);
             Messenger.AddListener<int>(ADConstants.PlayCardLotteryAD, PlayCardLotteryAD);
             Messenger.AddListener<int>(ADConstants.PlayCardLotteryADFailed, PlayCardLotteryAD);
+            Messenger.AddListener(CardSystemConstants.RefreshCardScoreProgress, RefreshCardScoreProgress);
+        }
+        private void RefreshCardScoreProgress()
+        {
+            var childCount = CardSystemManager.Instance.currentScore;
+            var parentCount = CardSystemManager.Instance.progressMaxScore;
+            if (childCount >= parentCount)
+            {
+                giftProgress.fillAmount = 1;
+                giftBtn.interactable = true;
+            }
+            else
+            {
+                giftProgress.fillAmount = (float)childCount / parentCount;
+                giftBtn.interactable = false;
+            }
+
+            giftProgressTxt.text = $"{childCount}/{parentCount}";
         }
 
         protected override void OnDisable()
@@ -107,6 +140,7 @@ namespace CardSystem
             Messenger.RemoveListener(CardSystemConstants.RefreshLotteryMsg, Refresh);
             Messenger.RemoveListener<int>(ADConstants.PlayCardLotteryAD, PlayCardLotteryAD);
             Messenger.RemoveListener<int>(ADConstants.PlayCardLotteryADFailed, PlayCardLotteryAD);
+            Messenger.RemoveListener(CardSystemConstants.RefreshCardScoreProgress, RefreshCardScoreProgress);
         }
 
         // 例如，处理抽奖逻辑、更新UI等

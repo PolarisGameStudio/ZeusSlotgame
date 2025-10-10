@@ -115,7 +115,7 @@ namespace CardSystem
             }
 
             cardScoreText.text = $"{childCount}/{parentCount}";
-            cardScoreTips.text = $"Collect {parentCount} card to receive cash reward";
+            //cardScoreTips.text = $"Collect {parentCount} card to receive cash reward";
         }
         private void BtnCollectClick(GameObject closeBtnObject)
         {

@@ -55,6 +55,7 @@ namespace CardSystem
         public Image giftProgress;
         public TextMeshProUGUI giftProgressTxt;
         public Button giftBtn;
+        private GiftShake _giftShake;
         
         // 这里可以添加特定于CardSystemLuckyDrawDialog的逻辑
         protected override void Awake()
@@ -82,6 +83,8 @@ namespace CardSystem
             );
             UpdateSelection(0);
             
+            _giftShake = giftBtn.GetComponent<GiftShake>();
+            _giftShake.CreateShakeSequence();
             giftBtn.onClick.AddListener(GiftBtnOnClick);
             RefreshCardScoreProgress();
         }
@@ -124,11 +127,13 @@ namespace CardSystem
             {
                 giftProgress.fillAmount = 1;
                 giftBtn.interactable = true;
+                _giftShake.StartShaking();
             }
             else
             {
                 giftProgress.fillAmount = (float)childCount / parentCount;
                 giftBtn.interactable = false;
+                _giftShake.StopShaking();
             }
 
             giftProgressTxt.text = $"{childCount}/{parentCount}";

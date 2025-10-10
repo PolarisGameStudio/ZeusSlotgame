@@ -16,7 +16,13 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 96bea4597973a4297bef634f33949985
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 6bbc20099e0a7478c8067ca21d59fd74
+    m_Address: FontAssetTable_pt
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-pt
+    - Preload
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

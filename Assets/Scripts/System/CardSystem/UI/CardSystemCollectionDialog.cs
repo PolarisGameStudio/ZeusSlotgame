@@ -6,6 +6,7 @@ using MarchingBytes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace CardSystem
@@ -24,9 +25,9 @@ namespace CardSystem
         
         public Image cardScoreProgress;
         public TextMeshProUGUI cardScoreTips;
-        public GameObject cardGiftDiable;
+       
         public TextMeshProUGUI cardScoreText;
-        private Button _giftBtn;
+        public Button giftBtn;
         private GiftShake _giftShake;
         
         // public LocalizedString tmp_Info_Str;
@@ -62,10 +63,9 @@ namespace CardSystem
             loopScrollRect.dataSource = this;
             loopScrollRect.totalCount = Cards.Count;
             loopScrollRect.RefillCells();
-
-            _giftBtn = cardGiftDiable.transform.parent.GetComponent<Button>();
-            _giftBtn.onClick.AddListener(GiftBtnOnClick);
-            _giftShake = _giftBtn.GetComponent<GiftShake>();
+            
+            giftBtn.onClick.AddListener(GiftBtnOnClick);
+            _giftShake = giftBtn.GetComponent<GiftShake>();
             _giftShake.CreateShakeSequence();
         }
         private void GiftBtnOnClick()
@@ -102,15 +102,13 @@ namespace CardSystem
             if (childCount >= parentCount)
             {
                 cardScoreProgress.fillAmount = 1;
-                cardGiftDiable.SetActive(false);
-                _giftBtn.interactable = true;
+                giftBtn.interactable = true;
                 _giftShake.StartShaking();
             }
             else
             {
                 cardScoreProgress.fillAmount = (float)childCount / parentCount;
-                cardGiftDiable.SetActive(true);
-                _giftBtn.interactable = false;
+                giftBtn.interactable = false;
                 _giftShake.StopShaking();
             }
 

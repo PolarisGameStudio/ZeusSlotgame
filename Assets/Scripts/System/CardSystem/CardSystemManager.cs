@@ -483,13 +483,13 @@ namespace CardSystem
                 //currentCards[cardId]++;
                 var level = GetCardLevel(cardId);
                 currentScore += _cardScoreList[level];//卡牌等级得分
-                Messenger.Broadcast(CardSystemConstants.RefreshCardScoreProgress);
             }
             else
             {
                 collectnew = true;
                 currentCards[cardId] = 1;
             }
+            Messenger.Broadcast(CardSystemConstants.RefreshCardScoreProgress);
             SharedPlayerPrefs.SetPlayerPrefsIntValue(CardSystemConstants.CardCurrentProgress, currentScore);
             // 保存进度数据
             SaveProgressData();

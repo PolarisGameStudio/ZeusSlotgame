@@ -25,11 +25,21 @@ namespace CardSystem
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, GetCardGiftCount, allCount);
             SharedPlayerPrefs.SetPlayerPrefsIntValue(GetCardGiftCount,allCount);
 
-            var amount = CardSystemManager.Instance.GetRandomMoneyReward();
+            
           
-            var money = OnLineEarningMgr.Instance.GetMoneyStr(amount,needIcon:false);
+           
+            
+            var randomReward = CardSystemManager.Instance.GetRandomMoneyReward();
+            
+            OnLineEarningMgr.Instance.IncreaseCash(randomReward);
+            
+            var money = OnLineEarningMgr.Instance.GetMoneyStr(randomReward,needIcon:false);
             
             _tips.text = $"x{money}";
+            
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
+            
+            Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
         }
         
         private void BtnCloseClick()

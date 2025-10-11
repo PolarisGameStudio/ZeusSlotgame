@@ -388,6 +388,25 @@ public class PlistColumnEditorWindow : EditorWindow
         }
 
         EditorGUILayout.EndScrollView();
+        
+        // --- 新增：检测列的空白区域点击 ---
+        Event e = Event.current;
+        if (e.type == EventType.MouseDown && e.button == 0)
+        {
+            // 获取整个列的区域
+            Rect columnRect = GUILayoutUtility.GetLastRect();
+            if (columnRect.Contains(e.mousePosition))
+            {
+                // 点击了列的空白区域
+                if (_editingValueNode != null || _renamingNode != null)
+                {
+                    CommitRename();
+                    CommitValueEdit();
+                    e.Use();
+                }
+            }
+        }
+        
         GUILayout.EndVertical();
     }
     
@@ -633,11 +652,37 @@ public class PlistColumnEditorWindow : EditorWindow
 
     private void HandleItemInteractions(int colIndex, int itemIndex, Rect itemRect, PlistTreeNode node)
     {
-        // 如果正在重命名或编辑值，跳过所有交互
-        if (_renamingNode != null || _editingValueNode != null)
-            return;
-        
         Event e = Event.current;
+        
+        // --- 关键修改：在编辑状态下，也要处理点击事件来提交编辑 ---
+        if (_renamingNode != null || _editingValueNode != null)
+        {
+            // 只处理鼠标点击事件
+            if (e.type == EventType.MouseDown && e.button == 0 && itemRect.Contains(e.mousePosition))
+            {
+                // 检查点击的是否是正在编辑的节点
+                bool isEditingThisNode = (_renamingNode == node) || (_editingValueNode == node);
+                
+                if (!isEditingThisNode)
+                {
+                    // 点击了其他节点，提交编辑并处理新的点击
+                    CommitRename();
+                    CommitValueEdit();
+                    // 不要return，让下面的代码继续执行以处理新的选择
+                }
+                else
+                {
+                    // 点击的是正在编辑的节点，不做处理
+                    return;
+                }
+            }
+            else
+            {
+                // 不是点击事件，或不在这个item范围内，跳过
+                return;
+            }
+        }
+        
         bool canDrag = (node.Parent != null);
 
         if (canDrag)
@@ -687,7 +732,6 @@ public class PlistColumnEditorWindow : EditorWindow
             }
             else if (e.button == 1) // Right click
             {
-                // Select the item first, then show the context menu
                 HandleColumnClick(colIndex, itemIndex);
                 ShowContextMenu(colIndex, itemIndex);
                 e.Use();
@@ -1198,7 +1242,17 @@ public class PlistColumnEditorWindow : EditorWindow
         if (_renamingNode == null || _isRenameJustInitiated) return;
 
         Event e = Event.current;
-        if (e.type == EventType.KeyDown)
+        // --- 新增：检测鼠标点击事件 ---
+        if (e.type == EventType.MouseDown && e.button == 0)
+        {
+            // 如果点击时焦点不在重命名框上，提交重命名
+            if (GUI.GetNameOfFocusedControl() != _renameControlName)
+            {
+                CommitRename();
+                e.Use();
+            }
+        }
+        else if (e.type == EventType.KeyDown)
         {
             // 回车键的逻辑已经被移到 DrawRenameEditor 中了
             // 这里只处理 Escape 键
@@ -1222,7 +1276,17 @@ public class PlistColumnEditorWindow : EditorWindow
         if (_editingValueNode == null || _isValueEditorJustInitiated) return;
 
         Event e = Event.current;
-        if (e.type == EventType.KeyDown && GUI.GetNameOfFocusedControl() == _valueEditorControlName)
+        // --- 新增：检测鼠标点击事件 ---
+        if (e.type == EventType.MouseDown && e.button == 0)
+        {
+            // 如果点击时焦点不在编辑框上，提交编辑
+            if (GUI.GetNameOfFocusedControl() != _valueEditorControlName)
+            {
+                CommitValueEdit();
+                e.Use();
+            }
+        }
+        else if (e.type == EventType.KeyDown && GUI.GetNameOfFocusedControl() == _valueEditorControlName)
         {
 
             if (e.keyCode == KeyCode.Escape)

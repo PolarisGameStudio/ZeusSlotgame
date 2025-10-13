@@ -30,7 +30,8 @@ namespace Libs
         UpdateLevel=14,
         UserAmount=15,
         IsInterADReady = 16,
-        IsRewardADReady = 17
+        IsRewardADReady = 17,
+        IsAdMobADReady = 18
     }
     
 #if UNITY_IOS || UNITY_TVOS
@@ -138,6 +139,9 @@ namespace Libs
                     break;
                 case MessageType.IsRewardADReady:
                     methodKey = "isRewardReady";
+                    break;
+                case MessageType.IsAdMobADReady:
+                    methodKey = "isAdMobReady";
                     break;
                 default: 
                     break;
@@ -334,7 +338,19 @@ namespace Libs
         /// <returns></returns>
         public bool IsADReady(int type)
         {
-            MessageType messageType = type == 0 ? MessageType.IsRewardADReady : MessageType.IsInterADReady;
+            MessageType messageType = MessageType.IsRewardADReady;
+            switch (type)
+            {
+                case 0:
+                    messageType = MessageType.IsRewardADReady;
+                    break;
+                case 1:
+                    messageType = MessageType.IsInterADReady;
+                    break;
+                case 2:
+                    messageType = MessageType.IsAdMobADReady;
+                    break;
+            }
             Dictionary<string, object> data = new Dictionary<string, object>();
             string methodName = GetMsgKeyByType(messageType);
             if (!string.IsNullOrEmpty(methodName))

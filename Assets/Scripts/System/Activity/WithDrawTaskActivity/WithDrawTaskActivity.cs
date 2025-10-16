@@ -1,8 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Libs;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Utils;
 
 namespace Activity
@@ -322,7 +326,21 @@ namespace Activity
 
             return info;
         }
-
+        
+        public IEnumerator GetTaskInfoDescAsync(Action<string> callback)
+        {
+            string info = "";
+            string key = Task.GetDesc();
+          
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,key);
+            if (localizedString!=null)
+            {
+                localizedString.Arguments = new object[] { GetProgressInfo() };
+                var operation = localizedString.GetLocalizedStringAsync();
+                yield return operation;
+                callback?.Invoke(operation.Result);
+            }
+        }
         public string GetTaskInfoDescForTip()
         {
             string info = "";

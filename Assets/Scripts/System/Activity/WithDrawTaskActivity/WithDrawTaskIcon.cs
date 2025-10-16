@@ -62,7 +62,7 @@ namespace Activity
                 this.OnDestroy();
             }
             RefreshProgress(activity.GetProgress(),activity.GetProgressText());
-            SetInfo();
+            GetTaskInfoAsync();
             ShowTaskIcon();
             //新的任务显示已经切换完成，通知活动检测任务状态
             new DelayAction(1f, null, () =>
@@ -150,6 +150,25 @@ namespace Activity
                     _spine.AnimationState.SetAnimation(0, "idle", true);
                 }
             }
+        }
+
+        private Coroutine startCor;
+        private void GetTaskInfoAsync()
+        {
+            Action<string> ac = (info)=>
+            {
+                if (tmp_info!=null)
+                {
+                    tmp_info.text = info;
+                }
+                if (startCor!=null)
+                {
+                    StopCoroutine(startCor);
+                    startCor = null;
+                }
+            };
+            
+            startCor = StartCoroutine(activity.GetTaskInfoDescAsync(ac));
         }
         
         public void SetInfo()

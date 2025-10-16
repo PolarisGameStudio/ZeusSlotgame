@@ -15,7 +15,8 @@ namespace Activity
         WithDrawTask=3,
         H5RewardActivity=4,
         ContinueSpin=5,
-        RotationBuff=6
+        WheelLucy=6,
+        RotationBuff=7
     }
 
     public enum ActivityState

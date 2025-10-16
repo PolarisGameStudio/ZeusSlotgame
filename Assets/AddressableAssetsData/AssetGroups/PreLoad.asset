@@ -60,7 +60,8 @@ MonoBehaviour:
   - m_GUID: 304e9757670d946f6badb698d757dcf9
     m_Address: Prefabs
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - PreLoad
   - m_GUID: 4a94d57b61a484e6593dec89410c7a11
     m_Address: SpinWinDialog
     m_ReadOnly: 0

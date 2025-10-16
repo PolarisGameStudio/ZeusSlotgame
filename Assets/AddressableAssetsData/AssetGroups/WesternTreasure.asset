@@ -60,7 +60,8 @@ MonoBehaviour:
   - m_GUID: 3955e599bfb8c4b2ab2a91b8ccde9f86
     m_Address: JackpotAni.prefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Machines
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

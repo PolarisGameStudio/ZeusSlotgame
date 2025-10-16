@@ -42,8 +42,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad
-  - m_GUID: 1774ecd9d81bb4e449073322966edf89
-    m_Address: Prefab
+  - m_GUID: bf6fba04022b342d898b280eb6c23743
+    m_Address: Prefab/Shared
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad
@@ -60,8 +60,7 @@ MonoBehaviour:
   - m_GUID: 304e9757670d946f6badb698d757dcf9
     m_Address: Prefabs
     m_ReadOnly: 0
-    m_SerializedLabels:
-    - PreLoad
+    m_SerializedLabels: []
   - m_GUID: 4a94d57b61a484e6593dec89410c7a11
     m_Address: SpinWinDialog
     m_ReadOnly: 0
@@ -77,6 +76,10 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad
+  - m_GUID: 7dc9ba6ba730e48078c9d1eb44f9d219
+    m_Address: Prefab/UI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

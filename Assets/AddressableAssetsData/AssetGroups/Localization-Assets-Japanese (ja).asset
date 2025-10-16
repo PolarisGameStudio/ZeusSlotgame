@@ -47,6 +47,16 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-ja
+  - m_GUID: 7ba4efb0d7ec7482081845da0ed12f14
+    m_Address: NotoSansJP-Bold Atlas Material 1
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-ja
+  - m_GUID: c6986c2342f5b430cb85ddc1a98756ac
+    m_Address: NotoSansJP-Bold SDF
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-ja
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

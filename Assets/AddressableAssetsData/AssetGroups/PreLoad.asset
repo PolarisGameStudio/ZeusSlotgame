@@ -22,11 +22,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad
-  - m_GUID: d3e00f84c9cfd443bbc55b746d664f82
-    m_Address: SpinWithDraw
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - PreLoad
   - m_GUID: 5a1134699931944749780e10be197270
     m_Address: Animation
     m_ReadOnly: 0

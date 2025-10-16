@@ -66,18 +66,6 @@ MonoBehaviour:
     - Locale-tr
     - Locale-vi
     - Locale-en
-  - m_GUID: 356a7c9529d6648b08530c7d0389eaf8
-    m_Address: NotoSans-Bold SDF
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale-hi
-    - Locale-en
-  - m_GUID: c6986c2342f5b430cb85ddc1a98756ac
-    m_Address: NotoSansJP-Bold SDF
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale-ja
-    - Locale-en
   - m_GUID: 35cdf49581391431e9e4328d8795acc4
     m_Address: Roboto-Bold Atlas Material 550285
     m_ReadOnly: 1
@@ -178,6 +166,26 @@ MonoBehaviour:
     - Locale-es
     - Locale-tr
     - Locale-vi
+  - m_GUID: edba89ab22e164fafb522d062457f0d9
+    m_Address: Roboto-Bold Atlas Material 1
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-tr
+    - Locale-vi
+    - Locale-id
+    - Locale-es
+    - Locale-ru
+    - Locale-ro
+    - Locale-pt
+    - Locale-pl
+    - Locale-ms
+    - Locale-it
+    - Locale-de
+    - Locale-fr
+    - Locale-fil
+    - Locale-en
+    - Locale-nl
+    - Locale-cs
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

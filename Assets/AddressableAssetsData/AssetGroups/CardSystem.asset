@@ -32,11 +32,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - CardSystem
-  - m_GUID: 1860980920dd34748b9045d1a7d1aaf3
-    m_Address: CardSystemLuckyDraw.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - CardSystem
   - m_GUID: cda6d4475330049cfb8aa3ac2e47ecc8
     m_Address: CardSystem/Animation
     m_ReadOnly: 0

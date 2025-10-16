@@ -190,19 +190,18 @@ namespace Classic
         #region 资源预加载
         private IEnumerator PreloadCoreAssets()
         {
-            // 使用AddressableManager加载PreLoad组资源
-            yield return AddressableManager.Instance.LoadAssetsByLabelCoroutine<GameObject>(
-                "PreLoad",
-                objects => Debug.Log($"加载了{objects.Count}个核心预制体"),
-                error => Debug.LogError(error),
-                progress => UpdateRealProgress(0.15f + progress * 0.35f)); // 0.15-0.50
-            
             // 使用AddressableManager加载图集
             yield return AddressableManager.Instance.LoadAssetsByLabelCoroutine<SpriteAtlas>(
                 "PreLoad",
                 atlases => Debug.Log($"加载了{atlases.Count}个图集"),
                 error => Debug.LogError(error),
-                progress => UpdateRealProgress(0.50f + progress * 0.15f)); // 0.50-0.65
+                progress => UpdateRealProgress(0.15f + progress * 0.3f)); // 0.15-0.3
+            // 使用AddressableManager加载PreLoad组资源
+            yield return AddressableManager.Instance.LoadAssetsByLabelCoroutine<GameObject>(
+                "PreLoad",
+                objects => Debug.Log($"加载了{objects.Count}个核心预制体"),
+                error => Debug.LogError(error),
+                progress => UpdateRealProgress(0.3f + progress * 0.65f)); // 0.3-0.50
         }
 
         private IEnumerator PreloadMachineAssets()

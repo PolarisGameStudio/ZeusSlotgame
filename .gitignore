@@ -50,3 +50,5 @@ Logs/
 .install.sh
 .install.bat
 .pre-commit
+
+Assets/AddressableAssetsData/Android/

@@ -25,12 +25,12 @@ MonoBehaviour:
     m_Address: Prefab/UI/AccountEnsureDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 2aa069aaad22a47c7a9d6a94d6cd8791
-    m_Address: Prefab/UI/AccountTaskDialog_p.prefab
+  - m_GUID: 17298a074682240b7986fe5f2e641cdf
+    m_Address: Prefab/UI/ExtraRewardCashDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: d7fdbe3f1c46548dca594922fc1f2217
-    m_Address: Prefab/UI/AccountTimeDialog_p.prefab
+  - m_GUID: eca406020ed7e6948b65a8daaf651cb9
+    m_Address: Prefab/UI/AccountLoginTipsDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 71783851a69ba431581d240fa91cbfc7
@@ -87,6 +87,26 @@ MonoBehaviour:
     m_SerializedLabels: []
   - m_GUID: ea5f2bb3c905c4832a00d96a841b24be
     m_Address: Prefabs/Dialog/Paytable/PayLineSymbol.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c4b937df283f04e1285a5d9ff2355288
+    m_Address: Prefab/UI/RewardCashDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e3495f7b641676a40bb7b4e242cbee42
+    m_Address: Prefab/UI/SpinWinDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ccf23c2f8ca324d30b3c861d0bd7d5e7
+    m_Address: Prefab/UI/TaskTipDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f9bc4a1931021c043a230d323754766f
+    m_Address: Prefab/UI/TipsDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b2096c672f18a48e08ba4354c1474ca2
+    m_Address: Prefab/UI/WithDrawDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

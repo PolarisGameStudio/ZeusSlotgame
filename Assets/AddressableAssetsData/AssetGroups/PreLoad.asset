@@ -76,8 +76,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad
-  - m_GUID: 7dc9ba6ba730e48078c9d1eb44f9d219
-    m_Address: Prefab/UI
+  - m_GUID: 5edc0a5cada584a1daa142d6430e26d2
+    m_Address: Prefab/Other
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

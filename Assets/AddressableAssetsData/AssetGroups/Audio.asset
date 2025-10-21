@@ -317,6 +317,22 @@ MonoBehaviour:
     m_Address: Audio/spin_auto_start.mp3
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 691bed19a8de640cd95172a89ab1259d
+    m_Address: Audio/GiftBox_down.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 49e7c600143304b85ae7da844b5e8a53
+    m_Address: Audio/GiftBox_open.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 70e05224930e7456393860645dec11bb
+    m_Address: Audio/giftboxcollectbtn.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e5d23911725284218b2f54db984a240e
+    m_Address: Audio/giftboxcolletcoin.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

@@ -590,5 +590,16 @@ namespace Classic
                     dialog.SetUIData(data,buff);
                 },defaultResourcePath:"RotationBuff/Prefab/RotationBuffDialog"));
         }
+
+        protected override void OpenGiftBoxDialog()
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<GiftBoxDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(), dialogInitCallBack:(dialog) =>
+                {
+                    dialog.Init("");
+                }));
+        }
     }
 }

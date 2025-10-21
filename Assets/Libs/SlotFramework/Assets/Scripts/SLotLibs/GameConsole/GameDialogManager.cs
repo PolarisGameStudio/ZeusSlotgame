@@ -26,6 +26,7 @@ public class GameDialogManager : MonoBehaviour
     public const string OpenAutoSpinAdditionalDialog = "OpenAutoSpinAdditionalDialog";
     public const string OpenHotHotChiliFreeSpinlDialog = "OpenHotHotChiliFreeSpinlDialog";
     public const string OpenHotHotChiliFreeSpinWinDialog = "OpenHotHotChiliFreeSpinWinDialog";
+    public const string OpenGiftBoxDialogMsg = "OpenGiftBoxDialogMsg";
 
     public const string OPEN_WIN_PUSH = "OpenWinPush";
     
@@ -182,6 +183,7 @@ public class GameDialogManager : MonoBehaviour
             Messenger.AddListener<System.Action>(OpenSpinLimitDialog, OpenSpinLimimiDialogMsg);
             Messenger.AddListener<int>(OpenRewardCashDialogMsg, OpenRewardCashDialog);
             Messenger.AddListener<int>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
+            Messenger.AddListener(OpenGiftBoxDialogMsg, OpenGiftBoxDialog);
 
 
             #region PopReward
@@ -292,6 +294,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener(OpenNewUserGuidDialogMsg, OpenNewUserGuidDialog);
 			Messenger.RemoveListener<int>(OpenRewardCashDialogMsg, OpenRewardCashDialog);
 			Messenger.RemoveListener<int>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
+			Messenger.RemoveListener(OpenGiftBoxDialogMsg, OpenGiftBoxDialog);
 
 			
 			Messenger.RemoveListener<int,int,System.Action>(OpenSpinWithDrawStartDialogMsg, OpenSpinWithDrawStartDialog);
@@ -693,6 +696,11 @@ public class GameDialogManager : MonoBehaviour
 		
 	}
 	protected virtual void OpenRotationBuffDialog(Dictionary<string,object> data,BaseBuff baseBuff)
+	{
+		
+	}
+	
+	protected virtual void OpenGiftBoxDialog()
 	{
 		
 	}

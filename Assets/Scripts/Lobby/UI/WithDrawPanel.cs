@@ -235,6 +235,7 @@ public class WithDrawPanel : MonoBehaviour
                     }).SetUpdate(true);
             });
             tweenAction.Play();
+            //显示增加的分数
             if (scoreText!=null)
             {
                 //播放score分数飞行动画
@@ -248,10 +249,14 @@ public class WithDrawPanel : MonoBehaviour
         }
     }
 
+    private bool SequencePlaying = false;
     public virtual void DoScoreAnim(System.Action onComplete = null)
     {
         if (scoreText == null) return;
-
+        if (SequencePlaying)
+        {
+            return;
+        }
         scoreText.gameObject.SetActive(true);
         scoreText.color = new Color(scoreText.color.r, scoreText.color.g, scoreText.color.b, 1);
 
@@ -261,7 +266,7 @@ public class WithDrawPanel : MonoBehaviour
 
         // 创建动画序列
         Sequence sequence = DOTween.Sequence();
-
+        SequencePlaying = true;
         // 第一阶段：向上移动 + 同步放大
         sequence.Append(
             scoreText.transform.DOLocalMoveY(initialPos.y + 20, 0.5f)
@@ -269,7 +274,7 @@ public class WithDrawPanel : MonoBehaviour
         );
         sequence.Join(
             scoreText.transform.DOScale(initialScale * 1.2f, 0.5f) // 放大到120%
-                .From(initialScale * 0.8f) // 从80%开始缩放
+                .From(initialScale) // 从80%开始缩放
                 .SetEase(Ease.OutBack) // 带弹性效果的缓动
         );
 
@@ -293,6 +298,7 @@ public class WithDrawPanel : MonoBehaviour
             scoreText.transform.localScale = initialScale; // 恢复初始缩放
             scoreText.color = new Color(scoreText.color.r, scoreText.color.g, scoreText.color.b, 1);
             onComplete?.Invoke();
+            SequencePlaying = false;
         });
 
         sequence.Play();

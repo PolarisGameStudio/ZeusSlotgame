@@ -19,13 +19,11 @@ namespace Activity
     {
         private int freeCount = 0;
         public List<int> buffList = new List<int>();
-        [SerializeField] private float displayDuration = 30f;
-        [SerializeField] private float hideDuration = 10f;
+        public int displayDuration = 30;
+        public int hideDuration = 10;
         private RotationState currentState;
 
-        private int coolDown = 10;
         private float stateTimer = 0f;
-        public int rotationInterval = 30; // in seconds
         //轮转顺序
         public int currentIndex = 0;
         private BaseBuff currentBuff = null;

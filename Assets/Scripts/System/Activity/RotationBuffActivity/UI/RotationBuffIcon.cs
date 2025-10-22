@@ -70,7 +70,7 @@ namespace Activity
         private int countDownStart = 30; // 倒计时起始值（秒）
         public void StartActiveCountdown()
         {
-            countDownStart = rotationBuffActivity.rotationInterval;
+            countDownStart = rotationBuffActivity.displayDuration;
             _cancellationTokenSource = new CancellationTokenSource();
             StartCountdown(_cancellationTokenSource.Token).Forget();
         }

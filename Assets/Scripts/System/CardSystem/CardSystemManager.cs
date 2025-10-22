@@ -38,6 +38,8 @@ namespace CardSystem
             ParsePlist();
             LoadResource();
             AddListener();
+            //上报一次当前卡牌类型
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"CardType",GetHaveCardTypeCount());
         }
 
         void ParsePlist()
@@ -497,6 +499,7 @@ namespace CardSystem
             if (collectnew)
             {
                 Messenger.Broadcast(CardSystemConstants.GetCardNewTypeCountMsg);
+                PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"HaveNewCard");
                 //事件上报
                 PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"CardType",GetHaveCardTypeCount());
             }

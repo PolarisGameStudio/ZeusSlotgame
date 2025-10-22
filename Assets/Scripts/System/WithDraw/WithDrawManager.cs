@@ -424,5 +424,22 @@ namespace System
             Debug.Log($"[WithDrawManager][ShowTip] msg:{msg}");
             Messenger.Broadcast(GameDialogManager.OpenTaskTipsDialogMsg);
         }
+
+        //发送事件
+        public void SendMsg(int money)
+        {
+            //上报redeem埋点
+            int count = PlayerPrefs.GetInt("Redeem", 0);
+            count++;
+            Dictionary<string,int>  data = new Dictionary<string, int>
+            {
+                { "count", count },
+                { "platform", PlatFormIndex},
+                { "cash", money }
+            };
+            string datastr = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "Redeem", datastr);
+            PlayerPrefs.SetInt("Redeem", count);
+        }
     }
 }

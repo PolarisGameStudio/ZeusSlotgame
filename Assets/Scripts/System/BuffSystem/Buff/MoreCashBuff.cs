@@ -4,13 +4,14 @@ namespace System.BuffSystem
 {
     public class MoreCashBuff:BaseTimeBuff
     {
-        public int cashMultiple = 2; // Default cash multiple is 2
+        private const string cashMultipleKey = "cashMultiple";
+        public float cashMultiple = 2; // Default cash multiple is 2
         public MoreCashBuff(Dictionary<string, object> dict) : base(dict)
         {
-            cashMultiple = Utils.Utilities.GetInt(dict, BuffConstant.ExtraNumKey, 2);
+            cashMultiple = Utils.Utilities.GetFloat(dict, cashMultipleKey, 2);
         }
         
-        public override int GetExtraCount()
+        public float GetCashMultiple()
         {
             return cashMultiple;
         }

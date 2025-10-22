@@ -157,7 +157,7 @@ namespace Activity
             panelMoreBet.gameObject.SetActive(true);
             // Implement UI logic to show More Bet Buff
             //显示翻倍数
-            int count = _buff.GetExtraCount();
+            int count = (_buff as ChangeADMultipleBuff).GetAdMultiple();
             Text txt1 = panelMoreBet.transform.Find("txt1").GetComponent<Text>();
             Text txt2 = panelMoreBet.transform.Find("txt2").GetComponent<Text>();
             txt1.text = "2";
@@ -188,7 +188,7 @@ namespace Activity
             // Implement UI logic to show More Bonus Buff
             //显示翻倍数
             UIText tmp_multiple = panelMoreMoney.transform.Find("tmp_multiple").GetComponent<UIText>();
-            int count = _buff.GetExtraCount()-1;
+            float count = (_buff as MoreCashBuff).GetCashMultiple()-1;
             tmp_multiple.SetText("+"+count*100+"%");
             //显示提示信息
             string key1 = "MoreBonusInfo";

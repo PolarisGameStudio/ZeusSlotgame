@@ -491,7 +491,7 @@ namespace Ads
             List<BaseBuff> activeBuffs = BuffManager.Instance.GetActiveBuffByType(BuffConstant.ChangeADMultipleBuff);
             foreach (var buff in activeBuffs)
             {
-                extraCount += buff.GetExtraCount();
+                extraCount += (buff as ChangeADMultipleBuff).GetAdMultiple();
                 //广播buff触发的消息
                 Messenger.Broadcast<int>(BuffConstant.OnBuffTrigger, buff.buffId);
             }

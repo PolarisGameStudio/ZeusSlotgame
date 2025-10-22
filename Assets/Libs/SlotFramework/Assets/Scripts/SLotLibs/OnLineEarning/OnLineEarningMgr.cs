@@ -341,7 +341,7 @@ public class OnLineEarningMgr
         {
             newCash *= _baseOnlineEarningModel.CashMultiple();
         }
-        newCash *= GetCashBuffMultiple();
+        newCash = (int)(newCash*GetCashBuffMultiple());
         int totalCash = cash + newCash;
         if (!isInfiniteOpen()&&totalCash>=GetMaxValue()*GetCashMultiple())
         {
@@ -356,15 +356,15 @@ public class OnLineEarningMgr
     }
 
     //获取金钱的加倍buff数值
-    public int GetCashBuffMultiple()
+    public float GetCashBuffMultiple()
     {
         List<BaseBuff> buffs = BuffManager.Instance.GetBuffByType(BuffConstant.MoreCashBuff);
-        int multiple = 0;
+        float multiple = 0;
         for (int i = 0; i < buffs.Count; i++)
         {
             if (buffs[i].isActive)
             {
-                multiple += buffs[i].GetExtraCount();
+                multiple += (buffs[i] as MoreCashBuff).GetCashMultiple();
             }
         }
         return multiple>0?multiple:1;

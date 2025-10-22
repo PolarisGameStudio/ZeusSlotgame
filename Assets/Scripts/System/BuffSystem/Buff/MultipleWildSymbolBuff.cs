@@ -4,13 +4,15 @@ namespace System.BuffSystem
 {
     public class MultipleWildSymbolBuff:BaseTimeBuff
     {
+        private const string extraCountKey = "extraCount";
+
         private int extraCount;
         public MultipleWildSymbolBuff(Dictionary<string, object> dict) : base(dict)
         {
-            extraCount = Utils.Utilities.GetInt(dict, BuffConstant.ExtraNumKey, 0);
+            extraCount = Utils.Utilities.GetInt(dict,extraCountKey, 0);
         }
         
-        public override int GetExtraCount()
+        public int GetExtraWildSymbolCount()
         {
             return extraCount;
         }

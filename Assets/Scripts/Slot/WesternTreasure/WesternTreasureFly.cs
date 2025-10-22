@@ -106,7 +106,7 @@ public class WesternTreasureFly : MonoBehaviour
         List<BaseBuff> activeBuffs = BuffManager.Instance.GetActiveBuffByType(BuffConstant.MultipleWildSymbolBuff);
         foreach (var buff in activeBuffs)
         {
-            extraCount += buff.GetExtraCount();
+            extraCount += (buff as MultipleWildSymbolBuff).GetExtraWildSymbolCount();
         }
         // Debug.Log($"WesternTreasureFly GetBuffExtraCount: {extraCount}");
         return extraCount;

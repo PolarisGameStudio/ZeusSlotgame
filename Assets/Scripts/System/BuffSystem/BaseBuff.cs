@@ -105,7 +105,7 @@ namespace System.BuffSystem
         {
         }
 
-        public virtual int GetExtraCount()
+        public virtual float GetExtraCount()
         {
             return 0;
         }

@@ -63,6 +63,12 @@ namespace Activity
             }
         }
 
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            Messenger.RemoveListener<bool>(RotationBuffConstant.RotationBuffDialogClose, SetRulePanelShowState);
+        }
+
         #region LoadAndSaveData
 
         private void LoadSavedData()
@@ -165,6 +171,7 @@ namespace Activity
         {
             //在此处考虑是否要缓存，获取初始化buff
             LoadSavedData();
+            Messenger.AddListener<bool>(RotationBuffConstant.RotationBuffDialogClose, SetRulePanelShowState);
             AddListener();
             isInitialized = true;
         }
@@ -252,8 +259,18 @@ namespace Activity
             currentIndex = (currentIndex + 1) % buffList.Count;
             currentBuff = BuffManager.Instance.GetBuffById(buffList[currentIndex]);
             AddListener();
+            
+            CheckAutoPopRuleDialog();
+        }
+        private void CheckAutoPopRuleDialog()
+        {
+            //弹窗已经弹出则进行阻断
+            if (RulePanelisShow)
+            {
+                return;
+            }
             curPopupCount++;
-            if (curPopupCount >= AutoPopupCount && AutoPopupCount>0)
+            if (curPopupCount == AutoPopupCount && AutoPopupCount>0)
             {
                 curPopupCount = 0;
                 ShowRulePanel(true);
@@ -284,8 +301,14 @@ namespace Activity
             }
         }
     
+        private bool RulePanelisShow = false;
+        private void SetRulePanelShowState(bool isShow)
+        {
+            RulePanelisShow = isShow;
+        }
         private void ShowRulePanel(bool isAutoPop = false)
         {
+            SetRulePanelShowState(true);
             Debug.Log($"[RotationBuffActivity] ShowRulePanel for buff {currentBuff.buffName}");
             Dictionary<string,object> eventData = new Dictionary<string, object>();
             eventData["OpenCloseAd"] = OpenCloseAd;

@@ -87,6 +87,8 @@ namespace Activity
         
         private void CloseDialog()
         {
+            //广播弹窗关闭消息
+            Messenger.Broadcast<bool>(RotationBuffConstant.RotationBuffDialogClose,false);
             this.Close();
         }
         

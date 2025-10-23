@@ -443,7 +443,12 @@ namespace System
             PlayerPrefs.SetInt("Redeem", count);
         }
         
-        public int GetTaskLevelCash()
+        /// <summary>
+        /// ismin:是否取当前平台的最小档位 为false则取当前平台下一个档位
+        /// </summary>
+        /// <param name="isMin"></param>
+        /// <returns></returns>
+        public int GetTaskLevelCash(bool isMin = false)
         {
             //先选出最优先的档位数组
             int arrayListIndex = 0;
@@ -467,13 +472,30 @@ namespace System
                 }
             }
             //当前没有可以领取的任务
-            if (arrayListIndex == 0)
+            if (count == 0)
             {
                 return 0;
             }
+            int targetCash = 0;
             List<RedeemItemData> targetRedeemItemList = redeemItemDict[PlatformKey + arrayListIndex];
-            ///取出当前平台的第一个任务
-            int targetCash = (int)targetRedeemItemList[0].task.TargetNum;
+            if (isMin)
+            {
+                ///取出当前平台的第一个任务
+                targetCash = (int)targetRedeemItemList[0].task.TargetNum;
+            }
+            else
+            {
+                int cash = OnLineEarningMgr.Instance.Cash();
+                for (int i = 0; i < targetRedeemItemList.Count-1; i++)
+                {
+                    if (cash >= targetRedeemItemList[i].task.TargetNum && targetRedeemItemList[i+1].task.TargetNum>cash)
+                    {
+                        targetCash = (int)targetRedeemItemList[i+1].task.TargetNum;
+                        break;
+                    }
+                }
+            }
+            
             return targetCash;
         }
     }

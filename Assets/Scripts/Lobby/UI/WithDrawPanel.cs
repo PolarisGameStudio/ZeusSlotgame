@@ -31,9 +31,10 @@ public class WithDrawPanel : MonoBehaviour
     public TextMeshProUGUI tipText;
     private Tween tweenerTip; //提示文字动画
     public LocalizedString _localizedString;
-    public float tipIdleTime= 5f;
-    public float tipShowTime=0.3f;
+    public float tipIdleTime = 5f;
+    public float tipShowTime = 0.3f;
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI guideCashText;
     public void Awake()
     {
         withDrawPanelBtn = GetComponent<Button>();
@@ -55,38 +56,50 @@ public class WithDrawPanel : MonoBehaviour
     {
         if (!PlatformManager.Instance.IsWhiteBao())
         {
-            Messenger.AddListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
+            // Messenger.AddListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
             Messenger.AddListener(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL, OnShowTip);
         }
+        Messenger.AddListener<int>(WithDrawConstants.DoneWithDrawAction, DoneWithDrawAction);
     }
 
     public void OnDisable()
     {
         Messenger.RemoveListener(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL, OnShowTip);
+        Messenger.RemoveListener<int>(WithDrawConstants.DoneWithDrawAction, DoneWithDrawAction);
     }
 
-    public void OnSpinEnd()
-    {
-        //首次登录
-        if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
-        {
-            showGuideCor = StartCoroutine(ShowGuide());
-            Messenger.RemoveListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
-        }
-    }
+    // public void OnSpinEnd()
+    // {
+    //     //首次登录
+    //     if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
+    //     {
+    //         showGuideCor = StartCoroutine(ShowGuide());
+    //         Messenger.RemoveListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
+    //     }
+    // }
 
     public void OnShowTip()
     {
-        if (tweenerTip!=null && tip.activeInHierarchy)
+        //判断显示的tip样式
+        int cash = OnLineEarningMgr.Instance.Cash();
+        int targetCash = WithDrawManager.Instance.GetTaskLevelCash(isDoingWithDraw);
+        //当前没有档位时，不再显示
+        if (targetCash == 0)
         {
             return;
         }
-        //做一个延时操作，等待WithDrawTaskActivity切换任务
-        new DelayAction(1.1f,null,() =>
+
+        if (cash<targetCash)
         {
+            //展示TaskTip文本
+            if (tweenerTip!=null && tip.activeInHierarchy)
+            {
+                return;
+            }
+            //做一个延时操作，等待WithDrawTaskActivity切换任务
             if (tipText!=null)
             {
-                string info = GetTipTextInfo();
+                string info = GetTipTextInfo(targetCash);
                 if (string.IsNullOrEmpty(info) || info == string.Empty)
                 {
                     tip.SetActive(false);
@@ -115,45 +128,33 @@ public class WithDrawPanel : MonoBehaviour
                     }
                 }).Play();
             }).Play();
-        }).Play();
+        }
+        else
+        {
+            isDoingWithDraw = false;
+            guideCashText.text = OnLineEarningMgr.Instance.GetMoneyStr(targetCash,needIcon:false);
+            if (showGuideCor!=null)
+            {
+                StopCoroutine(showGuideCor);
+                showGuideCor = null;
+            }
+            //展示tap to cash文本
+            showGuideCor = StartCoroutine(ShowGuide());
+        }
     }
 
-    public string GetTipTextInfo()
+    private string GetTipTextInfo(int targetCash)
     {
-        // int nowCash = OnLineEarningMgr.Instance.Cash();
-        // int leftCash = 0;
-        // int targetCash = 0;
-        // if (nowCash< 500*OnLineEarningMgr.Instance.GetCashMultiple())
-        // {
-        //     targetCash = 500*OnLineEarningMgr.Instance.GetCashMultiple();
-        // }else if (nowCash< 800*OnLineEarningMgr.Instance.GetCashMultiple())
-        // {
-        //     targetCash = 800*OnLineEarningMgr.Instance.GetCashMultiple();
-        // }else if (nowCash< 1300*OnLineEarningMgr.Instance.GetCashMultiple())
-        // {
-        //     targetCash = 1300*OnLineEarningMgr.Instance.GetCashMultiple();
-        // }else if (nowCash< 2000*OnLineEarningMgr.Instance.GetCashMultiple())
-        // {
-        //     targetCash = 2000*OnLineEarningMgr.Instance.GetCashMultiple();
-        // }else if (nowCash< 3000*OnLineEarningMgr.Instance.GetCashMultiple())
-        // {
-        //     targetCash = 3000*OnLineEarningMgr.Instance.GetCashMultiple();
-        // }else if (nowCash< 8000*OnLineEarningMgr.Instance.GetCashMultiple())
-        // {
-        //     targetCash = 8000*OnLineEarningMgr.Instance.GetCashMultiple();
-        // }
-        // leftCash = targetCash - nowCash;
-        // if (_localizedString != null && !string.IsNullOrEmpty(_localizedString.GetLocalizedString()))
-        // {
-        //     string arg1 = string.Format("<color=#D800D9>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr(leftCash, 2, false, true));
-        //     string arg2 = string.Format("<color=#D800D9>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr(targetCash, 2, false, true));
-        //     _localizedString.Arguments = new object[] {arg1,arg2};
-        //     return _localizedString.GetLocalizedString();
-        // }
-        WithDrawTaskActivity withDrawTaskActivity = ActivityManager.Instance.GetActivityByType(ActivityType.WithDrawTask) as WithDrawTaskActivity;
-        if (withDrawTaskActivity != null)
+        int nowCash = OnLineEarningMgr.Instance.Cash();
+        int leftCash = 0;
+        leftCash = targetCash - nowCash;
+        LocalizedString _localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"CollectMoreClaim");
+        if (_localizedString != null && !string.IsNullOrEmpty(_localizedString.GetLocalizedString()))
         {
-            return withDrawTaskActivity.GetTaskInfoDescForTip();
+            string arg1 = string.Format("<color=#D800D9>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr(leftCash, 2, false, true));
+            string arg2 = string.Format("<color=#D800D9>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr(targetCash, 2, false, true));
+            _localizedString.Arguments = new object[] {arg1,arg2};
+            return _localizedString.GetLocalizedString();
         }
         return String.Empty;
     }
@@ -163,31 +164,39 @@ public class WithDrawPanel : MonoBehaviour
         // Messenger.Broadcast<bool>(GameConstants.ShowButtonMask,true);
         // Messenger.Broadcast<int>(GameConstants.ChangeMaskOrder,400);
         yield return new WaitForSeconds(0.5f);
-        bool loadSuccess = false;
-        int index = 0;
-        List<string> spritePath = LocalizationManager.Instance.GetPlatFormSpriteResourcePath();
-        int num = spritePath.Count;
-        AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
-        {
-            if (result != null)
-            {
-                for (int i = 0; i < num; i++)
-                {
-                    Sprite sp = result.GetSprite(spritePath[i]);
-                    if (sp != null)
-                    {
-                        Images[index].sprite = sp;
-                        Images[index].gameObject.SetActive(true);
-                        index++;
-                    }
-                }
-            }
-        });
+        // bool loadSuccess = false;
+        // int index = 0;
+        // List<string> spritePath = LocalizationManager.Instance.GetPlatFormSpriteResourcePath();
+        // int num = spritePath.Count;
+        // AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
+        // {
+        //     if (result != null)
+        //     {
+        //         for (int i = 0; i < num; i++)
+        //         {
+        //             Sprite sp = result.GetSprite(spritePath[i]);
+        //             if (sp != null)
+        //             {
+        //                 Images[index].sprite = sp;
+        //                 Images[index].gameObject.SetActive(true);
+        //                 index++;
+        //             }
+        //         }
+        //     }
+        // });
        
         yield return GameConstants.FrameTime;
         StopCoroutine(showGuideCor);
         Guide.SetActive(true);
     }
+    
+    //是否提现过
+    private bool isDoingWithDraw = true;
+    private void DoneWithDrawAction(int money)
+    {
+        isDoingWithDraw = true;
+    }
+    
     //初始化设置钱数
     public virtual void InitMoney(int money)
     {

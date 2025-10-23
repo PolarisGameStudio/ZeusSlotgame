@@ -51,6 +51,10 @@ public class SpinWinDialog : UIDialog
 	private TaskTipPanel _taskTipPanel;
 	private bool isFirstTime = true;
 	private bool isSecondTime = false;
+	
+	//激励视频广告倍数
+	private int RewardAdMultiple = 1;
+	
 	protected override void Awake()
 	{
 		base.Awake();
@@ -139,6 +143,9 @@ public class SpinWinDialog : UIDialog
 			}
 			else
 			{
+				RewardAdMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
+				Text adMultiple = Utilities.RealFindObj<Text>(WatchAdBtn.transform, "number");
+				adMultiple.text = "" + RewardAdMultiple;
 				WatchAdBtn.gameObject.SetActive(true);
 				//显示免费的收集按钮
 				CollectBtn.gameObject.SetActive(false);
@@ -297,7 +304,7 @@ public class SpinWinDialog : UIDialog
 		OnClickStopUpdate();
 		//看广告跟弹窗关闭解绑，弹窗关闭不影响广告播放，只负责加钱操作。无论成功与失败都加钱
 		Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-		SendMsg(spinWinType,2);
+		SendMsg(spinWinType,RewardAdMultiple);
 	}
 	private void OnNotWatchADButtonClick(GameObject go)
 	{
@@ -367,10 +374,9 @@ public class SpinWinDialog : UIDialog
     
     void RewardADIsPlaySuccess()
     {
-        int multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-        totalCash *= multiple;
-        //钱已经加过一次了，所以需要倍数减1
-        totalCoins *= (multiple-1);
+	    totalCash *= RewardAdMultiple;
+	    //钱已经加过一次了，所以需要倍数减1
+	    totalCoins *= (RewardAdMultiple-1);
         DoneADCallBack();
     }
 

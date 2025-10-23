@@ -5,6 +5,7 @@ using Classic;
 using DG.Tweening;
 using Libs;
 using UnityEngine;
+using UnityEngine.Localization;
 using Utils;
 
 namespace System
@@ -440,6 +441,40 @@ namespace System
             string datastr = Newtonsoft.Json.JsonConvert.SerializeObject(data);
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "Redeem", datastr);
             PlayerPrefs.SetInt("Redeem", count);
+        }
+        
+        public int GetTaskLevelCash()
+        {
+            //先选出最优先的档位数组
+            int arrayListIndex = 0;
+            int count = 0;
+            ///遍历所有平台的任务列表，选出任务数量最少的那个平台
+            foreach (var kvp in redeemItemDict)
+            {
+                List<RedeemItemData> redeemItemList = kvp.Value;
+                if (count == 0)
+                {
+                    count = redeemItemList.Count;
+                    arrayListIndex = int.Parse(kvp.Key.Replace(PlatformKey,""));
+                }
+                else
+                {
+                    if (redeemItemList.Count < count)
+                    {
+                        count = redeemItemList.Count;
+                        arrayListIndex = int.Parse(kvp.Key.Replace(PlatformKey,""));
+                    }
+                }
+            }
+            //当前没有可以领取的任务
+            if (arrayListIndex == 0)
+            {
+                return 0;
+            }
+            List<RedeemItemData> targetRedeemItemList = redeemItemDict[PlatformKey + arrayListIndex];
+            ///取出当前平台的第一个任务
+            int targetCash = (int)targetRedeemItemList[0].task.TargetNum;
+            return targetCash;
         }
     }
 }

@@ -273,13 +273,13 @@ public class WithDrawPanel : MonoBehaviour
                 .SetEase(Ease.OutCubic)
         );
         sequence.Join(
-            scoreText.transform.DOScale(initialScale * 1.2f, 0.5f) // 放大到120%
+            scoreText.transform.DOScale(initialScale * 1.4f, 0.5f) // 放大到120%
                 .From(initialScale) // 从80%开始缩放
                 .SetEase(Ease.OutBack) // 带弹性效果的缓动
         );
 
         // 停留1.5秒
-        sequence.AppendInterval(1.5f);
+        sequence.AppendInterval(2.5f);
 
         // 第二阶段：继续上移 + 淡出
         sequence.Append(

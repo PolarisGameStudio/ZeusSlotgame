@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -106,7 +107,35 @@ namespace Libs
 
 
         #region 公共方法
+        public async UniTask<T> LoadAssetAsync<T>(string address) where T : class
+        {
+            if (string.IsNullOrEmpty(address))
+            {
+                return null;
+            }
+    
+            // 智能处理地址（根据类型决定是否添加后缀）
+            address = ProcessAddressWithExtension<T>(address);
 
+            // 检查缓存（类型安全）
+            if (TryGetFromCache<T>(address, out var cachedAsset))
+            {
+                return cachedAsset;
+            }
+            try
+            {
+                var handle = Addressables.LoadAssetAsync<T>(address);
+                T asset = await handle.Task;
+                return asset;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to load asset at address: {address}. Error: {ex.Message}");
+                return null;
+            }
+        }
+        
+        
         /// <summary>
         /// 加载资源（泛型），支持进度回调
         /// </summary>

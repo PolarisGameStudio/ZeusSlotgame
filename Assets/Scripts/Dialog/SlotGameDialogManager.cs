@@ -404,7 +404,7 @@ namespace Classic
                     dialog.SetUIData(cash);
                 },dialogCloseCallBack:callback,defaultResourcePath:"SpinWithDraw/Prefab/SpinWithDrawEndDialog"));
         }
-        protected override void OpenAccountDialog(int index,int cash)
+        protected override void OpenAccountDialog(RedeemItemData redeemItemData)
         {
             UIDialog dialog = UIManager.Instance.GetActiveDialog();
             OpenType type = dialog == null ? OpenType.Normal : OpenType.FrontOfHead;
@@ -413,10 +413,10 @@ namespace Classic
             UIManager.Instance.OpenSystemDialog(
                 new OpenConfigParam<AccountDialog>(isPortrait,dialog.eId,openType:type,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
                 {
-                    dialog.SetUIData(index,cash);
+                    dialog.SetUIData(redeemItemData);
                 }));
         }
-        protected override void OpenAccountEnsureDialog(int index,string account,int cash)
+        protected override void OpenAccountEnsureDialog(RedeemItemData redeemItemData,string account)
         {
             UIDialog dialog = UIManager.Instance.GetActiveDialog();
             OpenType type = dialog == null ? OpenType.Normal : OpenType.FrontOfHead;
@@ -425,7 +425,7 @@ namespace Classic
             UIManager.Instance.OpenSystemDialog(
                 new OpenConfigParam<AccountEnsureDialog>(isPortrait,dialog.eId,openType:type,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
                 {
-                    dialog.SetUIData(index,account,cash);
+                    dialog.SetUIData(redeemItemData,account);
                 }));
         }
         

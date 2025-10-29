@@ -14,7 +14,7 @@ namespace Classic
         public Image image;
         public TMP_InputField inputField;
         public Button ensureBtn;
-
+        private RedeemItemData _redeemItemData;
         private int platformIndex;
         private int money;
         public GameObject notice;
@@ -26,16 +26,16 @@ namespace Classic
             WithDrawManager.Instance.ResetShowAccountTag();
         }
 
-        public void SetUIData(int spriteIndex,int cash)
+        public void SetUIData(RedeemItemData data)
         {
-            platformIndex = spriteIndex;
-            money = cash;
+            _redeemItemData = data;
+            platformIndex = _redeemItemData.platSpIndex;
+            money = (int)_redeemItemData.RewardCash;
         }
 
         public override void Refresh()
         {
             base.Refresh();
-     
             AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
             {
                 if (result != null)
@@ -54,7 +54,7 @@ namespace Classic
             if (CheckAccountValid())
             {
                 this.Close();
-                WithDrawManager.Instance.ShowAccountEnsureDialog(inputField.text,money);
+                WithDrawManager.Instance.ShowAccountEnsureDialog(inputField.text,_redeemItemData);
             }
             else
             {

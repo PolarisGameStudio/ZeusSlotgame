@@ -55,6 +55,9 @@ namespace Libs
                 case TaskConstants.CollectSymbolCountTask_Key:
                     task = new CollectSymbolCountTask(taskInfoDict, parentTask);
                     break;
+                case TaskConstants.SequentialTask_Key:
+                    task = new SequentialTask(taskInfoDict, parentTask);
+                    break;
             }
             return task;
         }

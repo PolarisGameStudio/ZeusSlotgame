@@ -199,8 +199,8 @@ public class GameDialogManager : MonoBehaviour
             Messenger.AddListener<int,int,System.Action>(OpenSpinWithDrawStartDialogMsg, OpenSpinWithDrawStartDialog);
             Messenger.AddListener<int,System.Action>(OpenSpinWithDrawEndDialogMsg, OpenSpinWithDrawEndDialog);
 
-            Messenger.AddListener<int,int>(OpenAccountDialogMsg, OpenAccountDialog);
-            Messenger.AddListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
+            Messenger.AddListener<RedeemItemData>(OpenAccountDialogMsg, OpenAccountDialog);
+            Messenger.AddListener<RedeemItemData,string>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
             Messenger.AddListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
             Messenger.AddListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
             Messenger.AddListener<int>(OpenWheelLucyDialogMsg, OpenWheelLucyDialog);
@@ -299,8 +299,8 @@ public class GameDialogManager : MonoBehaviour
 			
 			Messenger.RemoveListener<int,int,System.Action>(OpenSpinWithDrawStartDialogMsg, OpenSpinWithDrawStartDialog);
 			Messenger.AddListener<int,System.Action>(OpenSpinWithDrawEndDialogMsg, OpenSpinWithDrawEndDialog);
-			Messenger.RemoveListener<int,int>(OpenAccountDialogMsg, OpenAccountDialog);
-			Messenger.RemoveListener<int,string,int>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
+			Messenger.RemoveListener<RedeemItemData>(OpenAccountDialogMsg, OpenAccountDialog);
+			Messenger.RemoveListener<RedeemItemData,string>(OpenAccountEnsureMsg, OpenAccountEnsureDialog);
 			Messenger.RemoveListener<int>(OpenAccountLoginTipsMsg, OpenAccountLoginTipsDialog);
 			Messenger.RemoveListener<int>(OpenContinueSpinDialogMsg, OpenContinueSpinDialog);
 			Messenger.RemoveListener<int>(OpenWheelLucyDialogMsg, OpenWheelLucyDialog);
@@ -627,11 +627,11 @@ public class GameDialogManager : MonoBehaviour
 		
 	}
 
-	protected virtual void OpenAccountDialog(int index,int cash)
+	protected virtual void OpenAccountDialog(RedeemItemData data)
 	{
 		
 	}
-	protected virtual void OpenAccountEnsureDialog(int index,string account,int cash)
+	protected virtual void OpenAccountEnsureDialog(RedeemItemData data,string account)
 	{
 		
 	}

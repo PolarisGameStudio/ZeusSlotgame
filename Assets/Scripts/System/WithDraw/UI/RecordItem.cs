@@ -33,7 +33,7 @@ public class RecordItem: MonoBehaviour
 
     public void Refresh()
     {
-        cashTMP.text = OnLineEarningMgr.Instance.GetMoneyStr(itemData.cash,needIcon:false);
+        cashTMP.text = OnLineEarningMgr.Instance.GetCashStr(itemData.cash,needIcon:false);
         progressTMP.text = $"{itemData.curProgress}/{itemData.targetProgress}";
         if (progressBar != null)
         {

@@ -71,7 +71,7 @@ public class TaskTipPanel : MonoBehaviour
             //     DelayShowSelf();
             //     return;
             // }
-            Debug.LogError("TaskTipPanel task is null, taskType: " + taskType);
+            // Debug.LogError("TaskTipPanel task is null, taskType: " + taskType);
             return;
         }
 

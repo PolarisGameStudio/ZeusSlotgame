@@ -24,20 +24,20 @@ namespace Classic
         private Coroutine _countdown;
         public void SetUIData(int cash)
         {
-            if (WithDrawManager.Instance.NeedLoginDays)
-            {
-                LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"ProgressNum");
-        
-                localizedString.Arguments = new object[] {1,WithDrawManager.Instance.GetCoolTime()};
-        
-                _time.text =  localizedString.GetLocalizedString();
-            }
-            else
-            {
-                var endTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
-            
-                _countdown = CoroutineUtil.Instance.StartCoroutine(ShowCountDownText(endTime));
-            }
+            // if (WithDrawManager.Instance.NeedLoginDays)
+            // {
+            //     LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"ProgressNum");
+            //
+            //     localizedString.Arguments = new object[] {1,WithDrawManager.Instance.GetCoolTime()};
+            //
+            //     _time.text =  localizedString.GetLocalizedString();
+            // }
+            // else
+            // {
+            //     var endTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
+            //
+            //     _countdown = CoroutineUtil.Instance.StartCoroutine(ShowCountDownText(endTime));
+            // }
         }
         
         private readonly WaitForSecondsRealtime _waitOneSecond = new WaitForSecondsRealtime(1);

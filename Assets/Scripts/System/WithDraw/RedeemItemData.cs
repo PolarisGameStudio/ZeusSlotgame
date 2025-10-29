@@ -8,45 +8,58 @@ namespace System
 {
     public enum RedeemItemState
     {
-        InProgress = 0,
+        InTaskProgress1 = 0,
+        InTaskProgress2,
         Complete,
-        Wait,
-        Failed,
-        Done
+        Failed
     }
+    
     public class RedeemItemData
     {
         public RedeemItemState state;
         public RedeemItem itemUI;
         private Dictionary<string, object> data = new Dictionary<string, object>();
-        public BaseTask task;
+        public AccumulateTotalCashTask CashTask;
+        public SequentialTask SequentialTask;
+        //当前任务
+        public BaseTask CurTask;
+        public BaseTask ChildTask1;
         public int index;
         private GameObject prefab;
         //平台序号
         public int platSpIndex = 0;
+        public int RewardCash =0;
         public RedeemItemData(Dictionary<string,object> config)
         {
             data = config;
             index = Utilities.GetInt(config, "index", -1);
-            Dictionary<string,object> taskInfos = Utilities.GetValue<Dictionary<string,object>>(config, "taskInfo", null);
-            if (taskInfos ==null || taskInfos.Count == 0)
+            RewardCash = Utilities.GetInt(config, "rewardCash", 0);
+            List<object> taskConfigList = Utilities.GetValue<List<object>>(config, "taskConfig", null);
+            if (taskConfigList ==null || taskConfigList.Count == 0)
             {
                 Debug.LogError("[RedeemItemData] taskInfos is null");
                 return;
             }
-            int taskId = Utilities.GetInt(taskInfos, TaskConstants.TaskId_Key, -1);
-            task = TaskManager.Instance.RegisterTask(taskId,taskInfos);
-            //根据任务刷新状态
+
+            for (int i = 0; i < taskConfigList.Count; i++)
+            {
+                Dictionary<string,object> taskInfos = taskConfigList[i] as Dictionary<string,object>;
+                int taskId = Utilities.GetInt(taskInfos, TaskConstants.TaskId_Key, -1);
+                BaseTask task = TaskManager.Instance.RegisterTask(taskId,taskInfos);
+                if (task.TaskType == TaskConstants.AccumulateCashTask_Key)
+                {
+                    CashTask = task as AccumulateTotalCashTask;
+                }else if (task.TaskType == TaskConstants.SequentialTask_Key)
+                {
+                    SequentialTask = task as SequentialTask;
+                }
+            }
+            SequentialTask.OnProgressUpdated += OnSequentialTaskProgressUpdated;
+            SequentialTask.OnTaskCompleted += OnSequentialTaskCompleted;
+            SequentialTask.OnSwitchChildTask+= OnSwitchChildTask;
             UpdateState();
-            //初始化时根据失败状态执行
-            Messenger.AddListener(task.UpdateTaskDataMsg,UpdateTaskData);
         }
-
-        ~RedeemItemData()
-        {
-            Messenger.RemoveListener(task.UpdateTaskDataMsg,UpdateTaskData);
-        }
-
+        
         public void OnInit(RedeemItem item)
         {
             BindUI(item);
@@ -57,6 +70,7 @@ namespace System
         {
             itemUI = item;
         }
+        
         public void UnBindUI()
         {
             itemUI = null;
@@ -66,96 +80,70 @@ namespace System
         {
             platSpIndex = index;
         }
-        
+
         public void UpdateState()
         {
-            if (task.GetTaskState()==TaskState.ONGOING)
+            if (CashTask.State == (int)TaskState.ONGOING)
             {
-                //未点击领取按钮回退过
-                if (task.CanRewardTime == 0)
-                {
-                    if (!task.IsTaskConditionOK)
-                    {
-                        state = RedeemItemState.InProgress;
-                    }
-                    else
-                    {
-                        state = RedeemItemState.Complete;
-                    }
-                }
-                else if (task.CanRewardTime > 0)
-                {
-                    if (WithDrawManager.Instance.NeedLoginDays)
-                    {
-                        //是否达到要求天数
-                        var loginDays = WithDrawManager.Instance.UpDateLoginDays(task.TaskId);
-                        var requireDays = WithDrawManager.Instance.GetCoolTime();
-                        if (loginDays >= requireDays)
-                        {
-                            state = RedeemItemState.Failed;
-                        }
-                        else
-                        {
-                            state = RedeemItemState.Wait;
-                        }
-                    }
-                    else
-                    {
-                        //已经点击了领取按钮，任务进度已回退,此时 istaskconditionOK不影响
-                        if (task.CanRewardTime>TimeUtils.ConvertDateTimeLong(DateTime.Now))
-                        {
-                            state = RedeemItemState.Wait;
-                        }
-                        else
-                        {
-                            state = RedeemItemState.Failed;
-                        }
-                    }
-                }
-            }else if (task.GetTaskState() == TaskState.CLOSE)
+                CurTask = CashTask;
+                state = RedeemItemState.InTaskProgress1;
+            }else if (SequentialTask.State == (int)TaskState.ONGOING)
             {
-                state = RedeemItemState.Done;
+                CurTask = SequentialTask;
+                state = RedeemItemState.InTaskProgress2;
+            }
+            else
+            {
+                state = RedeemItemState.Complete;
             }
         }
 
-        //任务状态已刷新，根据当前的状态进行操作
-        private void UpdateTaskData()
+        //切换至下一个任务
+        public void SwitchToNextTask()
         {
-            // if(!WithDrawManager.WithDrawUIShow) return;
-            Debug.Log($"[RedeemItemData][UpdateTaskData] [task.TaskId ==]:{task.TaskId}   [SelectId==]:{WithDrawManager.Instance.GetSelectId()}");
-            bool isSelf = WithDrawManager.Instance.GetSelectId() == task.TaskId;
-            if (isSelf && WithDrawManager.Instance.IsInWithDrawProgress)
+            if (state == RedeemItemState.InTaskProgress1)
             {
-                //可领奖时长 = 现在时间+额外领奖时长
-                task.CanRewardTime = TimeUtils.ConvertDateTimeLong(DateTime.Now) + WithDrawManager.Instance.GetCoolTime();
-  
-                WithDrawManager.Instance.IsInWithDrawProgress = false;
+                //切换到第二个任务
+                CashTask.CompleteTask();
+                SequentialTask.ActiveChildTask();
+                CurTask = SequentialTask;
+                state = RedeemItemState.InTaskProgress2;
             }
-            UpdateState();
-            //此处是否刷新UI取决于界面是否关闭
+        }
+
+        private void OnSequentialTaskProgressUpdated(BaseTask task, int progress)
+        {
             if (itemUI!=null)
             {
-                Debug.Log("绑定过刷新Ui taskId:{task.TaskId}");
-                Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);
+                itemUI.SetSequentialChildTaskUI();
             }
-            //Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);
         }
 
+        private void OnSwitchChildTask(BaseTask task, int childIndex)
+        {
+            if (itemUI!=null)
+            {
+                itemUI.RefreshUI();
+            }
+        }
+        
+        private void OnSequentialTaskCompleted(BaseTask task)
+        {
+            WithDrawFailed();
+        }
+        
         public void WithDrawFailed()
         {
-            if (state == RedeemItemState.InProgress ||state == RedeemItemState.Wait)
-            {
-                state = RedeemItemState.Failed;
-            }
             //提现状态失败，转换为集卡任务
             RecordItemData recordItemData = ToRecordItemData();
             WithDrawManager.Instance.RemoveRedeemItem(this);
             WithDrawManager.Instance.AddRecordItemData(recordItemData);
+            Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemMsg);
         }
 
         public bool IsFished()
         {
-            return state == RedeemItemState.Done || state == RedeemItemState.Failed;
+            return state == RedeemItemState.Complete || state == RedeemItemState.Failed;
         }
 
         public RecordItemData ToRecordItemData()
@@ -163,8 +151,7 @@ namespace System
             Dictionary<string, object> data = new Dictionary<string, object>();
             data["index"] =  index;
             data["platSpIndex"] = platSpIndex;
-            data["cash"] = (int)task.TargetNum;
-            data["taskId"] = task.TaskId;
+            data["cash"] = RewardCash;
             RecordItemData itemData = new RecordItemData(data);
             return itemData;
         }

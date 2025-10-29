@@ -359,28 +359,22 @@ namespace System
         /// 防止多个同时cell点击调用此方法，添加阻截
         /// </summary>
         /// <param name="taskId"></param>
-        public void ShowAccountDialog(int taskId,int cash)
+        public void ShowAccountDialog(RedeemItemData data)
         {
-            if (haveClickShowAccount)
-            {
-                return;
-            }
-            haveClickShowAccount = true;
-            CurSelectTaskId = taskId;
-            Debug.Log($"[WithDrawManager][ShowAccountDialog] PlatFormIndex:{GetPlatSpriteIndex()}");
-            Messenger.Broadcast<int,int>(GameDialogManager.OpenAccountDialogMsg,GetPlatSpriteIndex(),cash);
+            // Debug.Log($"[WithDrawManager][ShowAccountDialog] PlatFormIndex:{GetPlatSpriteIndex()}");
+            Messenger.Broadcast<RedeemItemData>(GameDialogManager.OpenAccountDialogMsg,data);
             // CloseWithDrawDialog();
         }
-        public void ShowAccountEnsureDialog(string email,int cash)
+        public void ShowAccountEnsureDialog(string email,RedeemItemData data)
         {
-            Debug.Log($"[WithDrawManager][ShowAccountDialog] PlatFormIndex:{GetPlatSpriteIndex()}");
-            Messenger.Broadcast<int,string,int>(GameDialogManager.OpenAccountEnsureMsg,GetPlatSpriteIndex(),email,cash);
+            // Debug.Log($"[WithDrawManager][ShowAccountDialog] PlatFormIndex:{GetPlatSpriteIndex()}");
+            Messenger.Broadcast<RedeemItemData,string>(GameDialogManager.OpenAccountEnsureMsg,data,email);
             // ReduceCash(cash);
         }
 
         public void ReduceCash(int money)
         {
-            Debug.Log($"[WithDrawManager][ReduceCash] money:{money}");
+            // Debug.Log($"[WithDrawManager][ReduceCash] money:{money}");
             int newCash = OnLineEarningMgr.Instance.Cash() - money;
             OnLineEarningMgr.Instance.SetCash(newCash);
             //广播刷新任务减钱
@@ -481,16 +475,16 @@ namespace System
             if (isMin)
             {
                 ///取出当前平台的第一个任务
-                targetCash = (int)targetRedeemItemList[0].task.TargetNum;
+                targetCash = (int)targetRedeemItemList[0].RewardCash;
             }
             else
             {
                 int cash = OnLineEarningMgr.Instance.Cash();
                 for (int i = 0; i < targetRedeemItemList.Count-1; i++)
                 {
-                    if (cash >= targetRedeemItemList[i].task.TargetNum && targetRedeemItemList[i+1].task.TargetNum>cash)
+                    if (cash >= targetRedeemItemList[i].RewardCash && targetRedeemItemList[i+1].RewardCash>cash)
                     {
-                        targetCash = (int)targetRedeemItemList[i+1].task.TargetNum;
+                        targetCash = (int)targetRedeemItemList[i+1].RewardCash;
                         break;
                     }
                 }

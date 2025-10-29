@@ -67,6 +67,7 @@ namespace Libs
                 }
                 //加载本地保存的任务数据
                 task.LoadSaveDataDict(taskDictItem);
+                taskDict[taskId] = task;
                 break;
             }
         }
@@ -77,10 +78,10 @@ namespace Libs
         /// <param name="taskId"></param>
         /// <param name="dict"></param>
         /// <returns></returns>
-        public BaseTask RegisterTask(int taskId,Dictionary<string,object> dict)
+        public BaseTask RegisterTask(int taskId,Dictionary<string,object> dict,BaseTask parentTask=null)
         {
             //创建对象，主要是走一遍构造函数
-            BaseTask task = TaskFactory.CreateTask(dict);
+            BaseTask task = TaskFactory.CreateTask(dict, parentTask);
             CloneTaskProgress(task);
             taskDict[taskId] = task;
             return task;

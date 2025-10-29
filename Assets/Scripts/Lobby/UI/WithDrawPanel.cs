@@ -82,7 +82,7 @@ public class WithDrawPanel : MonoBehaviour
     {
         //判断显示的tip样式
         int cash = OnLineEarningMgr.Instance.Cash();
-        int targetCash = WithDrawManager.Instance.GetTaskLevelCash(isDoingWithDraw);
+        int targetCash = WithDrawManager.Instance.GetTaskLevelCash(isDoingWithDraw)*OnLineEarningMgr.Instance.GetCashMultiple();
         //当前没有档位时，不再显示
         if (targetCash == 0)
         {

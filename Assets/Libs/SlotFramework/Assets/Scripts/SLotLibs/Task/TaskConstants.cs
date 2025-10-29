@@ -23,8 +23,15 @@ namespace Libs
         public const string StartTime_Key = "startTime";
         public const string EndTime_Key = "endTime";
         public const string CanRewardTime_Key = "canRewardTime";
+        public const string IsSequential_Key = "isSequential";
+        public const string CanAutoComplete_Key = "canAutoComplete";
 
-        public const int LeafTask_Key = 10;
+        public const string TaskIndex_Key = "index";
+        public const string ChildTasks_Key = "childTasks";
+
+
+        public const int LeafTask_Key = 9;
+        public const int SequentialTask_Key = 10;
         public const int SpinAwardCashTask_Key = 11;    //既要满足spin次数又要满足收集现金
         public const int AccumulateCashTask_Key = 12;   //收集现金
         public const int WatchADTimeTask_Key = 13;      //观看广告次数

@@ -17,6 +17,7 @@ namespace Classic
         public TextMeshProUGUI dataTmp;
         public Button ensureBtn;
         private int money = 0;
+        private RedeemItemData _itemData;
         protected override void Awake()
         {
             base.Awake();
@@ -25,16 +26,17 @@ namespace Classic
             // UGUIEventListener.Get(ensureBtn.gameObject).onClick = EnsureBtnClick;
         }
         
-        public void SetUIData(int spriteIndex,string account,int cash)
+        public void SetUIData(RedeemItemData data,string account)
         {
-            money = cash;
-            cashTmp.text = OnLineEarningMgr.Instance.GetMoneyStr(cash, needIcon: false);
+            _itemData = data;
+            money = (int)_itemData.RewardCash;
+            cashTmp.text = OnLineEarningMgr.Instance.GetMoneyStr(money, needIcon: false);
             
             AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
             {
                 if (result != null)
                 {
-                    Sprite sp = result.GetSprite(spriteIndex.ToString());
+                    Sprite sp = result.GetSprite(_itemData.platSpIndex.ToString());
                     if (sp != null)
                     {
                         image.sprite = sp;
@@ -51,10 +53,9 @@ namespace Classic
         {
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
             this.Close();
-            WithDrawManager.Instance.IsInWithDrawProgress = true;
+            Messenger.Broadcast<int>(WithDrawConstants.UpdateRedeemItemState,_itemData.CurTask.TaskId);
             WithDrawManager.Instance.ReduceCash(money);
-            Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
-            Messenger.Broadcast(WithDrawConstants.UpdateRedeemItemState);
+            //Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
             WithDrawManager.Instance.SendMsg(money);
             Messenger.Broadcast<int>(WithDrawConstants.DoneWithDrawAction,money);
         }

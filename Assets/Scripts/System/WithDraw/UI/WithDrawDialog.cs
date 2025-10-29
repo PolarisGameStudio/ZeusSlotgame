@@ -14,9 +14,6 @@ using UnityEngine.Localization;
 using UnityEngine.UI;
 using Utils;
 
-
-
-
 public class WithDrawDialog : UIDialog
 {
     public TextMeshProUGUI money;
@@ -152,10 +149,5 @@ public class WithDrawDialog : UIDialog
                 tweenerTip.Kill();
                 tweenerTip = null;
             });
-    }
-
-    public override void Close()
-    {
-        base.Close();
     }
 }

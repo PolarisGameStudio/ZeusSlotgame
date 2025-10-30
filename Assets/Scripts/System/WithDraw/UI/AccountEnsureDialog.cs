@@ -56,6 +56,7 @@ namespace Classic
             Messenger.Broadcast<int>(WithDrawConstants.UpdateRedeemItemState,_itemData.CurTask.TaskId);
             WithDrawManager.Instance.ReduceCash(money);
             //Messenger.Broadcast<int>(GameDialogManager.OpenAccountLoginTipsMsg,money);
+            WithDrawManager.Instance.CheckShowWithDrawTipDialog(money);
             WithDrawManager.Instance.SendMsg(money);
             Messenger.Broadcast<int>(WithDrawConstants.DoneWithDrawAction,money);
         }

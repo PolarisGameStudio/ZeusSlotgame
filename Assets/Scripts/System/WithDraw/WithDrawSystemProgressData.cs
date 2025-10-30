@@ -9,15 +9,18 @@ namespace System
         private List<BaseTask> _tasks = new List<BaseTask>();
         public int FreeSymbolNum = 0;
         public int S01SymbolNum = 0;
+        public bool isFirstWithDraw = false;
 
         public override void LoadData(WithDrawSystemProgressData progressData)
         {
             FreeSymbolNum = progressData.FreeSymbolNum;
             S01SymbolNum = progressData.S01SymbolNum;
+            isFirstWithDraw= progressData.isFirstWithDraw;
         }
 
         public override void SaveData()
         {
+            isFirstWithDraw= WithDrawManager.Instance.isFirstWithDraw;
             StoreManager.Instance.SaveDataJson(fileName,this);
         }
 

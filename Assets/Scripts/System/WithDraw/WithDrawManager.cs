@@ -32,7 +32,7 @@ namespace System
         private int _activeAdSpinCount;//激活广告所需的spin次数
         private bool _isActiveCloseAd;//是否激活提现界面关闭广告
         public bool CanPlayAd;//是否激活提现界面关闭广告
-        
+        public bool isFirstWithDraw = false;
         public static bool WithDrawUIShow = false;
         public bool NeedLoginDays = false;
         public static WithDrawManager Instance{
@@ -123,6 +123,7 @@ namespace System
                 WithDrawSystemProgressData data = StoreManager.Instance.LoadDataJson<WithDrawSystemProgressData>(progressData.fileName);
                 if (data!=null)
                 {
+                    isFirstWithDraw = data.isFirstWithDraw;
                     progressData.LoadData(data);
                 }
             }
@@ -390,6 +391,15 @@ namespace System
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
             //打开提现弹窗
             Messenger.Broadcast(GameDialogManager.OpenWithDrawDialog);
+        }
+        
+        public void CheckShowWithDrawTipDialog(int cash)
+        {
+            if (!isFirstWithDraw)
+            {
+                isFirstWithDraw = true;
+                Messenger.Broadcast<int>(GameDialogManager.OpenWithDrawTipDialogMsg,cash);
+            }
         }
         
         //关闭提现弹窗

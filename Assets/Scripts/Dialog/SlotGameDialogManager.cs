@@ -377,6 +377,18 @@ namespace Classic
             UIManager.Instance.OpenSystemDialog(
                 new OpenConfigParam<WithDrawDialog>(isPortrait,uiPopupStrategy: new MachineUIPopupStrategy()));
         }
+        
+        protected override void OpenWithDrawTipDialog(int cash)
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<WithDrawTipDialog>(isPortrait,uiPopupStrategy: new MachineUIPopupStrategy(),dialogInitCallBack: (dialog) =>
+                {
+                    dialog.SetData(cash);
+                }));
+        }
+        
         protected override void OpenNewUserGuidDialog()
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&

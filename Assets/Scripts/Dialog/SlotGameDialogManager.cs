@@ -389,6 +389,17 @@ namespace Classic
                 }));
         }
         
+        protected override void OpenWithDrawTaskCompletePanel(BaseTask task)
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenTips(new OpenConfigParam<WithDrawTaskCompletePanel>(isPortrait, 0, OpenType.Normal,
+                uiPopupStrategy: new MachineUIPopupStrategy(),
+                dialogInitCallBack: (dialog) => { dialog.SetData(task);},
+                animationIn: UIAnimation.NOAnimation, animationOut: UIAnimation.NOAnimation,
+                queueId: Constants.UI_TIPS_EVENT_KEY));
+        }
+        
         protected override void OpenNewUserGuidDialog()
         {
             bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&

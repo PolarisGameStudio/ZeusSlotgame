@@ -3,6 +3,7 @@ using System.BuffSystem;
 using UnityEngine;
 using System.Collections.Generic;
 using Beebyte.Obfuscator;
+using Libs;
 
 [Skip]
 public class GameDialogManager : MonoBehaviour
@@ -77,6 +78,7 @@ public class GameDialogManager : MonoBehaviour
 	public const string OpenWithDrawDialog = "OpenWithDrawDialog";
 	public const string CloseWithDrawDialog = "CloseWithDrawDialog";
 	public const string OpenWithDrawTipDialogMsg = "OpenWithDrawTipDialog";
+	public const string OpenWithDrawTaskCompletePanelMsg = "OpenWithDrawTaskCompletePanel";
 
 
 	public const string OpenGetMoreCashDialog = "OpenGetMoreCashDialog";
@@ -194,6 +196,8 @@ public class GameDialogManager : MonoBehaviour
             Messenger.AddListener<int>(OpenGetMoreCashDialog, OnOpenGetMoreCashDialog);
             Messenger.AddListener(OpenWithDrawDialog, OnOpenWithDrawDialog);
             Messenger.AddListener<int>(OpenWithDrawTipDialogMsg, OpenWithDrawTipDialog);
+            Messenger.AddListener<BaseTask>(OpenWithDrawTaskCompletePanelMsg, OpenWithDrawTaskCompletePanel);
+
             #endregion
             Messenger.AddListener(OpenNewUserGuidDialogMsg, OpenNewUserGuidDialog);
 
@@ -299,6 +303,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener<int>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
 			Messenger.RemoveListener(OpenGiftBoxDialogMsg, OpenGiftBoxDialog);
 			Messenger.RemoveListener<int>(OpenWithDrawTipDialogMsg, OpenWithDrawTipDialog);
+			Messenger.RemoveListener<BaseTask>(OpenWithDrawTaskCompletePanelMsg, OpenWithDrawTaskCompletePanel);
 
 			
 			Messenger.RemoveListener<int,int,System.Action>(OpenSpinWithDrawStartDialogMsg, OpenSpinWithDrawStartDialog);
@@ -619,6 +624,11 @@ public class GameDialogManager : MonoBehaviour
 	}
 	
 	protected virtual void OpenWithDrawTipDialog(int cash)
+	{
+		
+	}
+	
+	protected virtual void OpenWithDrawTaskCompletePanel(BaseTask task)
 	{
 		
 	}

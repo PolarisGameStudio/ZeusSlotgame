@@ -55,5 +55,10 @@ namespace Libs
         {
             activeTime = TimeUtils.ConvertDateTimeLong(DateTime.Now);
         }
+
+        public override string GetDesc()
+        {
+            return "tasklogin";
+        }
     }
 }

@@ -54,6 +54,7 @@ namespace System
                     SequentialTask = task as SequentialTask;
                 }
             }
+            SequentialTask.OnChildTaskCompleted += OnSequentialTaskChildTaskCompleted;
             SequentialTask.OnProgressUpdated += OnSequentialTaskProgressUpdated;
             SequentialTask.OnTaskCompleted += OnSequentialTaskCompleted;
             SequentialTask.OnSwitchChildTask+= OnSwitchChildTask;
@@ -119,6 +120,12 @@ namespace System
             }
         }
 
+        private void OnSequentialTaskChildTaskCompleted(BaseTask childTask)
+        {
+            Messenger.Broadcast(GameDialogManager.OpenWithDrawTaskCompletePanelMsg,childTask);
+        }
+        
+        
         private void OnSwitchChildTask(BaseTask task, int childIndex)
         {
             if (itemUI!=null)

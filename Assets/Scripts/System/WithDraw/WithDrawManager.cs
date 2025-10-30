@@ -491,5 +491,56 @@ namespace System
             
             return targetCash;
         }
+        
+        public string GetTaskInfo(BaseTask Task)
+        {
+            string info = GetTaskInfoDesc(Task);
+            string progressInfo = "";
+            if (Task is CollectCashFromZeroTask)
+            {
+                progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",OnLineEarningMgr.Instance.GetMoneyStr((int)Task.HasCollectNum,0,false,true),
+                    OnLineEarningMgr.Instance.GetMoneyStr((int)Task.TargetNum,0,false,true));
+            }
+            else
+            {
+                progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",Task.HasCollectNum,Task.TargetNum);
+            }
+            return info+". "+progressInfo;
+        }
+        public string GetTaskInfoDesc(BaseTask Task)
+        {
+            string info = "";
+            string key = Task.GetDesc();
+            if (string.IsNullOrEmpty(key))
+            {
+                Debug.LogError("WithDrawTaskActivity GetTaskInfoDesc error, key is null or empty, taskId: " + Task.TaskId);
+                return info;
+            }
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,key);
+            if (localizedString!=null)
+            {
+                localizedString.Arguments = new object[] { GetProgressInfo(Task) };
+                info = localizedString.GetLocalizedString();
+            }
+
+            return info;
+        }
+        
+        public string GetProgressInfo(BaseTask Task)
+        {
+            string info = string.Empty;
+            if (Task!= null)
+            {
+                if (Task.TaskType ==TaskConstants.AccumulateCashTask_Key || Task.TaskType==TaskConstants.CollectCashFromZeroTask_Key)
+                {
+                    info = string.Format("{0}",OnLineEarningMgr.Instance.GetMoneyStr((int)Task.TargetNum,0,false,true));
+                }
+                else
+                {
+                    info = string.Format("{0}",Task.TargetNum);
+                }
+            }
+            return info;
+        }
     }
 }

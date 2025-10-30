@@ -109,6 +109,8 @@ public class RedeemItem : MonoBehaviour
         {
             if (itemData.CurTask.IsTaskConditionOK)
             {
+                condition.gameObject.SetActive(false);
+                sequentialTaskObj.SetActive(false);
                 inProgress.gameObject.SetActive(false);
                 redeemBtn.gameObject.SetActive(true);
             }
@@ -157,13 +159,22 @@ public class RedeemItem : MonoBehaviour
             }
             else
             {
-                ShowInProgressUI(childTask);
+                SetTaskConditionInfo(childTask);
             }
         }else if (childTask.State == (int)TaskState.CLOSE)
         {
             //暂留接口，暂时无需处理
         }
     }
+
+    void SetTaskConditionInfo(BaseTask task)
+    {
+        inProgress.gameObject.SetActive(false);
+        redeemBtn.gameObject.SetActive(false);
+        condition.gameObject.SetActive(true);
+        conditionTMP.text = WithDrawManager.Instance.GetTaskInfo(task);
+    }
+    
     void SetProgressText(BaseTask task)
     {
         int type = task.TaskType;
@@ -184,9 +195,11 @@ public class RedeemItem : MonoBehaviour
     
     private void ShowInProgressUI(BaseTask task)
     {
+        taskIconImg.gameObject.SetActive(true);
         inProgress.gameObject.SetActive(true);
         redeemBtn.gameObject.SetActive(false);
         condition.gameObject.SetActive(false);
+        sequentialTaskObj.SetActive(false);
         SetProgressText(task);
         //设置任务图标排除任务类型
         if (task.TaskType != TaskConstants.CollectLoginDaysTask_Key)

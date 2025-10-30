@@ -117,6 +117,10 @@ MonoBehaviour:
     m_Address: Prefab/UI/WithDrawTipDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 05e3776f58fbf4c3aad877e60371849c
+    m_Address: Prefab/UI/WithDrawTaskCompletePanel_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

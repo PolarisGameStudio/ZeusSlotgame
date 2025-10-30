@@ -429,12 +429,14 @@ public class BaseGameConsole :MonoBehaviour
 		RulePatternManager.SaveLocalRuleData();
 		AsyncLogger.Instance.SaveData();
 		TaskManager.Instance.SaveProgressData();
+		WithDrawManager.Instance.SaveProgressData();
 		UserManager.GetInstance().UserProfile().IsFirstGameSession = false;
 		UserManager.GetInstance ().UserProfile ().SaveToPlayerPrefs ();
 		ADManager.Instance.SaveADProgressData();
 		ActivityManager.Instance.SaveData();
 		CardSystemManager.Instance.SaveProgressData();
-		BuffManager.Instance.SaveProgressData(); 
+		BuffManager.Instance.SaveProgressData();
+		WithDrawManager.Instance.SaveProgressData();
 	}
 	
 	void Update()

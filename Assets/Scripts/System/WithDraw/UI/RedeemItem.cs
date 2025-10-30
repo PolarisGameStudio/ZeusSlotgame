@@ -187,11 +187,19 @@ public class RedeemItem : MonoBehaviour
         inProgress.gameObject.SetActive(true);
         redeemBtn.gameObject.SetActive(false);
         condition.gameObject.SetActive(false);
-        ItemManager.Instance.GetTaskIcon(task.TaskType, (icon) =>
-        {
-            taskIconImg.sprite = icon;
-        });
         SetProgressText(task);
+        //设置任务图标排除任务类型
+        if (task.TaskType != TaskConstants.CollectLoginDaysTask_Key)
+        {
+            ItemManager.Instance.GetTaskIcon(task.TaskType, (icon) =>
+            {
+                taskIconImg.sprite = icon;
+            });
+        }
+        else
+        {
+            taskIconImg.gameObject.SetActive(false);
+        }
     }
     
     private void OnButtonClickHandler(GameObject go)

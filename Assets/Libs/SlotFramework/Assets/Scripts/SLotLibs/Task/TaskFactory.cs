@@ -58,6 +58,9 @@ namespace Libs
                 case TaskConstants.SequentialTask_Key:
                     task = new SequentialTask(taskInfoDict, parentTask);
                     break;
+                case TaskConstants.CollectLoginDaysTask_Key:
+                    task = new CollectLoginDaysTask(taskInfoDict, parentTask);
+                    break;
             }
             return task;
         }

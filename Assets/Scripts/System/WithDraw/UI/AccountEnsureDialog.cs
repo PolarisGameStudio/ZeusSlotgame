@@ -29,7 +29,7 @@ namespace Classic
         public void SetUIData(RedeemItemData data,string account)
         {
             _itemData = data;
-            money = (int)_itemData.RewardCash;
+            money = (int)_itemData.RewardCash*OnLineEarningMgr.Instance.GetCashMultiple();
             cashTmp.text = OnLineEarningMgr.Instance.GetMoneyStr(money, needIcon: false);
             
             AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>

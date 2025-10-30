@@ -53,7 +53,6 @@ namespace Libs
         
         public Action<BaseTask> OnTaskCompleted;
         public Action<BaseTask> OnChildTaskCompleted;
-       
         public BaseTask(Dictionary<string,object> taskInfoDict,BaseTask parentTask = null)
         {
             if (null == taskInfoDict) return;
@@ -143,6 +142,11 @@ namespace Libs
             }
         }
 
+        public virtual void HandleChildTaskActivated()
+        {
+            
+        }
+        
         protected virtual bool CheckAllChildTasksCompleted()
         {
             return ChildTasks.All(child => child.State == (int)TaskState.CLOSE);
@@ -308,7 +312,6 @@ namespace Libs
             data[TaskConstants.CollectNumber_Key] = HasCollectNum;
             data[TaskConstants.CanRewardTime_Key] = CanRewardTime;
             data[TaskConstants.SpinTotalNum_Key] = SpinTotalNum;
-            data[TaskConstants.TaskState_Key] = State;
             data[TaskConstants.TaskState_Key] = State;
             return data;
         }

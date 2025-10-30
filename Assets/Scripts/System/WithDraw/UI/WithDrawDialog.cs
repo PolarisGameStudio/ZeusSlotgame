@@ -56,6 +56,7 @@ public class WithDrawDialog : UIDialog
     protected override void Awake()
     {
         base.Awake();
+        Messenger.Broadcast(WithDrawConstants.WithDrawDialogOpened);
         redeemToggle.onValueChanged.AddListener(OnPanelToggleChanged);
         recordToggle.onValueChanged.AddListener(OnPanelToggleChanged);
         

@@ -129,7 +129,30 @@ namespace Libs
 				return defaultValue;
 			}
 		}
+		public static int CheckSameDayAndGetInterval(long activetime)
+		{
+			// 如果 activetime 为0，表示没有激活时间，返回特定值或抛出异常
+			if (activetime == 0)
+			{
+				return -1; // 或者根据业务需求返回其他值
+			}
 
+			// 将 long 类型的时间戳转换为 DateTime
+			DateTime activeDate = ConvertLongToDate(activetime);
+			DateTime currentDate = DateTime.Now;
+    
+			// 判断是否为同一天
+			if (activeDate.Date == currentDate.Date)
+			{
+				return 0; // 同一天
+			}
+			else
+			{
+				// 计算间隔的天数（取绝对值，确保正数）
+				TimeSpan interval = currentDate.Date - activeDate.Date;
+				return Math.Abs(interval.Days);
+			}
+		}
 		public static void SavePlayerPrefsLong (string key, long value)
 		{
 			PlayerPrefs.SetString (key, value.ToString());

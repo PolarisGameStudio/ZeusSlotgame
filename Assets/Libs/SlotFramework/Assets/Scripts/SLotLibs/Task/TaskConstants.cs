@@ -25,7 +25,7 @@ namespace Libs
         public const string CanRewardTime_Key = "canRewardTime";
         public const string IsSequential_Key = "isSequential";
         public const string CanAutoComplete_Key = "canAutoComplete";
-
+        public const string ActiveTime_Key = "activeTime";
         public const string TaskIndex_Key = "index";
         public const string ChildTasks_Key = "childTasks";
 
@@ -45,5 +45,7 @@ namespace Libs
         public const int CollectWildSymbolCountTask_Key = 21; //收集freespin symbol的任务
         public const int CollectTriggerSpinWinCountTask_Key = 22; //收集触发奖励弹窗的次数
         public const int CollectSymbolCountTask_Key = 23; //收集指定一种symbol的任务
+        public const int CollectLoginDaysTask_Key = 24; //收集登录天数任务
+
     }
 }

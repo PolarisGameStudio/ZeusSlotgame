@@ -33,6 +33,7 @@ namespace System
         public async void GetTaskIcon(int taskType,Action<Sprite> callback)
         {
             string iconName = GetTaskIconName(taskType);
+            
             Sprite icon = await AddressableManager.Instance.LoadAssetAsync<Sprite>(resourcePath +"TaskIcon/"+ iconName);
             if (icon!=null)
             {

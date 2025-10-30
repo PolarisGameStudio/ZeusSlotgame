@@ -11,5 +11,6 @@ namespace System
         public const string AdCoolTimeKey = "AdCoolTime";
         public const string ActiveAdSpinCount = "ActiveAdSpinCount";
         public const string DoneWithDrawAction = "DoneWithDrawAction";
+        public const string WithDrawDialogOpened = "WithDrawDialogOpened";
     }
 }

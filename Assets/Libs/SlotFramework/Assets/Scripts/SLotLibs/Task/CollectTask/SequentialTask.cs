@@ -50,6 +50,7 @@ namespace Libs
             if (ChildTasks[ChildIndex].State == (int)TaskState.AHEAD)
             {
                 ChildTasks[ChildIndex].State = (int)TaskState.ONGOING;
+                ChildTasks[ChildIndex].HandleChildTaskActivated();
             }
         }
         protected virtual void CompleteOneProgress()
@@ -87,7 +88,6 @@ namespace Libs
             {
                 ChildIndex = 0;
             }
-            ActiveChildTask();
             return ChildTasks[ChildIndex];
         }
     }

@@ -104,32 +104,7 @@ namespace Libs
             return null;
         }
         
-        private void CreatePlistTask()
-        {
-            Dictionary<string, object> taskInfoDict =
-                Configuration.GetInstance().GetValue<Dictionary<string,object>>(TaskConstants.PlistTask_Key,null);
-            if (taskInfoDict == null)
-            {
-                return;
-            }
-            foreach (var taskItem in taskInfoDict)
-            {
-                int taskId = Int32.Parse(taskItem.Key);
-                if (taskDict.ContainsKey(taskId))
-                {
-                    continue;
-                }
-                Dictionary<string, object> taskInfos = taskItem.Value as Dictionary<string, object>;
-                if (taskInfos == null || taskInfos.Count == 0)
-                {
-                    Debug.LogError("[TaskManager][CreatePlistTask] taskInfos is null");
-                    continue;
-                }
-
-                BaseTask task = TaskFactory.CreateTask(taskInfos);
-                taskDict.Add(taskId,task);
-            }
-        }
+        
         
         private BaseTask GetTaskById(int taskId)
         {

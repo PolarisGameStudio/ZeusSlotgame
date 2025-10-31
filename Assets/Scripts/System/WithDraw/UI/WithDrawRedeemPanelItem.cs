@@ -83,13 +83,12 @@ public class WithDrawRedeemPanelItem:MonoBehaviour,LoopScrollPrefabSource, LoopS
     public GameObject GetObject(int index)
     {
         GameObject go= PoolResourceManager.Instance.GetObjectFromPool(poolName);
-        go.AddComponent<RedeemItem>();
         return go;
     }
 
     public void ReturnObject(Transform trans)
     {
-        Destroy(trans.GetComponent<RedeemItem>());
+        trans.GetComponent<RedeemItem>().OnDispose();
         PoolResourceManager.Instance.ReturnTransformToPool(trans);
     }
     

@@ -81,7 +81,7 @@ public class WithDrawDialog : UIDialog
     {
         Messenger.AddListener(GameDialogManager.CloseWithDrawDialog,Close);
         Messenger.AddListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateCashNum);
-        Messenger.AddListener(WithDrawConstants.ShowTipMsg,ShowTip);
+        Messenger.AddListener<string>(WithDrawConstants.ShowTipMsg,ShowTip);
         Messenger.AddListener<int>(ADConstants.PlayWithDrawCloseAD,ShowVideoCallBack);
         Messenger.AddListener<int>(ADConstants.PlayWithDrawCloseADFailed,ShowVideoCallBack);
         Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
@@ -99,7 +99,7 @@ public class WithDrawDialog : UIDialog
         Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
         Messenger.RemoveListener(GameDialogManager.CloseWithDrawDialog,Close);
         Messenger.RemoveListener(SlotControllerConstants.OnCashChangeForDisPlay,UpdateCashNum);
-        Messenger.RemoveListener(WithDrawConstants.ShowTipMsg,ShowTip);
+        Messenger.RemoveListener<string>(WithDrawConstants.ShowTipMsg,ShowTip);
         Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseAD,ShowVideoCallBack);
         Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseADFailed,ShowVideoCallBack);
         Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
@@ -132,12 +132,13 @@ public class WithDrawDialog : UIDialog
         }
     }
     
-    void ShowTip()
+    void ShowTip(string info)
     {
         if (tweenerTip!=null && tip.activeInHierarchy)
         {
             return;
         }
+        tipInfo.text = info;
         tip.SetActive(true);
         tip.transform.localPosition = new Vector3(0, -100f, 0);
         tweenerTip = tip.transform.DOLocalMoveY(0f, 2f)

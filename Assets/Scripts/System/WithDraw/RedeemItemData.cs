@@ -21,6 +21,8 @@ namespace System
         private Dictionary<string, object> data = new Dictionary<string, object>();
         public AccumulateTotalCashTask CashTask;
         public SequentialTask SequentialTask;
+        public SequentialTask SequentialChildTask;
+
         //当前任务
         public BaseTask CurTask;
         public BaseTask ChildTask1;
@@ -54,7 +56,7 @@ namespace System
                     SequentialTask = task as SequentialTask;
                 }
             }
-            SequentialTask.OnChildTaskCompleted += OnSequentialTaskChildTaskCompleted;
+            // SequentialTask.OnChildTaskCompleted += OnSequentialTaskChildTaskCompleted;
             SequentialTask.OnProgressUpdated += OnSequentialTaskProgressUpdated;
             SequentialTask.OnTaskCompleted += OnSequentialTaskCompleted;
             SequentialTask.OnSwitchChildTask+= OnSwitchChildTask;
@@ -92,6 +94,7 @@ namespace System
             {
                 CurTask = SequentialTask;
                 state = RedeemItemState.InTaskProgress2;
+                BindSequentialTaskEvents();
             }
             else
             {
@@ -99,7 +102,7 @@ namespace System
             }
         }
 
-        //切换至下一个任务
+        //从收集现金切换至下一个任务
         public void SwitchToNextTask()
         {
             if (state == RedeemItemState.InTaskProgress1)
@@ -109,9 +112,26 @@ namespace System
                 SequentialTask.ActiveChildTask();
                 CurTask = SequentialTask;
                 state = RedeemItemState.InTaskProgress2;
+                BindSequentialTaskEvents();
             }
         }
 
+        private void BindSequentialTaskEvents()
+        {
+            SequentialChildTask = SequentialTask.GetOnGoingChildTask() as SequentialTask;
+            UnBindSequentialTaskEvents();
+            SequentialChildTask.OnSwitchChildTask += OnSwitchChildTask;
+            SequentialChildTask.OnChildTaskCompleted += OnSequentialTaskChildTaskCompleted;
+        }
+        private void UnBindSequentialTaskEvents()
+        {
+            if (SequentialChildTask!=null)
+            {
+                SequentialChildTask.OnSwitchChildTask -= OnSwitchChildTask;
+                SequentialChildTask.OnChildTaskCompleted -= OnSequentialTaskChildTaskCompleted;
+            }
+        }
+        
         private void OnSequentialTaskProgressUpdated(BaseTask task, int progress)
         {
             if (itemUI!=null)
@@ -125,12 +145,26 @@ namespace System
             Messenger.Broadcast(GameDialogManager.OpenWithDrawTaskCompletePanelMsg,childTask);
         }
         
-        
         private void OnSwitchChildTask(BaseTask task, int childIndex)
         {
-            if (itemUI!=null)
+            //当天任务已完成，已切换至下一天任务
+            if (task.TaskId == SequentialTask.TaskId)
             {
-                itemUI.RefreshUI();
+                UnBindSequentialTaskEvents();
+                SequentialChildTask = SequentialTask.GetOnGoingChildTask() as SequentialTask;
+                BindSequentialTaskEvents();
+                if (itemUI!=null)
+                {
+                    itemUI.RefreshUI();
+                }
+                
+            }else if (task.TaskId == SequentialChildTask.TaskId)
+            {
+                //已切换至当天的下一个子任务
+                if (itemUI!=null)
+                {
+                    itemUI.SetSequentialChildTaskUI();
+                }
             }
         }
         

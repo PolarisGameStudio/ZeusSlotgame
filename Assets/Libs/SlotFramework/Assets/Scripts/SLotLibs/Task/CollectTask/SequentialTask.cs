@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Libs
 {
@@ -30,6 +31,10 @@ namespace Libs
         
         protected override void HandleChildTaskCompleted(BaseTask childTask)
         {
+            if (State != (int)TaskState.ONGOING)
+            {
+                return;
+            }
             OnChildTaskCompleted?.Invoke(childTask);
             // 检查所有子任务是否完成
             if (CheckAllChildTasksCompleted())
@@ -47,17 +52,31 @@ namespace Libs
         
         public virtual void ActiveChildTask()
         {
+            if (State != (int)TaskState.ONGOING)
+            {
+                return;
+            }
+            Debug.Log($"[SequentialTask] ActiveChildTask ChildIndex:{ChildIndex}:self:{this.TaskId}");
             if (ChildTasks[ChildIndex].State == (int)TaskState.AHEAD)
             {
                 ChildTasks[ChildIndex].State = (int)TaskState.ONGOING;
                 ChildTasks[ChildIndex].HandleChildTaskActivated();
             }
         }
+
+        public override void HandleChildTaskActivated()
+        {
+            //重启第一个子任务
+            ChildIndex = 0;
+            ActiveChildTask();
+        }
+        
         protected virtual void CompleteOneProgress()
         {
             AddNumber = 1;
             DoCollectAction();
-            UpdateTaskStatus();
+            IsTaskConditionOK = HasCollectNum >= TargetNum;
+            Messenger.Broadcast(UpdateTaskDataMsg);
             OnProgressUpdated?.Invoke(this, (int)HasCollectNum);
             if (IsTaskConditionOK)
             {
@@ -89,6 +108,11 @@ namespace Libs
                 ChildIndex = 0;
             }
             return ChildTasks[ChildIndex];
+        }
+
+        public string GetChildInfo()
+        {
+            return string.Format("{0}/{1}",ChildIndex,ChildTasks.Count);
         }
     }
 }

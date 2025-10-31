@@ -134,6 +134,10 @@ namespace Libs
 
         protected virtual void HandleChildTaskCompleted(BaseTask childTask)
         {
+            if (State!= (int)TaskState.ONGOING)
+            {
+                return;
+            }
             OnChildTaskCompleted?.Invoke(childTask);
             // 检查所有子任务是否完成
             if (CheckAllChildTasksCompleted())

@@ -144,12 +144,12 @@ public class RedeemItem : MonoBehaviour
     public void UpdateSequentialUI()
     {
         sequentialTaskObj.SetActive(true);
-        sequentialTaskProgressTMP.text = string.Format("{0}/{1}", (int)itemData.CurTask.HasCollectNum, (int)itemData.CurTask.TargetNum);
+        sequentialTaskProgressTMP.text =itemData.SequentialTask.GetChildInfo();
     }
     
     public void SetSequentialChildTaskUI()
     {
-        BaseTask childTask = itemData.SequentialTask.GetOnGoingChildTask();
+        BaseTask childTask = itemData.SequentialChildTask.GetOnGoingChildTask();
         //显示子任务对应的UI显示
         if (childTask.State == (int)TaskState.ONGOING)
         {
@@ -172,7 +172,7 @@ public class RedeemItem : MonoBehaviour
         inProgress.gameObject.SetActive(false);
         redeemBtn.gameObject.SetActive(false);
         condition.gameObject.SetActive(true);
-        conditionTMP.text = WithDrawManager.Instance.GetTaskInfo(task);
+        conditionTMP.text = "["+itemData.SequentialChildTask.GetChildInfo()+"]"+WithDrawManager.Instance.GetTaskInfo(task);
     }
     
     void SetProgressText(BaseTask task)
@@ -226,6 +226,8 @@ public class RedeemItem : MonoBehaviour
         }else if (go == sequentialTaskBtn.gameObject)
         {
             //点击了信息展示按钮
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"withdrawprogress");
+            Messenger.Broadcast<string>(WithDrawConstants.ShowTipMsg,localizedString.GetLocalizedString());
         }
     }
 

@@ -3,6 +3,7 @@ using System;
 using Libs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.U2D;
 using UnityEngine.UI;
 public class RecordItem: MonoBehaviour
@@ -28,7 +29,8 @@ public class RecordItem: MonoBehaviour
     }
     private void OnButtonClickHandler(GameObject go)
     {
-        Messenger.Broadcast(WithDrawConstants.ShowTipMsg);
+        LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"MustCollectCards");
+        Messenger.Broadcast<string>(WithDrawConstants.ShowTipMsg,localizedString.GetLocalizedString());
     }
 
     public void Refresh()

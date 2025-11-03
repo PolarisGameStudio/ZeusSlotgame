@@ -98,6 +98,7 @@ namespace Activity
                 //设置buff初始化状态
                 BuffManager.Instance.SetBuffInit(currentBuff.buffId);
                 UpdateIconDisplay(true);
+                OnBuffActive(currentBuff.buffId);
             }
         }
 

@@ -147,7 +147,7 @@ public class WithDrawPanel : MonoBehaviour
         int nowCash = OnLineEarningMgr.Instance.Cash();
         int leftCash = 0;
         leftCash = targetCash - nowCash;
-        LocalizedString _localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"CollectMoreClaim");
+        LocalizedString _localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"CollectToWithdrawTips");
         if (_localizedString != null && !string.IsNullOrEmpty(_localizedString.GetLocalizedString()))
         {
             string arg1 = string.Format("<color=#D800D9>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr(leftCash, 2, false, true));

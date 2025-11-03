@@ -210,10 +210,10 @@ public class WesternTreasureFly : MonoBehaviour
             //SetTriggerEffect(true);
             PlayAnimation(3);
             AudioManager.Instance.AsyncPlayEffectAudio("treelevelup");
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
             Messenger.Broadcast<string>(GameConstants.PlayFullScreenAnimation, "JackPotStart");
             AudioManager.Instance.AsyncPlayEffectAudio("JackPotStart1");
-            yield return new WaitForSeconds(5.8f);
+            yield return new WaitForSeconds(4.3f);
             // SetTriggerEffect(false);
             treeManager.OpenJackpotGame();
         }

@@ -1,5 +1,6 @@
 using Libs;
 using TMPro;
+using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 
@@ -33,6 +34,7 @@ namespace Classic
         {
             string info = "";
             LocalizedString title = null;
+            Debug.Log($"WithDrawTaskCompletePanel task.taskType:{task.TaskType}");
             switch (task.TaskType)
             {
                 case TaskConstants.CollectSpinCountTask_Key:
@@ -44,6 +46,7 @@ namespace Classic
                     title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawcard");
                     title.Arguments = new object[] {task.TargetNum};
                     break;
+                case TaskConstants.CollectCashFromZeroTask_Key:
                 case TaskConstants.AccumulateCashTask_Key:
                     title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawcash");
                     title.Arguments = new object[] {OnLineEarningMgr.Instance.GetMoneyStr((int)task.TargetNum, needIcon: false)};

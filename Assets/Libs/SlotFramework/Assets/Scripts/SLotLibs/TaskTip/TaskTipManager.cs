@@ -106,13 +106,13 @@ namespace Libs
 
         void AddListener()
         {
-            Messenger.AddListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+            // Messenger.AddListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
             Messenger.AddListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
         }
 
         void RemoveListener()
         {
-            Messenger.RemoveListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
+            // Messenger.RemoveListener<ReelManager, long>(GameConstants.SpinAwardEndMsg, OnSpinAwardEnd);
             Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
         }
 

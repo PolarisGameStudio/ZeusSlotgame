@@ -494,7 +494,15 @@ namespace System
         
         public string GetTaskInfo(BaseTask Task)
         {
-            string info = GetTaskInfoDesc(Task);
+            string info = GetTaskInfos(Task);
+            if (string.IsNullOrEmpty(info))
+            {
+                return info;
+            }
+            //去除info字符串中”()“之间包含的字符串的内容：譬如"info(fjsdffs)cds"处理后变为"infocds"
+            info = info.Substring(0, info.IndexOf("(")) + info.Substring(info.IndexOf(")") + 1);
+            //info中有‘.’字符，需要替换为‘.’
+            info = info.Replace(".", "");
             string progressInfo = "";
             if (Task is CollectCashFromZeroTask)
             {
@@ -505,41 +513,62 @@ namespace System
             {
                 progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",Task.HasCollectNum,Task.TargetNum);
             }
+            
             return info+". "+progressInfo;
         }
-        public string GetTaskInfoDesc(BaseTask Task)
+
+
+        //获取任务信息描述
+        public string GetTaskInfos(BaseTask task)
         {
             string info = "";
-            string key = Task.GetDesc();
-            if (string.IsNullOrEmpty(key))
+            LocalizedString title = null;
+            switch (task.TaskType)
             {
-                Debug.LogError("WithDrawTaskActivity GetTaskInfoDesc error, key is null or empty, taskId: " + Task.TaskId);
-                return info;
+                case TaskConstants.CollectSpinCountTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawspin");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
+                case TaskConstants.CollectNewCardTypeCountTask_Key:
+                case TaskConstants.CollectNewCardCountTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawcard");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
+                case TaskConstants.CollectCashFromZeroTask_Key:
+                case TaskConstants.AccumulateCashTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawcash");
+                    title.Arguments = new object[] {OnLineEarningMgr.Instance.GetMoneyStr((int)task.TargetNum, needIcon: false)};
+                    break;
+                case TaskConstants.WatchADTimeTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawad");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
+                case TaskConstants.CollectFreeGameTriggerCountTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawfreegame");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
+                case TaskConstants.CollectWildSymbolCountTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdraww01");
+                    title.Arguments = new object[] {task.TargetNum,"<sprite=0>"};
+                    break;
+                case TaskConstants.CollectSymbolCountTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdraws01");
+                    title.Arguments = new object[] {task.TargetNum,"<sprite=1>"};
+                    break;
+                case TaskConstants.CollectTriggerSpinWinCountTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawwin");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
+                case TaskConstants.CollectJackpotGameCountTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawjackpot");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
+                case TaskConstants.CollectLoginDaysTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawlogin");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
             }
-            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,key);
-            if (localizedString!=null)
-            {
-                localizedString.Arguments = new object[] { GetProgressInfo(Task) };
-                info = localizedString.GetLocalizedString();
-            }
-
-            return info;
-        }
-        
-        public string GetProgressInfo(BaseTask Task)
-        {
-            string info = string.Empty;
-            if (Task!= null)
-            {
-                if (Task.TaskType ==TaskConstants.AccumulateCashTask_Key || Task.TaskType==TaskConstants.CollectCashFromZeroTask_Key)
-                {
-                    info = string.Format("{0}",OnLineEarningMgr.Instance.GetMoneyStr((int)Task.TargetNum,0,false,true));
-                }
-                else
-                {
-                    info = string.Format("{0}",Task.TargetNum);
-                }
-            }
+            info = title.GetLocalizedString();
             return info;
         }
     }

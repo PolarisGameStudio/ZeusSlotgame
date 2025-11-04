@@ -299,13 +299,13 @@ namespace Libs
             isWithDrawDialogShow = false;
             isWithDrawActivityShow = false;
             
-            //withdrawdialog展示的任务
-            if (CheckShowWithDrawTaskTip(taskType))
-            {
-                Debug.Log("TaskTipManager isWithDrawDialogShow");
-                isWithDrawDialogShow = true;
-                return TaskManager.Instance.GetTaskByType(taskType);
-            }
+            // //withdrawdialog展示的任务
+            // if (CheckShowWithDrawTaskTip(taskType))
+            // {
+            //     Debug.Log("TaskTipManager isWithDrawDialogShow");
+            //     isWithDrawDialogShow = true;
+            //     return TaskManager.Instance.GetTaskByType(taskType);
+            // }
 
             //展示300模式的现金进度，跟CheckShowWithDrawActivityTip互斥
             if (CheckShow300CashTip())

@@ -9,15 +9,21 @@ namespace Libs
         public CollectLoginDaysTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask = null) : base(taskInfoDict, parentTask)
         {
             Messenger.AddListener(WithDrawConstants.WithDrawDialogOpened,UpdateTask);
+            Messenger.AddListener(GameConstants.OnSceneInit,UpdateTask);
         }
 
         ~CollectLoginDaysTask()
         {
             Messenger.RemoveListener(WithDrawConstants.WithDrawDialogOpened,UpdateTask);
+            Messenger.RemoveListener(GameConstants.OnSceneInit,UpdateTask);
         }
         
         void UpdateTask()
         {
+            if (IsTaskConditionOK)
+            {
+                return;
+            }
             int days = TimeUtils.CheckSameDayAndGetInterval(activeTime);
             if (days<=0)
             {

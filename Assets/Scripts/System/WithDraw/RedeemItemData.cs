@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CardSystem;
 using Libs;
+using UniRx.Async;
 using UnityEngine;
 using Utils;
 
@@ -61,6 +62,29 @@ namespace System
             SequentialTask.OnTaskCompleted += OnSequentialTaskCompleted;
             SequentialTask.OnSwitchChildTask+= OnSwitchChildTask;
             UpdateState();
+            AddListeners();
+        }
+        ~RedeemItemData()
+        {
+            RemoveListeners();
+        }
+        private void AddListeners()
+        {
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
+        }
+        private void RemoveListeners()
+        {
+            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
+        }
+
+        bool haveTaskCompleted = false;
+        bool waitForSpinEnd = false;
+        void OnSpinEnd()
+        {
+            if (haveTaskCompleted)
+            {
+                waitForSpinEnd = true;
+            }
         }
         
         public void OnInit(RedeemItem item)
@@ -142,7 +166,24 @@ namespace System
 
         private void OnSequentialTaskChildTaskCompleted(BaseTask childTask)
         {
+            if (childTask.IsSpinRelated())
+            {
+                haveTaskCompleted = true;
+                ShowTaskCompleteDialogAsync(childTask).Forget();
+            }
+            else
+            {
+                Messenger.Broadcast(GameDialogManager.OpenWithDrawTaskCompletePanelMsg,childTask);
+            }
+        }
+        
+        private async UniTaskVoid ShowTaskCompleteDialogAsync(BaseTask childTask)
+        {
+            //等待转盘结束
+            await UniTask.WaitUntil(()=>waitForSpinEnd);
             Messenger.Broadcast(GameDialogManager.OpenWithDrawTaskCompletePanelMsg,childTask);
+            haveTaskCompleted = false;
+            waitForSpinEnd = false;
         }
         
         private void OnSwitchChildTask(BaseTask task, int childIndex)

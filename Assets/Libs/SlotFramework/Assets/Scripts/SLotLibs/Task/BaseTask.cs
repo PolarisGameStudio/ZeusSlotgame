@@ -319,5 +319,18 @@ namespace Libs
             data[TaskConstants.TaskState_Key] = State;
             return data;
         }
+
+        public bool IsSpinRelated()
+        {
+            if (TaskType== TaskConstants.CollectSpinCountTask_Key ||
+                TaskType== TaskConstants.CollectSymbolCountTask_Key ||
+                TaskType== TaskConstants.CollectJackpotGameCountTask_Key ||
+                TaskType== TaskConstants.CollectTriggerSpinWinCountTask_Key||
+                TaskType== TaskConstants.CollectFreeGameTriggerCountTask_Key)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

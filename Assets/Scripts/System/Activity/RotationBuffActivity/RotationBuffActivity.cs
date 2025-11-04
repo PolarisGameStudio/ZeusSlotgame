@@ -37,6 +37,12 @@ namespace Activity
         public int curPopupCount = 0;
         private bool isFree = true;
         private bool OpenCloseAd = true;
+        //spin次数限制
+        private int spinLimit = 0;
+        //当前累计spin次数
+        private int curSpin = 0;
+        //活动是否已开启(基于spin次数)
+        private bool isActivityEnabled = false;
         //解析配置
         public RotationBuffActivity(Dictionary<string, object> data) : base(data)
         {
@@ -45,6 +51,7 @@ namespace Activity
             displayDuration = Utilities.GetInt(data, "RotationInterval", 30);
             AutoPopupCount = Utilities.GetInt(data, "PopCount", 0);
             OpenCloseAd = Utilities.GetBool(data, "OpenCloseAd", true);
+            spinLimit = Utilities.GetInt(data, "SpinLimit", 0);
             List<object> buffDataList = Utilities.GetValue<List<object>>(data, "buffList",null);
             if (buffDataList==null)
             {
@@ -63,10 +70,17 @@ namespace Activity
             }
         }
 
+        public override void OnInit()
+        {
+            //不在这里调用 AddListener,而是在 InitializeRotation 中统一处理
+            //这样可以避免重复添加监听(RegisterIcon 时会调用 InitializeRotation)
+        }
+
         public override void OnDestroy()
         {
             base.OnDestroy();
             Messenger.RemoveListener<bool>(RotationBuffConstant.RotationBuffDialogClose, SetRulePanelShowState);
+            RemoveListener();
         }
 
         #region LoadAndSaveData
@@ -79,51 +93,98 @@ namespace Activity
             {
                 _rotationBuffProgressData.LoadData(Data);
                 activityCount = _rotationBuffProgressData.activeCount;
+                curSpin = _rotationBuffProgressData.curSpin;
             }
+            //检查活动是否已开启(基于spin次数)
+            isActivityEnabled = curSpin >= spinLimit;
             isFree = activityCount < freeCount;
             //根据加载的数据恢复状态
             currentIndex = _rotationBuffProgressData.currentIndex;
             currentBuff = BuffManager.Instance.GetBuffById(buffList[currentIndex]);
-            Debug.Log($"[RotationBuffActivity] LoadSavedData: index={currentIndex}, buff={currentBuff?.buffName}");             
-            //保存的buff未生效
-            if (!currentBuff.CheckActive())
+            Debug.Log($"[RotationBuffActivity] LoadSavedData: index={currentIndex}, buff={currentBuff?.buffName}, curSpin={curSpin}, spinLimit={spinLimit}, isActivityEnabled={isActivityEnabled}");             
+            //只有活动开启时才恢复buff状态
+            if (isActivityEnabled)
             {
-                //展示当前buff
-                StartShowingState();
+                //保存的buff未生效
+                if (!currentBuff.CheckActive())
+                {
+                    //展示当前buff
+                    StartShowingState();
+                }
+                else
+                {
+                    currentState = RotationState.Active;
+                    isBuffActive = true;
+                    //设置buff初始化状态
+                    BuffManager.Instance.SetBuffInit(currentBuff.buffId);
+                    UpdateIconDisplay(true);
+                    OnBuffActive(currentBuff.buffId);
+                }
             }
             else
             {
-                currentState = RotationState.Active;
-                isBuffActive = true;
-                //设置buff初始化状态
-                BuffManager.Instance.SetBuffInit(currentBuff.buffId);
-                UpdateIconDisplay(true);
-                OnBuffActive(currentBuff.buffId);
+                //活动未开启,隐藏icon
+                UpdateIconDisplay(false);
             }
         }
 
         public override void SaveData()
         {
-            _rotationBuffProgressData.SaveData(currentIndex, currentBuff,activityCount);
+            _rotationBuffProgressData.SaveData(currentIndex, currentBuff, activityCount, curSpin);
         }
         
         #endregion
 
         #region AddListener
 
-        private void AddListener()
+        public override void AddListener()
         {
+            base.AddListener();
+            //避免重复添加监听
+            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd, UpdateSpinCount);
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd, UpdateSpinCount);
             if (currentBuff!=null)
             {
+                Messenger.RemoveListener<bool>(currentBuff.UpdateBuffMsg, OnBuffChange);
                 Messenger.AddListener<bool>(currentBuff.UpdateBuffMsg, OnBuffChange);
             }
         }
         
-        private void RemoveListener()
+        public override void RemoveListener()
         {
+            base.RemoveListener();
+            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd, UpdateSpinCount);
             if (currentBuff!=null)
             {
                 Messenger.RemoveListener<bool>(currentBuff.UpdateBuffMsg, OnBuffChange);
+            }
+        }
+
+        private void UpdateSpinCount()
+        {
+            curSpin++;
+            //保存当前spin次数
+            SaveData();
+            //检查是否达到开启条件
+            if (!isActivityEnabled && curSpin >= spinLimit)
+            {
+                isActivityEnabled = true;
+                Debug.Log($"[RotationBuffActivity] Activity enabled: curSpin={curSpin} > spinLimit={spinLimit}");
+                //活动开启,开始轮转
+                if(currentBuff == null)
+                {
+                    currentBuff = BuffManager.Instance.GetBuffById(buffList[currentIndex]);
+                }
+                if (currentBuff != null)
+                {
+                    //设置显示状态
+                    currentState = RotationState.Showing;
+                    stateTimer = displayDuration;
+                    //显示icon
+                    UpdateIconDisplay(true);
+                    //活动初次满足开启条件时,展示RotationBuffDialog
+                    ShowRulePanel(true);
+                }
             }
         }
         
@@ -206,6 +267,11 @@ namespace Activity
         //显示角标
         private void StartShowingState()
         {
+            //只有活动开启时才显示
+            if (!isActivityEnabled)
+            {
+                return;
+            }
             currentState = RotationState.Showing;
             //计时器
             stateTimer = displayDuration;
@@ -228,6 +294,11 @@ namespace Activity
             if (!isInitialized)
             {
                return; 
+            }
+            //只有活动开启时才更新
+            if (!isActivityEnabled)
+            {
+                return;
             }
             //buff激活时不轮转
             if (currentState == RotationState.Active)
@@ -292,13 +363,21 @@ namespace Activity
         
         private void UpdateIconDisplay(bool show)
         {
-            //控制角标显示和隐藏
-            _icon.gameObject.SetActive(show);
-            if (show) 
-                _icon.UpdateBuffUI(currentBuff,this);
-            else
+            //只有活动开启时才显示icon
+            if (!isActivityEnabled)
             {
-                _icon.CancelCountDown();
+                show = false;
+            }
+            //控制角标显示和隐藏
+            if (_icon != null)
+            {
+                _icon.gameObject.SetActive(show);
+                if (show) 
+                    _icon.UpdateBuffUI(currentBuff,this);
+                else
+                {
+                    _icon.CancelCountDown();
+                }
             }
         }
     

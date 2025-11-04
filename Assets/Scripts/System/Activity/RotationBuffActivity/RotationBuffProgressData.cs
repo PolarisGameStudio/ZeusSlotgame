@@ -9,10 +9,13 @@ namespace Activity
         public int currentIndex = 0;
         //buff激活的次数
         public int activeCount = 0;
+        //当前累计的spin次数
+        public int curSpin = 0;
         public override void LoadData(RotationBuffProgressData progressData)
         {
             currentIndex = progressData.currentIndex;
             activeCount= progressData.activeCount;
+            curSpin = progressData.curSpin;
         }
 
         public override void SaveData()
@@ -20,10 +23,11 @@ namespace Activity
             
         }
 
-        public void SaveData(int index, BaseBuff buff,int activityC)
+        public void SaveData(int index, BaseBuff buff,int activityC, int curSpinCount)
         {
             currentIndex = index;
             activeCount = activityC;
+            curSpin = curSpinCount;
             StoreManager.Instance.SaveDataJson(fileName, this);
         }
         
@@ -31,6 +35,7 @@ namespace Activity
         {
             currentIndex = 0;
             activeCount = 0;
+            curSpin = 0;
         }
     }
 }

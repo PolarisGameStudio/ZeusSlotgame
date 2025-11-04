@@ -96,7 +96,6 @@ public class WithDrawPanel : MonoBehaviour
             {
                 return;
             }
-            //做一个延时操作，等待WithDrawTaskActivity切换任务
             if (tipText!=null)
             {
                 string info = GetTipTextInfo(targetCash);

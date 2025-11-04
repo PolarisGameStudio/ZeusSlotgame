@@ -454,10 +454,25 @@ namespace System
         /// <returns></returns>
         public int GetTaskLevelCash(bool isMin = false)
         {
+            Dictionary<string, List<RedeemItemData>> tempRedeemItemDict = new Dictionary<string, List<RedeemItemData>>();
+            //对redeemItemDict进行过滤，去除掉List<RedeemItemData>中，RedeemItemData.state!=RedeemItemState.InTaskProgress1 的元素
+            foreach (var kvp in redeemItemDict)
+            {
+                List<RedeemItemData> tempList = new List<RedeemItemData>();
+                foreach (var item in kvp.Value)
+                {
+                    if (item.state == RedeemItemState.InTaskProgress1)
+                    {
+                        tempList.Add(item);
+                    }
+                }
+                tempRedeemItemDict[kvp.Key] = tempList;
+            }
+            
             //先选出最优先的档位数组
             int minLength = 100;
             List<RedeemItemData> targetRedeemItemList = null;
-            foreach (var kvp in redeemItemDict)
+            foreach (var kvp in tempRedeemItemDict)
             {
                 if (kvp.Value.Count < minLength)
                 {

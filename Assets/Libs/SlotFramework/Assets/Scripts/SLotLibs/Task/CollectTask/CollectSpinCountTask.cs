@@ -17,7 +17,7 @@ namespace Libs
 
         void OnSpinEnd()
         {
-            if (IsConditionOK())
+            if (IsConditionOK()||State!=(int)TaskState.ONGOING)
             {
                 return;
             }

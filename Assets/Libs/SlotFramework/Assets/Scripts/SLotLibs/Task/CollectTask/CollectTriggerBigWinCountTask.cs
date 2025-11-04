@@ -18,6 +18,10 @@ namespace Libs
         
         protected override bool IsCollectConditionOk(ReelManager reelManager, long totalWin)
         {
+            if (IsConditionOK()||State!=(int)TaskState.ONGOING)
+            {
+                return false;
+            }
             if (BaseSlotMachineController.Instance.hasPopReward || BaseSlotMachineController.Instance.isBigWin || BaseSlotMachineController.Instance.isMegaWin || BaseSlotMachineController.Instance.isEpicWin || isWin(totalWin))
             {
                 AddNumber = 1;

@@ -20,7 +20,7 @@ namespace Libs
         
         void UpdateTask()
         {
-            if (IsTaskConditionOK)
+            if (IsTaskConditionOK||State!=(int)TaskState.ONGOING)
             {
                 return;
             }

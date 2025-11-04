@@ -16,6 +16,10 @@ namespace Libs
         }
         protected override bool IsCollectConditionOk(ReelManager reelManager, long totalWin)
         {
+            if (IsConditionOK()||State!=(int)TaskState.ONGOING)
+            {
+                return false;
+            }
             if (!reelManager.HitFs) return false;
             AddNumber = 1;
             return true;

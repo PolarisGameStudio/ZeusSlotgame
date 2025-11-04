@@ -20,7 +20,7 @@ namespace Libs
 
         void UpdateAdCount()
         {
-            if (IsConditionOK())
+            if (IsConditionOK()||State!=(int)TaskState.ONGOING)
             {
                 return;
             }

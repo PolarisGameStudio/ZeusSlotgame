@@ -21,6 +21,10 @@ namespace Libs
 
         void UpdateCard()
         {
+            if (IsConditionOK()||State!=(int)TaskState.ONGOING)
+            {
+                return;
+            }
             HasCollectNum++;
             UpdateTaskStatus();
         }

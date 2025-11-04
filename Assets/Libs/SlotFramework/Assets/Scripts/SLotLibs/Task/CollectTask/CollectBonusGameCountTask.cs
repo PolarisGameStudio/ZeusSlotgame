@@ -18,7 +18,7 @@ namespace Libs
 
         private void TriggerBonusGame()
         {
-            if (IsTaskConditionOK)
+            if (IsTaskConditionOK||State!=(int)TaskState.ONGOING)
             {
                 return;
             }

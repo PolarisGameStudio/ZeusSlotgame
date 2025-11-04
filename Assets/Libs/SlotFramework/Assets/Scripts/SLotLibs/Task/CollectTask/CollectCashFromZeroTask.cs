@@ -26,6 +26,10 @@ namespace Libs
         }
         private void UpdateTaskNum(int addCash)
         {
+            if (IsConditionOK()||State!=(int)TaskState.ONGOING)
+            {
+                return;
+            }
             HasCollectNum += addCash;
             // Debug.Log($"[AccumulateTotalCashTask][UpdateTaskStatus]  taskId:{TaskId}");
             base.UpdateTaskStatus();

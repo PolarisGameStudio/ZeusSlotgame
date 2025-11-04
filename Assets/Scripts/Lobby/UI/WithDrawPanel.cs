@@ -27,6 +27,8 @@ public class WithDrawPanel : MonoBehaviour
     public Image[] Images;
     public Button GuideBtn;
     private Coroutine showGuideCor;
+    private Coroutine showGuideCor1;
+
     public GameObject tip;
     public TextMeshProUGUI tipText;
     private Tween tweenerTip; //提示文字动画
@@ -35,6 +37,7 @@ public class WithDrawPanel : MonoBehaviour
     public float tipShowTime = 0.3f;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI guideCashText;
+    public GameObject contentGroup;
     public void Awake()
     {
         withDrawPanelBtn = GetComponent<Button>();
@@ -56,7 +59,7 @@ public class WithDrawPanel : MonoBehaviour
     {
         if (!PlatformManager.Instance.IsWhiteBao())
         {
-            // Messenger.AddListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
+            Messenger.AddListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
             Messenger.AddListener(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL, OnShowTip);
         }
         Messenger.AddListener<int>(WithDrawConstants.DoneWithDrawAction, DoneWithDrawAction);
@@ -68,15 +71,17 @@ public class WithDrawPanel : MonoBehaviour
         Messenger.RemoveListener<int>(WithDrawConstants.DoneWithDrawAction, DoneWithDrawAction);
     }
 
-    // public void OnSpinEnd()
-    // {
-    //     //首次登录
-    //     if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
-    //     {
-    //         showGuideCor = StartCoroutine(ShowGuide());
-    //         Messenger.RemoveListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
-    //     }
-    // }
+    public void OnSpinEnd()
+    {
+        //首次登录
+        if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
+        {
+            contentGroup.gameObject.SetActive(true);
+            guideCashText.gameObject.SetActive(false);
+            showGuideCor = StartCoroutine(ShowGuide());
+            Messenger.RemoveListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
+        }
+    }
 
     public void OnShowTip()
     {
@@ -131,14 +136,16 @@ public class WithDrawPanel : MonoBehaviour
         else
         {
             isDoingWithDraw = false;
+            guideCashText.gameObject.SetActive(true);
+            contentGroup.gameObject.SetActive(false);
             guideCashText.text = OnLineEarningMgr.Instance.GetMoneyStr(targetCash,needIcon:false);
-            if (showGuideCor!=null)
+            if (showGuideCor1!=null)
             {
-                StopCoroutine(showGuideCor);
-                showGuideCor = null;
+                StopCoroutine(showGuideCor1);
+                showGuideCor1 = null;
             }
             //展示tap to cash文本
-            showGuideCor = StartCoroutine(ShowGuide());
+            showGuideCor1 = StartCoroutine(ShowGuideText());
         }
     }
 
@@ -163,32 +170,37 @@ public class WithDrawPanel : MonoBehaviour
         // Messenger.Broadcast<bool>(GameConstants.ShowButtonMask,true);
         // Messenger.Broadcast<int>(GameConstants.ChangeMaskOrder,400);
         yield return new WaitForSeconds(0.5f);
-        // bool loadSuccess = false;
-        // int index = 0;
-        // List<string> spritePath = LocalizationManager.Instance.GetPlatFormSpriteResourcePath();
-        // int num = spritePath.Count;
-        // AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
-        // {
-        //     if (result != null)
-        //     {
-        //         for (int i = 0; i < num; i++)
-        //         {
-        //             Sprite sp = result.GetSprite(spritePath[i]);
-        //             if (sp != null)
-        //             {
-        //                 Images[index].sprite = sp;
-        //                 Images[index].gameObject.SetActive(true);
-        //                 index++;
-        //             }
-        //         }
-        //     }
-        // });
+        bool loadSuccess = false;
+        int index = 0;
+        List<string> spritePath = LocalizationManager.Instance.GetPlatFormSpriteResourcePath();
+        int num = spritePath.Count;
+        AddressableManager.Instance.LoadAsset<SpriteAtlas>("Platform.spriteatlas", (result) =>
+        {
+            if (result != null)
+            {
+                for (int i = 0; i < num; i++)
+                {
+                    Sprite sp = result.GetSprite(spritePath[i]);
+                    if (sp != null)
+                    {
+                        Images[index].sprite = sp;
+                        Images[index].gameObject.SetActive(true);
+                        index++;
+                    }
+                }
+            }
+        });
        
         yield return GameConstants.FrameTime;
         StopCoroutine(showGuideCor);
         Guide.SetActive(true);
     }
-    
+    private IEnumerator ShowGuideText()
+    {
+        yield return new WaitForSeconds(0.5f);
+        StopCoroutine(showGuideCor1);
+        Guide.SetActive(true);
+    }
     //是否提现过
     private bool isDoingWithDraw = true;
     private void DoneWithDrawAction(int money)

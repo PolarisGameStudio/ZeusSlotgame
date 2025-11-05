@@ -219,7 +219,7 @@ public class WesternTreasureMiniDialog : UIDialog
         // {
         //     ADManager.Instance.PlayRewardVideo(ADEntrances.REWARD_VIDEO_ENTRANCE_BONUSGAMEWIN);
         // }
-        SendMsg(2);
+        // SendMsg(2);
     }
 
     private void OnNotWatchADButtonClick()
@@ -238,7 +238,7 @@ public class WesternTreasureMiniDialog : UIDialog
         //不看广告
         Messenger.Broadcast(ADConstants.JackpotGameEndMsg);
         Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.Interstitial_Entrance_JACKPOTEND);
-        SendMsg();
+        // SendMsg();
     }
 
     public void Close()
@@ -294,11 +294,11 @@ public class WesternTreasureMiniDialog : UIDialog
             this.SetCashCoins(totalCash);
         }
     }
-    private void SendMsg(int multiple = 1)
-    {
-        string msgName = "JackPot";
-        msgName +=multiple.ToString();
-        //发送消息给平台
-        PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,msgName);
-    }
+    // private void SendMsg(int multiple = 1)
+    // {
+    //     string msgName = "JackPot";
+    //     msgName +=multiple.ToString();
+    //     //发送消息给平台
+    //     PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,msgName);
+    // }
 }

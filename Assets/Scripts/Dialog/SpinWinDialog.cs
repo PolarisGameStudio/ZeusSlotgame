@@ -304,7 +304,7 @@ public class SpinWinDialog : UIDialog
 		OnClickStopUpdate();
 		//看广告跟弹窗关闭解绑，弹窗关闭不影响广告播放，只负责加钱操作。无论成功与失败都加钱
 		Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-		SendMsg(spinWinType,RewardAdMultiple);
+		// SendMsg(spinWinType,RewardAdMultiple);
 	}
 	private void OnNotWatchADButtonClick(GameObject go)
 	{
@@ -323,7 +323,7 @@ public class SpinWinDialog : UIDialog
 		// Messenger.Broadcast(ADConstants.CloseSpinWinMsg);
 		//检查是否可以播放广告
 		Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_CLOSESPINWIN);
-		SendMsg(spinWinType);
+		// SendMsg(spinWinType);
 	}
 
 	public void OnCollectBtnClick(GameObject go)

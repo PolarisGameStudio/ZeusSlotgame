@@ -243,6 +243,7 @@ namespace Activity
         {
             if (_buff != null)
             {
+                PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,_buff.buffName);
                 Messenger.Broadcast<int>(BuffConstant.OnBuffActive,_buff.buffId);
                 Close();
             }

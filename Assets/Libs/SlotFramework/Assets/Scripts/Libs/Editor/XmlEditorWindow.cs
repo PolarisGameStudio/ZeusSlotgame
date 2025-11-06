@@ -566,13 +566,18 @@ public class PlistColumnEditorWindow : EditorWindow
 
     private void DrawValueEditor(PlistTreeNode node)
     {
+        float oldLabelWidth = EditorGUIUtility.labelWidth;
+        EditorGUIUtility.labelWidth = 40f; // "Value" 大约占 40 像素，可根据需要调整
+
         EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.PrefixLabel("Value");
+    
+        // 使用 PropertyField 风格的标签，但不绑定 property
+        EditorGUILayout.LabelField("Value", GUILayout.Width(EditorGUIUtility.labelWidth));
 
         if (node.NodeType == PlistNodeType.Boolean)
         {
             bool boolValue = node.Value == "true";
-            bool newBoolValue = EditorGUILayout.Toggle(boolValue);
+            bool newBoolValue = EditorGUILayout.Toggle(boolValue, GUILayout.ExpandWidth(false));
             if (newBoolValue != boolValue)
             {
                 node.Value = newBoolValue ? "true" : "false";
@@ -600,13 +605,15 @@ public class PlistColumnEditorWindow : EditorWindow
         }
         else
         {
-            if (GUILayout.Button(node.Value, EditorStyles.textField))
+            if (GUILayout.Button(node.Value, EditorStyles.textField, GUILayout.MinWidth(30)))
             {
                 StartValueEdit(node);
             }
         }
 
         EditorGUILayout.EndHorizontal();
+
+        EditorGUIUtility.labelWidth = oldLabelWidth; // 恢复原始值
     }
     private void DrawSelectedPath()
     {

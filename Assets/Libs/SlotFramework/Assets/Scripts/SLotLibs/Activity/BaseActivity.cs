@@ -16,7 +16,8 @@ namespace Activity
         H5RewardActivity=4,
         ContinueSpin=5,
         WheelLucy=6,
-        RotationBuff=7
+        FloatingReward=7,
+        LuckyGift=8
     }
 
     public enum ActivityState
@@ -51,6 +52,7 @@ namespace Activity
         public Dictionary<string, object> iconData = new Dictionary<string, object>();
         
         public BaseIcon icon;
+        public int priority = 0;
 
         //唯一标识，通过id区别不同的活动
         public int id;
@@ -81,6 +83,7 @@ namespace Activity
             endTime = Utilities.GetLong(data, ActivityConstants.ENDTIME, 0);
             id = Utilities.GetInt(data, ActivityConstants.ID, 0);
             iconData =  Utilities.GetValue<Dictionary<string,object>>(data, ActivityConstants.ICON, null);
+            priority = Utilities.GetInt(iconData, ActivityConstants.Priority, 0);
             //ParseTaskData();
             InitState();
         }

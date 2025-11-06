@@ -32,6 +32,8 @@ namespace Libs
         IsInterADReady = 16,
         IsRewardADReady = 17,
         IsAdMobADReady = 18
+        IsRewardADReady = 17,
+        ShowWithDrawGuide=18
     }
     
 #if UNITY_IOS || UNITY_TVOS
@@ -142,6 +144,9 @@ namespace Libs
                     break;
                 case MessageType.IsAdMobADReady:
                     methodKey = "isAdMobReady";
+                    break;
+                case MessageType.ShowWithDrawGuide:
+                    methodKey = "showWithdrawGuide";
                     break;
                 default: 
                     break;

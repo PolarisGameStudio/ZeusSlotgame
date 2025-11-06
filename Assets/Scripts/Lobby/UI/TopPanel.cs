@@ -22,6 +22,9 @@ namespace Classic
         public static string CLICK_SETTING_OPEN = "CLICK_SETTING_OPEN";
         public static string CLICK_SETTING_CLOSE = "CLICK_SETTING_CLOSE";
         public Sprite image_300bg;
+        public Button H5Button;
+        public Transform HandSpin;
+
         private bool FlyCoinsPanelCanShow
         {
             get { return gameObject.activeInHierarchy; }
@@ -44,6 +47,10 @@ namespace Classic
             {
                 animators[i].updateMode = AnimatorUpdateMode.UnscaledTime;
             }
+            if (HandSpin!=null)
+            {
+                HandSpin.gameObject.SetActive(false);
+            }
         }
 
         void OnDestroy()
@@ -65,12 +72,14 @@ namespace Classic
 
         private void OnEnable()
         {
+            Messenger.AddListener(SlotControllerConstants.OnSpinEnd,onSpinEnd);
             Messenger.AddListener(GameConstants.GetTopPanelScaleAdaption, AssignmentProperty);
         }
 
         private void OnDisable()
         {
             Messenger.RemoveListener(GameConstants.GetTopPanelScaleAdaption, AssignmentProperty);
+            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd,onSpinEnd);
         }
 
         public void Init()
@@ -174,6 +183,25 @@ namespace Classic
             FlyCoinsPanel.Instance.topPanelParentScale = transform.parent ? transform.parent : null;
             FlyCoinsPanel.Instance.topPanelRect = (transform as RectTransform);
             FlyCoinsPanel.Instance.GetCurrentCoinsPanelTrans(coinsPanel.transform);
+        }
+
+        private void onSpinEnd()
+        {
+            if((int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==3)
+            {
+                if (HandSpin!=null)
+                {
+                    HandSpin.gameObject.SetActive(true);
+                }
+            }
+        }
+        public void H5ButtonClick()
+        {
+            if (HandSpin!=null)
+            {
+                HandSpin.gameObject.SetActive(false);
+            }
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.ShowWithDrawGuide);
         }
     }
 }

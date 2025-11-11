@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Libs;
 using UnityEditor;
 using UnityEngine;
@@ -41,7 +42,14 @@ namespace Activity
             //等待一秒
             yield return GameConstants.OneSecondWait;
             Dictionary<int,BaseActivity> activities = ActivityManager.Instance.GetActivities();
-            foreach (var item in activities)
+            if (activities == null || activities.Count == 0)
+            {
+                yield break;
+            }
+            Debug.Log("[ActivityPanel][LoadActivityIcon] activities count: " + activities.Count);
+            //排序
+            var sortedActivities = activities.OrderBy(item => item.Value.priority).ToDictionary(item => item.Key, item => item.Value);
+            foreach (var item in sortedActivities)
             {
                 BaseActivity activity = item.Value;
                 string prefabName = activity.GetIconResourceName();

@@ -1786,9 +1786,17 @@ public class PlistColumnEditorWindow : EditorWindow
             if (node.NodeType == PlistNodeType.Boolean)
             {
                 if (node.Value != "true" && node.Value != "false") node.Value = "false";
-                if (node.XmlValueNode.Name != node.Value)
+                
+                // 检查当前元素是否已经是正确的布尔元素
+                string expectedElementName = node.Value; // "true" 或 "false"
+                if (node.XmlValueNode.Name != expectedElementName)
                 {
-                    XmlElement newElement = _xmlDoc.CreateElement(node.Value);
+                    // 对于布尔值，需要创建自闭合元素
+                    XmlElement newElement = _xmlDoc.CreateElement(expectedElementName);
+                
+                    // 对于布尔元素，不需要设置 InnerText，保持自闭合
+                    // newElement.InnerText = node.Value; // 删除这行
+                
                     if (node.XmlValueNode.ParentNode != null)
                         node.XmlValueNode.ParentNode.ReplaceChild(newElement, node.XmlValueNode);
                     node.XmlValueNode = newElement;

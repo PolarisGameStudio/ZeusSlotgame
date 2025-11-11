@@ -225,7 +225,18 @@ public class OnLineEarningMgr
             return;
         }
         curRewardCount++;
-        if (curRewardCount>=PopRewardLimit)
+        SaveProgressData();
+        return curRewardCount>=PopRewardLimit && !PlatformManager.Instance.IsWhiteBao();
+    }
+    
+    public bool PredictShowRewardCash()
+    {
+        return curRewardCount+1>=PopRewardLimit && !PlatformManager.Instance.IsWhiteBao();
+    }
+    
+    public void ShowExtraRewardCashDialog(Action callBack = null)
+    {
+        Action closeCallBack = () =>
         {
             curRewardCount = 0;
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
@@ -632,7 +643,7 @@ public class OnLineEarningMgr
         }
         string decimalFormat = "F" + decimalPlace+"}";
         //需要针对金钱进行大数处理
-        if (needBigNum)
+        if (needBigNum && money>1000)
         {
             string cashInfo = Utilities.GetBigNumberShow((int)money,false);
             if (needIcon)

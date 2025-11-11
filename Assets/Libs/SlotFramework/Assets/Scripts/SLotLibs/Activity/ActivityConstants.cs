@@ -19,8 +19,9 @@ namespace Activity
         public const string UniversalH5Activity = "UniversalH5Activity";
 
         public const string IconResource = "resource";
-        
+        public const string Priority = "priority";
         public const string RemoveIconMsg = "RemoveIconMsg";
+
 
     }
 }

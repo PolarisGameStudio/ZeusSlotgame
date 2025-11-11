@@ -147,6 +147,14 @@ namespace Ads
                     //兑换商店播广告
                     Messenger.Broadcast<int>(ADConstants.PlayWheelLuckAD, 1);
                     break;
+                case ADEntrances.REWARD_VIDEO_FLOATING_REWARD:
+                    //浮动奖励广告
+                    Messenger.Broadcast<int>(ADConstants.PlayFloatingRewardAD, 0);
+                    break;
+                case ADEntrances.Interstitial_Entrance_LUCKYGIFT_ACTIVITY:
+                    //LuckyCashActivity插屏广告
+                    Messenger.Broadcast<int>(ADConstants.PlayLuckyGiftActivityAD, 1);
+                    break;
                 case ADEntrances.Interstitial_Entrance_WITHDRAWCLOSE:
                     //提现商店关闭广告
                     Messenger.Broadcast<int>(ADConstants.PlayWithDrawCloseAD, 1);
@@ -243,6 +251,14 @@ namespace Ads
                 case ADEntrances.Interstitial_Entrance_WHEELLUCKBubble:
                     //兑换商店播广告
                     Messenger.Broadcast<int>(ADConstants.PlayWheelLuckADFailed, 1);
+                    break;
+                case ADEntrances.REWARD_VIDEO_FLOATING_REWARD:
+                    //浮动奖励广告失败
+                    Messenger.Broadcast<int>(ADConstants.PlayFloatingRewardADFailed, 0);
+                    break;
+                case ADEntrances.Interstitial_Entrance_LUCKYGIFT_ACTIVITY:
+                    //LuckyCashActivity插屏广告失败
+                    Messenger.Broadcast<int>(ADConstants.PlayLuckyGiftActivityADFailed, 1);
                     break;
                 case ADEntrances.Interstitial_Entrance_WITHDRAWCLOSE:
                     //提现商店关闭广告

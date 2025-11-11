@@ -1530,7 +1530,8 @@ public class BaseSlotMachineController : MonoBehaviour
     BaseActionNormal awardSymbolsAnimationAction = new BaseActionNormal();
     BaseActionNormal normalAnimationEndAction = new BaseActionNormal();
 	BaseActionNormal payLineWholeAction = new BaseActionNormal(); 
-	
+	BaseActionNormal extraRewardCashAnimationAction = new BaseActionNormal();
+
 	protected virtual void InitAnimationActions()
 	{
         extraAnimationAction.AutoPlayNextAction = false;
@@ -1539,6 +1540,9 @@ public class BaseSlotMachineController : MonoBehaviour
         normalAnimationStartAction.AutoPlayNextAction = false;
         normalAnimationStartAction.PlayCallBack.AddStartMethod (PlayNormalAwardAnimation);
 
+        extraRewardCashAnimationAction.AutoPlayNextAction = false;
+        extraRewardCashAnimationAction.PlayCallBack.AddStartMethod (PlayExtraRewardCashAnimation);
+        
 		jackpotAnimationAction.AutoPlayNextAction = false;
 		jackpotAnimationAction.PlayCallBack.AddStartMethod (PlayJackpotAnimation);
 
@@ -1584,6 +1588,7 @@ public class BaseSlotMachineController : MonoBehaviour
         }
 
 		animationAction.AppendAction (normalAnimationStartAction);
+		animationAction.AppendAction (extraRewardCashAnimationAction);
 
         if (reelManager.resultContent.awardResult.isAwarded || totalAward > 0) {
 			if (reelManager.resultContent.awardResult.blackAward.isAwarded) {
@@ -1682,6 +1687,24 @@ public class BaseSlotMachineController : MonoBehaviour
 		reelManager.OpenBlackoutDialog(animationAction.PlayNextChildAction);
     }
 
+	public virtual void PlayExtraRewardCashAnimation()
+	{
+		//当前有任何奖励弹版的时候，都不进入action
+		if (hasPopReward||isBigWin||isMegaWin||isEpicWin||reelManager.HitFs||reelManager.isFreespinBonus||reelManager.HasBonusGame)
+		{
+			OnLineEarningMgr.Instance.ResetRewardCount();
+			animationAction.PlayNextChildAction();
+			return;
+		}
+
+		if (!OnLineEarningMgr.Instance.CheckShowRewardCash())
+		{
+			animationAction.PlayNextChildAction();
+			return;
+		}
+		OnLineEarningMgr.Instance.ShowExtraRewardCashDialog(animationAction.PlayNextChildAction);
+	}
+	
     protected virtual void PlayJackpotAnimation()
     {
         long totalWin = Utils.Utilities.CastValueLong(Math.Round(totalAward));

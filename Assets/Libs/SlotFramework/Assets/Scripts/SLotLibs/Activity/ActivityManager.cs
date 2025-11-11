@@ -78,9 +78,14 @@ namespace Activity
                 case (int)ActivityType.WheelLucy:
                     activity = new WheelLuckActivity(data);
                     break;
+                case (int)ActivityType.FloatingReward:
+                    activity = new FloatingRewardActivity(data);
+                    break;
+                case (int)ActivityType.LuckyGift:
+                    activity = new LuckyGiftActivity(data);
+                    break;
                 case (int)ActivityType.DailyTask:
                     activity = new DailyTaskActivity(data);
-                    break;
             }
 
             return activity;

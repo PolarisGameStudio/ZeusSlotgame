@@ -156,7 +156,7 @@ public class OnLineEarningMgr
         Messenger.AddListener<bool>(GameConstants.RefreshCashInFree, RefreshCashInFree);
         Messenger.AddListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
         Messenger.AddListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
-        Messenger.AddListener<ReelManager,long>(GameConstants.SpinAwardEndMsg,HandleSpinAwardEnd);
+        // Messenger.AddListener<ReelManager,long>(GameConstants.SpinAwardEndMsg,HandleSpinAwardEnd);
 
         // Messenger.AddListener(GameConstants.IntervalBackToApp, IntervalBackToApp);
     }
@@ -166,7 +166,7 @@ public class OnLineEarningMgr
         Messenger.RemoveListener<bool>(GameConstants.RefreshCashInFree,RefreshCashInFree);
         Messenger.RemoveListener(OnLineEarningConstants.ResetLuckyCashMsg,ResetSpinTime);
         Messenger.RemoveListener(GameConstants.OnSlotMachineSceneInit, OnSlotMachineSceneInit);
-        Messenger.RemoveListener<ReelManager,long>(GameConstants.SpinAwardEndMsg,HandleSpinAwardEnd);
+        // Messenger.RemoveListener<ReelManager,long>(GameConstants.SpinAwardEndMsg,HandleSpinAwardEnd);
         // Messenger.RemoveListener(GameConstants.IntervalBackToApp, IntervalBackToApp);
     }
     
@@ -185,56 +185,38 @@ public class OnLineEarningMgr
             }).Play();
         }
     }
-
-    //处理300和区间模式下，奖励弹板的弹出
-    //当前spin未有任何奖励弹窗弹出时，bigwin,freespin,bonus,rewardcash,withdrawactivity等都不弹出时，计一次数，
-    //当计数达到一定值时，弹出奖励弹窗
-    //有任何奖励弹窗弹出时次数重置
-    void HandleSpinAwardEnd(ReelManager reelManager, long coins)
+    
+    public void ResetRewardCount()
     {
-        if (isWhitePackage)
-        {
-            return;
-        }
-        //当前spin结果有bigwin
-        if (BaseSlotMachineController.Instance.hasPopReward || BaseSlotMachineController.Instance.isBigWin || BaseSlotMachineController.Instance.isMegaWin || BaseSlotMachineController.Instance.isEpicWin)
-        {
-            curRewardCount = 0;
-            SaveProgressData();
-            return;
-        }
-        //当前spin结果有freespin
-        if (reelManager.HitFs||reelManager.isFreespinBonus)
-        {
-            curRewardCount = 0;
-            SaveProgressData();
-            return;
-        }
-        //当前spin结果有bonus
-        if (reelManager.HasBonusGame)
-        {
-            curRewardCount = 0;
-            SaveProgressData();
-            return;
-        }
-        //当前spin结果有luckycash奖励弹版
-        if (BaseSlotMachineController.Instance.hasPopReward)
-        {
-            curRewardCount = 0;
-            SaveProgressData();
-            return;
-        }
-        curRewardCount++;
-        if (curRewardCount>=PopRewardLimit)
-        {
-            curRewardCount = 0;
-            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
-            //满足弹出条件弹出小弹窗
-            Messenger.Broadcast<int>(GameDialogManager.OpenExtraAwardCashDialogMsg,GetRewardsByName(OnLineEarningConstants.REWARD_ExtraAward));
-        }
+        curRewardCount = 0;
         SaveProgressData();
     }
-    
+    public bool CheckShowRewardCash()
+    {
+        curRewardCount++;
+        SaveProgressData();
+        return curRewardCount>=PopRewardLimit && !PlatformManager.Instance.IsWhiteBao();
+    }
+    public bool PredictShowRewardCash()
+    {
+        return curRewardCount+1>=PopRewardLimit && !PlatformManager.Instance.IsWhiteBao();
+    }
+
+    public void ShowExtraRewardCashDialog(Action callBack = null)
+    {
+        Action closeCallBack = () =>
+        {
+            if (callBack != null)
+            {
+                callBack();
+            }
+            curRewardCount = 0;
+            SaveProgressData();
+        };
+        //弹出奖励现金的弹板
+        Messenger.Broadcast<int,Action>(GameDialogManager.OpenExtraAwardCashDialogMsg,GetRewardsByName(OnLineEarningConstants.REWARD_ExtraAward),closeCallBack);
+    }
+
     void ShowRewardCashDialog(int cash)
     {
         //弹出奖励现金的弹板
@@ -626,13 +608,13 @@ public class OnLineEarningMgr
     {
         string str = "";
         double money = ConvertMoneyToDouble(amount, decimalPlace);
-        if (money<0.01&& money>=0&&!isInfiniteOpen())
+        if (money<0.01&& money>0 &&!isInfiniteOpen())
         {
             money = 0.01;
         }
         string decimalFormat = "F" + decimalPlace+"}";
         //需要针对金钱进行大数处理
-        if (needBigNum)
+        if (needBigNum && money>1000)
         {
             string cashInfo = Utilities.GetBigNumberShow((int)money,false);
             if (needIcon)

@@ -213,6 +213,9 @@ namespace Ads
                 case ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH:
                     adNode = new CloseLuckyCashAdNode(entranceName, data, adCondition);
                     break;
+                case ADEntrances.Interstitial_Entrance_LUCKYGIFT_ACTIVITY:
+                    adNode = new LuckyGiftActivityAdNode(entranceName, data, adCondition);
+                    break;
                 case ADEntrances.REWARD_VIDEO_ROTATION_BUFF:
                     adNode = new RotationBuffAdNode(entranceName, data, adCondition);
                     break;

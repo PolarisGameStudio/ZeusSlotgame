@@ -86,6 +86,7 @@ namespace Activity
                     break;
                 case (int)ActivityType.DailyTask:
                     activity = new DailyTaskActivity(data);
+                    break;
             }
 
             return activity;

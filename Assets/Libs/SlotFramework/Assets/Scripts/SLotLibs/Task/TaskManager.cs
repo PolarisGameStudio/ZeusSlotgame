@@ -192,6 +192,10 @@ namespace Libs
                     title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawlogin");
                     title.Arguments = new object[] {task.TargetNum};
                     break;
+                case TaskConstants.CollectLuckyGiftAdTask_Key:
+                    title = new LocalizedString(LocalizationManager.Instance.tableName, "CollectLuckyGift");
+                    title.Arguments = new object[] {task.TargetNum};
+                    break;
             }
             info = title.GetLocalizedString();
             return info;

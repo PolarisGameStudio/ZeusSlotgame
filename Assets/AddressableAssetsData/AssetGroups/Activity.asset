@@ -58,11 +58,6 @@ MonoBehaviour:
     m_Address: LuckyGiftActivity
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 804840b80a338c8439c60594ac989f6c
-    m_Address: DailyTask
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Activity
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

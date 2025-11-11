@@ -523,7 +523,7 @@ namespace Ads
         /// <param name="type">暂时无用，通过看广告的入口来判断当前是哪种类型的广告</param>
         public void HandlePlayVideoResult(int type)
         {
-            Messenger.Broadcast(ADConstants.OnPlayVideoEnd);
+            Messenger.Broadcast<string>(ADConstants.OnPlayVideoEnd,requestEntranceName);
             adsCallbackHandler.OnVideoReward(requestEntranceName);
         }
         

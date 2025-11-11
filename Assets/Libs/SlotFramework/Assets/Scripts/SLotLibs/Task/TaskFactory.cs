@@ -61,6 +61,9 @@ namespace Libs
                 case TaskConstants.CollectLoginDaysTask_Key:
                     task = new CollectLoginDaysTask(taskInfoDict, parentTask);
                     break;
+                case TaskConstants.CollectLuckyGiftAdTask_Key:
+                    task = new CollectLuckyGiftAdTask(taskInfoDict, parentTask);
+                    break;
             }
             return task;
         }

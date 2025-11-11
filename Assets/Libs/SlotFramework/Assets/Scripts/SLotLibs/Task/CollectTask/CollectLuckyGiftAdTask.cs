@@ -1,18 +1,15 @@
 using System.Collections.Generic;
 using Ads;
+
 namespace Libs
 {
-    /// <summary>
-    /// 收集看广告次数的任务
-    /// </summary>
-    public class CollectADCountTask:BaseTask
+    public class CollectLuckyGiftAdTask:BaseTask
     {
-        public CollectADCountTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask) : base(taskInfoDict, parentTask)
+        public CollectLuckyGiftAdTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask = null) : base(taskInfoDict, parentTask)
         {
             Messenger.AddListener<string>(ADConstants.OnPlayVideoEnd,UpdateAdCount);
         }
-        
-        ~CollectADCountTask()
+        ~CollectLuckyGiftAdTask()
         {
             // 这里可以添加清理逻辑，如果有需要的话
             Messenger.RemoveListener<string>(ADConstants.OnPlayVideoEnd,UpdateAdCount);
@@ -24,14 +21,15 @@ namespace Libs
             {
                 return;
             }
+
+            if (name != ADEntrances.Interstitial_Entrance_LUCKYGIFT_ACTIVITY)
+            {
+                return;
+            }
             AddNumber = 1;
             MultipleAddNum();
             DoCollectAction();
             UpdateTaskStatus();
-        }
-        public override string GetDesc()
-        {
-            return "WatchNumVideo";
         }
     }
 }

@@ -41,10 +41,6 @@ MonoBehaviour:
     m_Address: ContinueSpin
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 567e9164ce9ac4c61b04b54168c29f52
-    m_Address: FloatingReward
-    m_SerializedLabels:
-    - Activity
   - m_GUID: 44c1222abeeed4448bb3e4a4f58d3768
     m_Address: RotationBuff
     m_ReadOnly: 0
@@ -54,7 +50,11 @@ MonoBehaviour:
     m_Address: WheelLuck
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 18337951d48a14492b0576ee7b98bbe6
+  - m_GUID: 40d77749e34cc4fa681913f8e4891b74
+    m_Address: FloatingReward
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 29bb93f6749a74c2a8f958da0be76181
     m_Address: LuckyGiftActivity
     m_ReadOnly: 0
     m_SerializedLabels: []

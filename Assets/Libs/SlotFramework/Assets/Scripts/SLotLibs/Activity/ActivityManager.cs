@@ -1,4 +1,5 @@
 using System;
+using System.Activity.DailyTaskActivity;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -76,6 +77,9 @@ namespace Activity
                     break;
                 case (int)ActivityType.WheelLucy:
                     activity = new WheelLuckActivity(data);
+                    break;
+                case (int)ActivityType.DailyTask:
+                    activity = new DailyTaskActivity(data);
                     break;
             }
 

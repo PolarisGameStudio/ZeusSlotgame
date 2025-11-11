@@ -9,6 +9,7 @@ namespace Ads
         public const string REWARD_VIDEO_ENTRANCE_CARDLOTTERY = "CardLottery";
         public const string REWARD_VIDEO_CONTINUE_SPIN = "ContinueSpin";
         public const string REWARD_VIDEO_WHEELLUCK_SPIN = "WheelLuckSpin";
+        public const string REWARD_VIDEO_DAILY_TASK = "DailyTask";
 
         public const string REWARD_VIDEO_ENTRANCE_FREESPINSTART = "FreeSpinStart";
         public const string REWARD_VIDEO_ENTRANCE_FREESPINEND= "FreeSpinEnd";

@@ -34,6 +34,9 @@ namespace Ads
         
         public const string PlayWithDrawCloseAD = "PlayWithDrawCloseAD";
         public const string PlayWithDrawCloseADFailed = "PlayWithDrawCloseADFailed";
+        
+        public const string PlayDailyTaskAD = "PlayDailyTaskAD";
+        public const string PlayDailyTaskADFailed = "PlayDailyTaskADFailed";
 
         public const string Time = "time";
     

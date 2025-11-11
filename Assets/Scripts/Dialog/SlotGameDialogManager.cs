@@ -3,6 +3,7 @@ using Core;
 using System.Collections.Generic;
 using Libs;
 using System;
+using System.Activity.DailyTaskActivity;
 using System.BuffSystem;
 using Activity;
 using CardSystem;
@@ -538,6 +539,17 @@ namespace Classic
                 {
                     dialog.SetUIData(activityId);
                 },defaultResourcePath:"ContinueSpin/Prefab/ContinueSpinDialog"));
+        }
+
+        protected override void OpenDailyTaskDialog(int activityId)
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<DailyTaskDialog>(isPortrait,uiPopupStrategy: new SystemUIPopupStrategy(),dialogInitCallBack: (dialog) =>
+                {
+                    dialog.SetUIData(activityId);
+                },defaultResourcePath:"DailyTask/Prefab/DailyTaskDialog"));
         }
         
         protected override void OpenWheelLucyDialog(int activityId)

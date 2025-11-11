@@ -193,13 +193,13 @@ namespace Activity
 
         public void PlayAwardAnim(BaseAwardItem baseAwardItem)
         {
-            if (baseAwardItem is CashAwardItem cashAwardItem)
+            /*if (baseAwardItem is CashAwardItem cashAwardItem)
             {
                 OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
                 Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
                     GameConstants.CollectBonusWithType, rewardCount.transform.parent, Libs.CoinsBezier.BezierType.DailyBonus, null);
                 Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
-            }
+            }*/
             //领奖动画播放完毕
             new DelayAction(1f,null, () =>
             {

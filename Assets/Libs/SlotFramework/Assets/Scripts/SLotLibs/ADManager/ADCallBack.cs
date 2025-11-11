@@ -151,6 +151,10 @@ namespace Ads
                     //提现商店关闭广告
                     Messenger.Broadcast<int>(ADConstants.PlayWithDrawCloseAD, 1);
                     break;
+                case ADEntrances.REWARD_VIDEO_DAILY_TASK:
+                    //每日任务播广告
+                    Messenger.Broadcast<int>(ADConstants.PlayDailyTaskAD, 0);
+                    break;
                 default:
                     break;
             }
@@ -243,6 +247,10 @@ namespace Ads
                 case ADEntrances.Interstitial_Entrance_WITHDRAWCLOSE:
                     //提现商店关闭广告
                     Messenger.Broadcast<int>(ADConstants.PlayWithDrawCloseADFailed, 1);
+                    break;
+                case ADEntrances.REWARD_VIDEO_DAILY_TASK:
+                    //每日任务播广告
+                    Messenger.Broadcast<int>(ADConstants.PlayDailyTaskADFailed, 0);
                     break;
                 default:
                     break;

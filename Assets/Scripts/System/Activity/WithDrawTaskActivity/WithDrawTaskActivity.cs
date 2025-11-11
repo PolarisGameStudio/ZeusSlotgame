@@ -1,4 +1,5 @@
 using System;
+using System.Activity.DailyTaskActivity;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -27,6 +28,7 @@ namespace Activity
         public LocalizedString WatchNumVideo;
         public LocalizedString CollectNumCash;
         private BaseAwardItem _baseAwardItem;
+        public static int ActivityId;
         public int CurrentTaskIndex
         {
             set
@@ -47,6 +49,7 @@ namespace Activity
         protected override void ParseTaskData()
         {
             base.ParseTaskData();
+            ActivityId = id;
             taskData = Utilities.GetValue<List<object>>(Data, ActivityConstants.TASKS, null);
             if (taskData== null|| taskData.Count==0)
             {
@@ -109,6 +112,7 @@ namespace Activity
             }
             _baseAwardItem = baseAwardItems[0];
             SendMsgToPlatform();
+            Messenger.Broadcast(DailyTaskActivity.ChangeMainTask);
         }
         void RemoveListener()
         {

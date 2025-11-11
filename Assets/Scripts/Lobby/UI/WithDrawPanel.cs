@@ -36,7 +36,7 @@ public class WithDrawPanel : MonoBehaviour
     public float tipIdleTime = 5f;
     public float tipShowTime = 0.3f;
     public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI guideCashText;
+    public GameObject withdrawTip;
     public GameObject contentGroup;
     public void Awake()
     {
@@ -77,7 +77,7 @@ public class WithDrawPanel : MonoBehaviour
         if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
         {
             contentGroup.gameObject.SetActive(true);
-            guideCashText.gameObject.SetActive(false);
+            withdrawTip.gameObject.SetActive(false);
             showGuideCor = StartCoroutine(ShowGuide());
             Messenger.RemoveListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
         }
@@ -136,9 +136,8 @@ public class WithDrawPanel : MonoBehaviour
         else
         {
             isDoingWithDraw = false;
-            guideCashText.gameObject.SetActive(true);
+            withdrawTip.gameObject.SetActive(true);
             contentGroup.gameObject.SetActive(false);
-            guideCashText.text = OnLineEarningMgr.Instance.GetMoneyStr(targetCash,needIcon:false);
             if (showGuideCor1!=null)
             {
                 StopCoroutine(showGuideCor1);

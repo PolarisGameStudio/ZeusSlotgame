@@ -186,7 +186,7 @@ public class GameDialogManager : MonoBehaviour
             // Messenger.AddListener (OpenBetHigherDialog, openBetHigherDialog);
             Messenger.AddListener<System.Action>(OpenSpinLimitDialog, OpenSpinLimimiDialogMsg);
             Messenger.AddListener<int>(OpenRewardCashDialogMsg, OpenRewardCashDialog);
-            Messenger.AddListener<int>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
+            Messenger.AddListener<int,Action>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
             Messenger.AddListener(OpenGiftBoxDialogMsg, OpenGiftBoxDialog);
 
 
@@ -300,7 +300,7 @@ public class GameDialogManager : MonoBehaviour
 			Messenger.RemoveListener<int>(OpenGetMoreCashDialog, OnOpenGetMoreCashDialog);
 			Messenger.RemoveListener(OpenNewUserGuidDialogMsg, OpenNewUserGuidDialog);
 			Messenger.RemoveListener<int>(OpenRewardCashDialogMsg, OpenRewardCashDialog);
-			Messenger.RemoveListener<int>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
+			Messenger.RemoveListener<int,Action>(OpenExtraAwardCashDialogMsg, OpenExtraAwardCashDialog);
 			Messenger.RemoveListener(OpenGiftBoxDialogMsg, OpenGiftBoxDialog);
 			Messenger.RemoveListener<int>(OpenWithDrawTipDialogMsg, OpenWithDrawTipDialog);
 			Messenger.RemoveListener<BaseTask>(OpenWithDrawTaskCompletePanelMsg, OpenWithDrawTaskCompletePanel);
@@ -677,7 +677,7 @@ public class GameDialogManager : MonoBehaviour
 	{
 		
 	}
-	protected virtual void OpenExtraAwardCashDialog(int cash)
+	protected virtual void OpenExtraAwardCashDialog(int cash,Action closeCallBack)
 	{
 		
 	}

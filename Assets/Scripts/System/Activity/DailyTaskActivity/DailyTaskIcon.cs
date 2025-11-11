@@ -34,8 +34,6 @@ namespace System.Activity.DailyTaskActivity
             {
                 _clickButton.onClick.AddListener(OnButtonClick);
             }
-            ChangeMainTask();
-            
             if (ActivityManager.Instance.GetActivityByID(DailyTaskActivity.ActivityId) is DailyTaskActivity activity)
             {
                 _activity = activity;
@@ -46,6 +44,8 @@ namespace System.Activity.DailyTaskActivity
                     Messenger.AddListener(dailyTaskData.Task.UpdateTaskDataMsg,UpdateRedPoint);
                 }
             }
+            
+            ChangeMainTask();
         }
         private void UpdateRedPoint()
         {
@@ -131,6 +131,8 @@ namespace System.Activity.DailyTaskActivity
             }
             if (ActivityManager.Instance.GetActivityByID(WithDrawTaskActivity.ActivityId) is WithDrawTaskActivity activity)
             {
+                _activity.InitMainTask();
+                    
                 _tipsTxt.text = activity.GetTaskInfoDesc();
                 
                 _mainTask = activity.Task;

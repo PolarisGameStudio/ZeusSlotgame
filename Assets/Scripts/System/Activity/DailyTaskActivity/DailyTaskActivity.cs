@@ -84,7 +84,10 @@ namespace System.Activity.DailyTaskActivity
                 dailyTask.GetRewardState();
                 _taskList.Add(dailyTask);
             }
-            
+        }
+
+        public void InitMainTask()
+        {
             //构造主线任务
             if (ActivityManager.Instance.GetActivityByID(WithDrawTaskActivity.ActivityId) is  WithDrawTaskActivity activity)
             {
@@ -102,6 +105,8 @@ namespace System.Activity.DailyTaskActivity
                 _taskList.Add(task);
             }
         }
+        
+        
         private readonly List<DailyTaskData> _finishList = new List<DailyTaskData>();
         private readonly List<DailyTaskData> _canGetMoneyList = new List<DailyTaskData>();
         private readonly List<DailyTaskData> _unFinishList= new List<DailyTaskData>();

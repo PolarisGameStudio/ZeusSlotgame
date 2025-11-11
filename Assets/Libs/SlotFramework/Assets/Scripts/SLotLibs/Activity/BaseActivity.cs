@@ -16,8 +16,9 @@ namespace Activity
         H5RewardActivity=4,
         ContinueSpin=5,
         WheelLucy=6,
-        FloatingReward=7,
-        LuckyGift=8
+        RotationBuff=7,
+        FloatingReward=8,
+        LuckyGift=9
     }
 
     public enum ActivityState

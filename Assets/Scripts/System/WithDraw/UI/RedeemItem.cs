@@ -172,7 +172,7 @@ public class RedeemItem : MonoBehaviour
         inProgress.gameObject.SetActive(false);
         redeemBtn.gameObject.SetActive(false);
         condition.gameObject.SetActive(true);
-        conditionTMP.text = "["+itemData.SequentialChildTask.GetChildInfo()+"]"+WithDrawManager.Instance.GetTaskInfo(task);
+        conditionTMP.text = "["+itemData.SequentialChildTask.GetChildInfo()+"]"+TaskManager.Instance.GetTaskInfo(task);
     }
     
     void SetProgressText(BaseTask task)

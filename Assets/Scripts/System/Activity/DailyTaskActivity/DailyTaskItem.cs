@@ -48,7 +48,7 @@ namespace System.Activity.DailyTaskActivity
             _dailyTaskData = dailyTaskData;
             taskProgress.fillAmount = GetProgress();
             taskProgressTxt.text = GetProgressText();
-            taskDes.text = GetTaskInfoDesc();
+            taskDes.text = TaskManager.Instance.GetTaskInfo(_dailyTaskData.Task);
             rewardCount.text = OnLineEarningMgr.Instance.GetMoneyStr(_dailyTaskData.Reward, needIcon: false);
             RefreshMask();
             Messenger.AddListener(_dailyTaskData.Task.UpdateTaskDataMsg, UpdateProgress);

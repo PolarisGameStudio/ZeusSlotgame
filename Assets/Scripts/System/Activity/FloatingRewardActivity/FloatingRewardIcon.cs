@@ -404,6 +404,10 @@ namespace Activity
                 {
                     // 广告回调完成，隐藏icon
                     HideIcon();
+                    if (!PlatformManager.Instance.IsWhiteBao())
+                    {
+                        Messenger.Broadcast(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL);
+                    }
                 };
                 Messenger.Broadcast<int,Action>(GameDialogManager.OpenExtraAwardCashDialogMsg,currentReward,closeCallBack);
             }
@@ -419,6 +423,10 @@ namespace Activity
             {
                 // 广告回调完成，隐藏icon
                 HideIcon();
+                if (!PlatformManager.Instance.IsWhiteBao())
+                {
+                    Messenger.Broadcast(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL);
+                }
             };
             Messenger.Broadcast<int,Action>(GameDialogManager.OpenExtraAwardCashDialogMsg,currentReward,closeCallBack);
         }

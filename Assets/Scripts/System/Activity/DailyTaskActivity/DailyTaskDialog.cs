@@ -53,6 +53,7 @@ namespace System.Activity.DailyTaskActivity
             {
                 //每次需要重新切换任务
                 _mainTaskData.Task = activity.Task;
+                _mainTaskData.Reward = RewardManager.Instance.CreateRewardByStr(_mainTaskData.Task.RewardList);
                 mainTaskItem.SetData(_mainTaskData);
             }
         }

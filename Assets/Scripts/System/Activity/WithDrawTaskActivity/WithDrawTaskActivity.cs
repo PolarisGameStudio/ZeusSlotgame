@@ -217,11 +217,11 @@ namespace Activity
             {
                 if (Task.TaskType ==TaskConstants.AccumulateCashTask_Key || Task.TaskType==TaskConstants.CollectCashFromZeroTask_Key)
                 {
-                    info = string.Format("<color=#FFFD3A>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr((int)Task.TargetNum,0,false,true));
+                    info = string.Format("<color=#d908d8>{0}</color>",OnLineEarningMgr.Instance.GetMoneyStr((int)Task.TargetNum,0,false,true));
                 }
                 else
                 {
-                    info = string.Format("<color=#FFFD3A>{0}</color>",Task.TargetNum);
+                    info = string.Format("<color=#d908d8>{0}</color>",Task.TargetNum);
                 }
             }
             return info;

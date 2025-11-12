@@ -15,6 +15,8 @@ namespace System.Activity.DailyTaskActivity
         private TextMeshProUGUI _tipsTxt;
         private Transform _tip;
         private Transform _redPoint;
+        private TextMeshProUGUI _mainTaskRewadCount;
+        private Image _rewardIcon;
 
         private bool _firstTaskShow = true;
 
@@ -26,10 +28,12 @@ namespace System.Activity.DailyTaskActivity
         {
             base.OnInit(id, data);
             _clickButton = GetComponent<Button>();
-            _finishIcon = transform.RealFindObj<Transform>("Tips/Layout/FinishIcon");
+            _finishIcon = transform.RealFindObj<Transform>("Tips/FinishIcon");
             _tipsTxt = transform.RealFindObj<TextMeshProUGUI>("Tips/Layout/TipsTxt");
             _redPoint = transform.RealFindObj<Transform>("RedPoint");
             _tip = transform.RealFindObj<Transform>("Tips");
+            _rewardIcon = transform.RealFindObj<Image>("Tips/Layout/RewardIcon");
+            _mainTaskRewadCount = transform.RealFindObj<TextMeshProUGUI>("Tips/Layout/RewardIcon/RewardText");
             if (_clickButton != null)
             {
                 _clickButton.onClick.AddListener(OnButtonClick);
@@ -52,23 +56,23 @@ namespace System.Activity.DailyTaskActivity
         {
             _redPoint.gameObject.SetActive(_activity.CheckHasFinishTask());
         }
-        private void PlayMoneyAnim()
+        
+        private void SetCoins()
         {
-            var rewardCount = _mainTask.RewardList.Split(",")[0];
-            
-            var reward = int.Parse(rewardCount) * 100;
-            
-            OnLineEarningMgr.Instance.IncreaseCash(reward);
-            
-            Messenger.Broadcast<Transform,CoinsBezier.BezierType, Action>(
-                GameConstants.CollectBonusWithType, transform, CoinsBezier.BezierType.DailyBonus, null);
-            Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
-            //Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
+            var baseAwardItem = RewardManager.Instance.CreateRewardByStr(_mainTask.RewardList);
+            if (baseAwardItem[0] is CashAwardItem cashAwardItem) 
+            {
+                OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
+                Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+                    GameConstants.CollectBonusWithType, _rewardIcon.transform, Libs.CoinsBezier.BezierType.JShape, null);
+                Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay); 
+            }
             new DelayAction(0.8f,null, () =>
             {
                 Messenger.Broadcast(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL);
             }).Play();
         }
+  
         
         private void UpdateMainTaskDes()
         {
@@ -79,7 +83,7 @@ namespace System.Activity.DailyTaskActivity
                 {
                     ShowBubble();
                 }
-                DOVirtual.DelayedCall(0.3f, PlayMoneyAnim);
+                DOVirtual.DelayedCall(0.3f, SetCoins);
                 DOVirtual.DelayedCall(1f, () =>
                 {
                     HiddenBubble();
@@ -139,6 +143,7 @@ namespace System.Activity.DailyTaskActivity
                     {
                         _tipsTxt.text = info;
                     }
+                    
                     if (startCor!=null)
                     {
                         StopCoroutine(startCor);
@@ -149,6 +154,8 @@ namespace System.Activity.DailyTaskActivity
                 startCor = StartCoroutine(activity.GetTaskInfoDescAsync(ac));
                 
                 _mainTask = activity.Task;
+
+                _mainTaskRewadCount.text = activity.GetTaskAwardCountDesc();
                 
                 _eventString = _mainTask.UpdateTaskDataMsg;
                 

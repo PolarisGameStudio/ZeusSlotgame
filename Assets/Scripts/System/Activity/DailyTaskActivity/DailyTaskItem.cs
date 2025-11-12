@@ -1,4 +1,5 @@
-﻿using Activity;
+﻿using System.Collections.Generic;
+using Activity;
 using Ads;
 using Libs;
 using TMPro;
@@ -22,6 +23,8 @@ namespace System.Activity.DailyTaskActivity
         public GameObject maskObj;
         
         public Button getBtn;
+        
+        public Image rewardIcon;
 
         private DailyTaskData _dailyTaskData;
 
@@ -49,7 +52,7 @@ namespace System.Activity.DailyTaskActivity
             taskProgress.fillAmount = GetProgress();
             taskProgressTxt.text = GetProgressText();
             taskDes.text = TaskManager.Instance.GetTaskInfo(_dailyTaskData.Task);
-            rewardCount.text = OnLineEarningMgr.Instance.GetMoneyStr(_dailyTaskData.Reward, needIcon: false);
+            rewardCount.text = GetTaskAwardCountDesc();//OnLineEarningMgr.Instance.GetMoneyStr(_dailyTaskData.Reward, needIcon: false);
             RefreshMask();
             Messenger.AddListener(_dailyTaskData.Task.UpdateTaskDataMsg, UpdateProgress);
         }
@@ -112,27 +115,31 @@ namespace System.Activity.DailyTaskActivity
             
         }
 
-        private string GetTaskInfoDesc()
+    
+
+        private string GetTaskAwardCountDesc()
         {
-            string info = "";
-            string key = _dailyTaskData.Task.GetDesc();
-            if (string.IsNullOrEmpty(key))
+            List<BaseAwardItem> baseAwardItems =_dailyTaskData.Reward;
+            if (baseAwardItems==null || baseAwardItems.Count == 0)
             {
-                Debug.LogError("WithDrawTaskActivity GetTaskInfoDesc error, key is null or empty, taskId: " + _dailyTaskData.Task.TaskId);
-                return info;
+                Debug.LogError("WithDrawTaskActivity GetTaskAward is null, activityId: " + _dailyTaskData.Task.TaskId);
+                return string.Empty;
             }
-            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName, key)
+            BaseAwardItem baseAwardItem = baseAwardItems[0];
+            if (baseAwardItem != null)
             {
-                Arguments = new object[]
+                if (baseAwardItem is CashAwardItem cashAwardItem)
                 {
-                    GetProgressInfo()
+                    return cashAwardItem.GetAwardCountDesc();
                 }
-            };
-            info = localizedString.GetLocalizedString();
-
-            return info;
+                else
+                {
+                    return baseAwardItem.GetAwardCountDesc();
+                }
+            }
+            return string.Empty;
         }
-
+        
         private string GetProgressText()
         {
             string info = string.Empty;
@@ -180,15 +187,16 @@ namespace System.Activity.DailyTaskActivity
             return info;
         }
         
-        
         private void SetCoins()
         {
-            var randomReward = _dailyTaskData.Reward;
-            OnLineEarningMgr.Instance.IncreaseCash(randomReward);
-            Messenger.Broadcast<Transform,CoinsBezier.BezierType, Action>(
-                GameConstants.CollectBonusWithType, transform, CoinsBezier.BezierType.DailyBonus, null);
-            Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
-            //Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
+            var baseAwardItem = _dailyTaskData.Reward[0];
+            if (baseAwardItem is CashAwardItem cashAwardItem) 
+            {
+               OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
+               Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+                   GameConstants.CollectBonusWithType, rewardIcon.transform, Libs.CoinsBezier.BezierType.JShape, null);
+               Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay); 
+            }
             new DelayAction(0.8f,null, () =>
             {
                 Messenger.Broadcast(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL);

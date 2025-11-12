@@ -486,6 +486,7 @@ namespace Libs
 			EmailBonus = 1,
 			Inbox = 2,
             WelcomVegas = 3,
+            JShape = 7,
 			Purchase = 100,
 			Purchase1 = 101,
 			Purchase2 = 102,
@@ -515,7 +516,8 @@ namespace Libs
 
             case BezierType.WelcomVegas:
                 return 6;
-
+            case BezierType.JShape:
+	            return 7; 
 			case BezierType.Test:
 				return 2;
 			}
@@ -587,6 +589,9 @@ namespace Libs
 
             bezierMiddlePoints.Add(new List<Vector3>());
             bezierMiddlePoints[6].Add(new Vector3(0.14f, -3.08f, 0f));
+            
+            bezierMiddlePoints.Add(new List<Vector3>());
+            bezierMiddlePoints[7].Add(new Vector3(0.5f, 0.2f, 0f)); // 第一个控制点偏移
 		}
 
 		// 在这里设定曲线中间点的随机相对偏移量最大值
@@ -602,6 +607,7 @@ namespace Libs
             bezierMiddlePointsOffset.Add(0f);
             bezierMiddlePointsOffset.Add(0.04f);
             bezierMiddlePointsOffset.Add(0.04f);
+            bezierMiddlePointsOffset.Add(0.04f); // 索引7
 		}
 
 		// 在这里设定物体在何时运动到曲线的何处
@@ -647,6 +653,10 @@ namespace Libs
             timeScaleChangePolylines.Add(new List<Vector2>());
             timeScaleChangePolylines[6].Add(new Vector2(0.0f, 0.0f));
             timeScaleChangePolylines[6].Add(new Vector2(1.0f, 1.0f));
+            
+            timeScaleChangePolylines.Add(new List<Vector2>());
+            timeScaleChangePolylines[7].Add(new Vector2(0.0f, 0.0f));
+            timeScaleChangePolylines[7].Add(new Vector2(1.0f, 1.0f));
 		}
 
 		// 在这里设定物体在运动时的大小变化
@@ -696,6 +706,10 @@ namespace Libs
             sizeScaleChangePolylines.Add(new List<Vector2>());
             sizeScaleChangePolylines[6].Add(new Vector2(0.0f, 0.8f));
             sizeScaleChangePolylines[6].Add(new Vector2(1.0f, 0.5f));
+            
+            sizeScaleChangePolylines.Add(new List<Vector2>());
+            sizeScaleChangePolylines[7].Add(new Vector2(0.0f, 1f));
+            sizeScaleChangePolylines[7].Add(new Vector2(1.0f, 0.5f));
 		}
 
 		// 在这里设定物体做曲线运动的时间范围
@@ -711,6 +725,7 @@ namespace Libs
             timeDuration.Add(new Vector2(1.8f, 2.3f));
             timeDuration.Add(new Vector2(1.8f, 2.3f));
             timeDuration.Add(new Vector2(1.8f, 2.3f));
+            timeDuration.Add(new Vector2(1f, 1f)); // 索引7
 		}
 
 		// 在这里设定物体出现的出现时间
@@ -726,6 +741,7 @@ namespace Libs
             popDuration.Add(1.1f);
             popDuration.Add(1.1f);
             popDuration.Add(1.1f);
+            popDuration.Add(0.8f); // 索引7
 		}
 	}
 }

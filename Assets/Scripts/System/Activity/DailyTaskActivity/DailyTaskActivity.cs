@@ -10,7 +10,7 @@ namespace System.Activity.DailyTaskActivity
         public BaseTask Task;
         public bool ShowAd;
         public int RewardState;
-        public int Reward;
+        public List<BaseAwardItem> Reward; 
         public bool IsMainTask;
         
         private const string RewardStateKey = "RewardStateKey";//是否领取奖励
@@ -79,7 +79,9 @@ namespace System.Activity.DailyTaskActivity
                 {
                     Task = task,
                     ShowAd = showAd,
-                    Reward = reward * 100
+                    RewardState = CanGetMoney,
+                    Reward = RewardManager.Instance.CreateRewardByStr(task.RewardList),
+                    IsMainTask = false
                 };
                 dailyTask.GetRewardState();
                 _taskList.Add(dailyTask);
@@ -99,7 +101,7 @@ namespace System.Activity.DailyTaskActivity
                     Task = mainTask,
                     ShowAd = false,
                     RewardState = CanGetMoney,
-                    Reward = reward * 100,
+                    Reward = RewardManager.Instance.CreateRewardByStr(mainTask.RewardList),
                     IsMainTask = true
                 };
                 _taskList.Add(task);
@@ -173,12 +175,6 @@ namespace System.Activity.DailyTaskActivity
             Messenger.Broadcast<int>(GameDialogManager.OpenDailyTaskDialogMsg, id);
         }
 
-        public override void AddListener()
-        {
-            base.AddListener();
-        }
-        
-       
         
         private void CheckAndResetDailyTask()
         {
@@ -242,6 +238,11 @@ namespace System.Activity.DailyTaskActivity
         {
             foreach (var dailyTaskData in _taskList)
             {
+                //跳过主线任务
+                if (dailyTaskData.IsMainTask)
+                {
+                    continue;
+                }
                 if (dailyTaskData.Task.IsTaskConditionOK && dailyTaskData.RewardState == CanGetMoney) return true;
             }
             return false;

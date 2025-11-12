@@ -372,6 +372,10 @@ namespace Activity
                 RemoveItem(currentAdItem);
                 currentAdItem = null;
                 isProcessingItem = false;
+                if (!PlatformManager.Instance.IsWhiteBao())
+                {
+                    Messenger.Broadcast(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL);
+                }
             });
         }
 

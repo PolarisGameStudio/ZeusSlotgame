@@ -194,7 +194,7 @@ namespace System.Activity.DailyTaskActivity
             {
                OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
                Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
-                   GameConstants.CollectBonusWithType, rewardIcon.transform, Libs.CoinsBezier.BezierType.DailyBonus, null);
+                   GameConstants.CollectBonusWithType, rewardIcon.transform, Libs.CoinsBezier.BezierType.JShape, null);
                Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay); 
             }
             new DelayAction(0.8f,null, () =>

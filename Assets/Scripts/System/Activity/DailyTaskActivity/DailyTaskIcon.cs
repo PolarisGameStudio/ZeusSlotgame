@@ -37,6 +37,7 @@ namespace System.Activity.DailyTaskActivity
             if (ActivityManager.Instance.GetActivityByID(DailyTaskActivity.ActivityId) is DailyTaskActivity activity)
             {
                 _activity = activity;
+                _activity.InitMainTask();
                 _redPoint.gameObject.SetActive(activity.CheckHasFinishTask());
                 foreach (var dailyTaskData in activity.TaskList)
                 {
@@ -131,8 +132,7 @@ namespace System.Activity.DailyTaskActivity
             }
             if (ActivityManager.Instance.GetActivityByID(WithDrawTaskActivity.ActivityId) is WithDrawTaskActivity activity)
             {
-                _activity.InitMainTask();
-                    
+                
                 _tipsTxt.text = activity.GetTaskInfoDesc();
                 
                 _mainTask = activity.Task;

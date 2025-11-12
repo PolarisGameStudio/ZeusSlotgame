@@ -4,7 +4,6 @@ using Ads;
 using Libs;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Localization;
 using UnityEngine.UI;
 namespace System.Activity.DailyTaskActivity
 {
@@ -25,6 +24,8 @@ namespace System.Activity.DailyTaskActivity
         public Button getBtn;
         
         public Image rewardIcon;
+
+        public GameObject effectImage;
 
         private DailyTaskData _dailyTaskData;
 
@@ -69,6 +70,7 @@ namespace System.Activity.DailyTaskActivity
                 getBtn.interactable = false;
                 finishIcon.gameObject.SetActive(false);
                 maskObj.gameObject.SetActive(false);
+                effectImage.gameObject.SetActive(false);
                 return;
             }
             
@@ -77,12 +79,14 @@ namespace System.Activity.DailyTaskActivity
                 getBtn.interactable = false;
                 maskObj.gameObject.SetActive(true);
                 finishIcon.gameObject.SetActive(false);
+                effectImage.gameObject.SetActive(false);
             }
             else
             {
                 getBtn.interactable = true;
                 finishIcon.gameObject.SetActive(true);
                 maskObj.gameObject.SetActive(false);
+                effectImage.gameObject.SetActive(true);
             }
             
         }
@@ -109,16 +113,12 @@ namespace System.Activity.DailyTaskActivity
         {
             if( DailyTaskActivity.PlayAdTaskId != _dailyTaskData.Task.TaskId) return;
             _dailyTaskData.SetRewardState(DailyTaskActivity.GetMoneyFinish);
-            getBtn.interactable = false;
-            finishIcon.gameObject.SetActive(false);
-            maskObj.gameObject.SetActive(true);
             SetCoins();
-            
             if (ActivityManager.Instance.GetActivityByID(DailyTaskActivity.ActivityId) is DailyTaskActivity activity)
             {
                 Messenger.Broadcast(DailyTaskActivity.SetRedPointState,activity.CheckHasFinishTask());
             }
-            
+            RefreshMask();
         }
 
     

@@ -33,11 +33,16 @@ namespace System.Activity.DailyTaskActivity
         {
             getBtn.onClick.AddListener(OnTaskBtnClick);
         }
+        private const string DailyTaskShowAdCount= "ad_dailytask";
         private void OnTaskBtnClick()
         {
             DailyTaskActivity.PlayAdTaskId = _dailyTaskData.Task.TaskId;
             if (_dailyTaskData.ShowAd)
             {
+                var allCount = SharedPlayerPrefs.GetPlayerPrefsIntValue(DailyTaskShowAdCount);
+                allCount++;
+                PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, DailyTaskShowAdCount, allCount);
+                SharedPlayerPrefs.SetPlayerPrefsIntValue(DailyTaskShowAdCount,allCount);
                 Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.REWARD_VIDEO_DAILY_TASK);
             }
             else

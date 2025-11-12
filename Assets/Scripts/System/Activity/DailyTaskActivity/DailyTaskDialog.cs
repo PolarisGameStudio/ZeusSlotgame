@@ -42,6 +42,7 @@ namespace System.Activity.DailyTaskActivity
 
         protected override void OnDisable()
         {
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
             base.OnDisable();
             Messenger.RemoveListener(DailyTaskActivity.ChangeMainTask,ChangeMainTask);
             Messenger.RemoveListener(DailyTaskActivity.ChangeTime,ChangeTime);

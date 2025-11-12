@@ -49,8 +49,14 @@ namespace Classic
             dataTmp.text = now.ToString("MM/dd/yyyy");
         }
 
+        private bool btnClick = false;
         private void EnsureBtnClick()
         {
+            if (btnClick)
+            {
+                return;
+            }
+            btnClick = true;
             Debug.Log("[AccountEnsureDialog][EnsureBtnClick]");
             this.Close();
             Messenger.Broadcast<int>(WithDrawConstants.UpdateRedeemItemState,_itemData.CurTask.TaskId);

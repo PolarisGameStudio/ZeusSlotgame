@@ -84,6 +84,7 @@ namespace System.Activity.DailyTaskActivity
      
         private void UpdateProgress()
         {
+            taskDes.text = TaskManager.Instance.GetTaskInfo(_dailyTaskData.Task);
             taskProgress.fillAmount = GetProgress();
             taskProgressTxt.text = GetProgressText();
             RefreshMask();

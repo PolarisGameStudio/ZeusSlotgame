@@ -73,6 +73,7 @@ namespace Activity
             }).Play();
             
             _hiddenNode.gameObject.SetActive(activity.ShowPanel);
+            clickButton.interactable = activity.ShowPanel;
         }
 
         private void ShowTaskIcon()

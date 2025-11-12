@@ -144,7 +144,7 @@ namespace Libs
 
 
         //获取任务信息描述
-        private string GetTaskInfos(BaseTask task)
+        public string GetTaskInfos(BaseTask task)
         {
             string info = "";
             LocalizedString title = null;

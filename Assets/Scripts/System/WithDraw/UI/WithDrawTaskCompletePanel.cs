@@ -32,56 +32,7 @@ namespace Classic
 
         public void SetTaskInfo()
         {
-            string info = "";
-            LocalizedString title = null;
-            Debug.Log($"WithDrawTaskCompletePanel task.taskType:{task.TaskType}");
-            switch (task.TaskType)
-            {
-                case TaskConstants.CollectSpinCountTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawspin");
-                    title.Arguments = new object[] {task.TargetNum};
-                    break;
-                case TaskConstants.CollectNewCardTypeCountTask_Key:
-                case TaskConstants.CollectNewCardCountTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawcard");
-                    title.Arguments = new object[] {task.TargetNum};
-                    break;
-                case TaskConstants.CollectCashFromZeroTask_Key:
-                case TaskConstants.AccumulateCashTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawcash");
-                    title.Arguments = new object[] {OnLineEarningMgr.Instance.GetMoneyStr((int)task.TargetNum, needIcon: false)};
-                    break;
-                case TaskConstants.WatchADTimeTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawad");
-                    title.Arguments = new object[] {task.TargetNum};
-                    break;
-                case TaskConstants.CollectFreeGameTriggerCountTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawfreegame");
-                    title.Arguments = new object[] {task.TargetNum};
-                    break;
-                case TaskConstants.CollectWildSymbolCountTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdraww01");
-                    title.Arguments = new object[] {task.TargetNum,"<sprite=0>"};
-                    break;
-                case TaskConstants.CollectSymbolCountTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdraws01");
-                    title.Arguments = new object[] {task.TargetNum,"<sprite=1>"};
-                    break;
-                case TaskConstants.CollectTriggerSpinWinCountTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawwin");
-                    title.Arguments = new object[] {task.TargetNum};
-                    break;
-                case TaskConstants.CollectJackpotGameCountTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawjackpot");
-                    title.Arguments = new object[] {task.TargetNum};
-                    break;
-                case TaskConstants.CollectLoginDaysTask_Key:
-                    title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawlogin");
-                    title.Arguments = new object[] {task.TargetNum};
-                    break;
-            }
-            info = title.GetLocalizedString();
-            infotext.text = info;
+            infotext.text = TaskManager.Instance.GetTaskInfos(task);
         }
     }
 }

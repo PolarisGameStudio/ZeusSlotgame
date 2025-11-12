@@ -28,6 +28,8 @@ namespace Activity
         public LocalizedString WatchNumVideo;
         public LocalizedString CollectNumCash;
         private BaseAwardItem _baseAwardItem;
+
+        public bool ShowPanel;
         public static int ActivityId;
         public int CurrentTaskIndex
         {
@@ -60,6 +62,8 @@ namespace Activity
             {
                 ChangeTask();
             }
+            
+            ShowPanel = Utilities.GetValue<bool>(Data, "ShowPanel", false);
         }
 
         /// <summary>

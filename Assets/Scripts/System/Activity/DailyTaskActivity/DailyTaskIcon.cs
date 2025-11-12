@@ -133,7 +133,20 @@ namespace System.Activity.DailyTaskActivity
             if (ActivityManager.Instance.GetActivityByID(WithDrawTaskActivity.ActivityId) is WithDrawTaskActivity activity)
             {
                 
-                _tipsTxt.text = activity.GetTaskInfoDesc();
+                Action<string> ac = (info)=>
+                {
+                    if (_tipsTxt!=null)
+                    {
+                        _tipsTxt.text = info;
+                    }
+                    if (startCor!=null)
+                    {
+                        StopCoroutine(startCor);
+                        startCor = null;
+                    }
+                };
+            
+                startCor = StartCoroutine(activity.GetTaskInfoDescAsync(ac));
                 
                 _mainTask = activity.Task;
                 
@@ -143,7 +156,8 @@ namespace System.Activity.DailyTaskActivity
             }
             ShowBubble();
         }
-
+        private Coroutine startCor;
+       
         private void OnButtonClick()
         {
             ActivityManager.Instance.OnClickIcon(activityId);

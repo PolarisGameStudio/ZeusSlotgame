@@ -24,7 +24,7 @@ namespace Activity
         WithDrawTaskActivity activity;
         private void Awake()
         {
-            clickButton = GetComponent<Button>();
+            clickButton = Util.FindObject<Button>(transform, "HiddenNode/Button");
             _hiddenNode = Util.FindObject<Transform>(transform, "HiddenNode");
             tmp_info = Util.FindObject<TextMeshProUGUI>(transform, "HiddenNode/tmp_info");
             tmp_progress = Util.FindObject<TextMeshProUGUI>(transform, "HiddenNode/slider_bg/tmp_progress");

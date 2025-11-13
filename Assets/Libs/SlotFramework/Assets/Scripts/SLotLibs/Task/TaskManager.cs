@@ -127,7 +127,7 @@ namespace Libs
             //去除info字符串中”()“之间包含的字符串的内容：譬如"info(fjsdffs)cds"处理后变为"infocds"
             info = info.Substring(0, info.IndexOf("(")) + info.Substring(info.IndexOf(")") + 1);
             //info中有‘.’字符，需要替换为‘.’
-            info = info.Replace(".", "");
+            // info = info.Replace(".", "");
             string progressInfo = "";
             if (Task is CollectCashFromZeroTask)
             {
@@ -138,7 +138,12 @@ namespace Libs
             {
                 progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",Task.HasCollectNum,Task.TargetNum);
             }
-            
+
+            //info最后结束于'.'字符，则去除这个字符
+            if (info.EndsWith("."))
+            {
+                info = info.Substring(0, info.Length - 1);
+            }
             return info+". "+progressInfo;
         }
 

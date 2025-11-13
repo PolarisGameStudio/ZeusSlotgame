@@ -70,11 +70,8 @@ namespace System.Activity.DailyTaskActivity
                 Dictionary<string, object> taskInfoDict = objectA as Dictionary<string, object>;
                 
                 int taskId = Utils.Utilities.GetInt(taskInfoDict, TaskConstants.TaskId_Key, 0);
-                
                 var task = TaskManager.Instance.RegisterTask(taskId, taskInfoDict);
                 var showAd = Utils.Utilities.GetBool(taskInfoDict, "ShowAd",false);
-                var rewardCash = task.RewardList.Split(",")[1];
-                int reward = int.Parse(rewardCash);
                 var dailyTask = new DailyTaskData
                 {
                     Task = task,
@@ -94,8 +91,6 @@ namespace System.Activity.DailyTaskActivity
             if (ActivityManager.Instance.GetActivityByID(WithDrawTaskActivity.ActivityId) is  WithDrawTaskActivity activity)
             {
                 var mainTask = activity.Task;
-                var rewardCash = mainTask.RewardList.Split(",")[1];
-                int reward = int.Parse(rewardCash);
                 var task = new DailyTaskData
                 {
                     Task = mainTask,

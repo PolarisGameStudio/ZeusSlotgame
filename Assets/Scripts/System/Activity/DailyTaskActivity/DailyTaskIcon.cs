@@ -76,27 +76,37 @@ namespace System.Activity.DailyTaskActivity
         
         private void UpdateMainTaskDes()
         {
-            if (_mainTask.IsTaskConditionOK)
+            if (ActivityManager.Instance.GetActivityByID(WithDrawTaskActivity.ActivityId) is not WithDrawTaskActivity withDrawTaskActivity)
+                return;
+            
+            if (withDrawTaskActivity.ShowPanel)
             {
-                _finishIcon.gameObject.SetActive(true);
-                if (!_firstTaskShow)
-                {
-                    ShowBubble();
-                }
-                DOVirtual.DelayedCall(0.3f, SetCoins);
-                DOVirtual.DelayedCall(1f, () =>
-                {
-                    HiddenBubble();
-                    DOVirtual.DelayedCall(0.3f, ChangeMainTask);
-                });
+                ChangeMainTask();
             }
             else
             {
-                _finishIcon.gameObject.SetActive(false);
-                if (_firstTaskShow)
+                if (_mainTask.IsTaskConditionOK)
                 {
-                    HiddenBubble();
-                    _firstTaskShow = false;
+                    _finishIcon.gameObject.SetActive(true);
+                    if (!_firstTaskShow)
+                    {
+                        ShowBubble();
+                    }
+                    DOVirtual.DelayedCall(0.3f, SetCoins);
+                    DOVirtual.DelayedCall(1f, () =>
+                    {
+                        HiddenBubble();
+                        DOVirtual.DelayedCall(0.3f, ChangeMainTask);
+                    });
+                }
+                else
+                {
+                    _finishIcon.gameObject.SetActive(false);
+                    if (_firstTaskShow)
+                    {
+                        HiddenBubble();
+                        _firstTaskShow = false;
+                    }
                 }
             }
         }
@@ -160,8 +170,17 @@ namespace System.Activity.DailyTaskActivity
                 _eventString = _mainTask.UpdateTaskDataMsg;
                 
                 Messenger.AddListener(_eventString, UpdateMainTaskDes);
+
+                if (activity.ShowPanel)
+                {
+                    _tip.gameObject.SetActive(false);
+                }
+                else
+                {
+                    ShowBubble();
+                }
             }
-            ShowBubble();
+           
         }
         private Coroutine startCor;
        

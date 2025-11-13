@@ -18,16 +18,18 @@ namespace Activity
         private TextMeshProUGUI tmp_progress;
         private List<Image> icons = new List<Image>();
         private SkeletonGraphic _spine;
+        private Transform _hiddenNode;
         public TextMeshProUGUI rewardCount;
         // private Animator _animator;
         WithDrawTaskActivity activity;
         private void Awake()
         {
             clickButton = GetComponent<Button>();
-            tmp_info = Util.FindObject<TextMeshProUGUI>(transform, "tmp_info");
-            tmp_progress = Util.FindObject<TextMeshProUGUI>(transform, "slider_bg/tmp_progress");
-            bar = Util.FindObject<Image>(transform, "slider_bg/img_progress");
-            _spine = Util.FindObject<SkeletonGraphic>(transform, "spinAni");
+            _hiddenNode = Util.FindObject<Transform>(transform, "HiddenNode");
+            tmp_info = Util.FindObject<TextMeshProUGUI>(transform, "HiddenNode/tmp_info");
+            tmp_progress = Util.FindObject<TextMeshProUGUI>(transform, "HiddenNode/slider_bg/tmp_progress");
+            bar = Util.FindObject<Image>(transform, "HiddenNode/slider_bg/img_progress");
+            _spine = Util.FindObject<SkeletonGraphic>(transform, "HiddenNode/spinAni");
             if (_spine!= null)
             {
                 _spine.Initialize(true);
@@ -69,6 +71,9 @@ namespace Activity
             {
                 activity.CheckTaskState();
             }).Play();
+            
+            _hiddenNode.gameObject.SetActive(activity.ShowPanel);
+            clickButton.interactable = activity.ShowPanel;
         }
 
         private void ShowTaskIcon()
@@ -193,13 +198,17 @@ namespace Activity
 
         public void PlayAwardAnim(BaseAwardItem baseAwardItem)
         {
-            /*if (baseAwardItem is CashAwardItem cashAwardItem)
+            if (activity.ShowPanel)
             {
-                OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
-                Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
-                    GameConstants.CollectBonusWithType, rewardCount.transform.parent, Libs.CoinsBezier.BezierType.DailyBonus, null);
-                Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
-            }*/
+                if (baseAwardItem is CashAwardItem cashAwardItem)
+                {
+                     OnLineEarningMgr.Instance.IncreaseCash(cashAwardItem.count,true);
+                     Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
+                         GameConstants.CollectBonusWithType, rewardCount.transform.parent, Libs.CoinsBezier.BezierType.DailyBonus, null);
+                     Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
+                }
+            }
+            
             //领奖动画播放完毕
             new DelayAction(1f,null, () =>
             {

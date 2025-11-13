@@ -24,19 +24,21 @@ public class LocalizeStringAndFontComppnent_TMP
          return null;
       if (target.gameObject.GetComponent<LocalizeFontEvent>() != null)
          return null;
-      var componentString = Undo.AddComponent(target.gameObject,typeof(LocalizeStringEvent)) as LocalizeStringEvent;
+      if (target.gameObject.GetComponent<LocalizeStringEvent>()==null)
+      {
+         //添加文本
+         var componentString = Undo.AddComponent(target.gameObject,typeof(LocalizeStringEvent)) as LocalizeStringEvent;
+         var setStringMethod = target.GetType().GetProperty("text").GetSetMethod();
+         var stringMethodDelegate = System.Delegate.CreateDelegate(typeof(UnityAction<string>), target, setStringMethod) as UnityAction<string>;
+         UnityEventTools.AddPersistentListener(componentString.OnUpdateString,stringMethodDelegate);
+         componentString.OnUpdateString.SetPersistentListenerState(0, UnityEventCallState.EditorAndRuntime);
+      }
+      //添加字体
       var componentFont = Undo.AddComponent(target.gameObject,typeof(LocalizeFontEvent)) as LocalizeFontEvent;
-
-      var setStringMethod = target.GetType().GetProperty("text").GetSetMethod();
-      
       var setFontMethod = target.GetType().GetProperty("font").GetSetMethod();
-      
-      var stringMethodDelegate = System.Delegate.CreateDelegate(typeof(UnityAction<string>), target, setStringMethod) as UnityAction<string>;
       var fontMethodDelegate = System.Delegate.CreateDelegate(typeof(UnityAction<TMP_FontAsset>), target, setFontMethod)  as UnityAction<TMP_FontAsset>;
-
-      UnityEventTools.AddPersistentListener(componentString.OnUpdateString,stringMethodDelegate);
       UnityEventTools.AddPersistentListener(componentFont.OnUpdateAsset,fontMethodDelegate);
-
+      componentFont.OnUpdateAsset.SetPersistentListenerState(0, UnityEventCallState.EditorAndRuntime);
       return null;
    }
 }

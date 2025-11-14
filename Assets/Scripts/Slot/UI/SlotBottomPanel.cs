@@ -525,7 +525,7 @@ public class SlotBottomPanel : MonoBehaviour
         Transform xian = win.transform.parent.Find("xian");
         xian.gameObject.SetActive(false);
         RectTransform winTr = win.GetComponent<RectTransform>();
-        winTr.anchoredPosition = new Vector3(0, 60);
+        winTr.anchoredPosition = new Vector3(0,  winTr.anchoredPosition.y);
         winTr.sizeDelta = new Vector2(800,100);
         TextMeshProUGUI tmp_win =  win.GetComponent<TextMeshProUGUI>();
         tmp_win.fontSizeMax = 105;
@@ -538,7 +538,7 @@ public class SlotBottomPanel : MonoBehaviour
         xian.gameObject.SetActive(true);
         SetCashText(0);
         RectTransform winTr = win.GetComponent<RectTransform>();
-        winTr.anchoredPosition = new Vector3(-200, 54);
+        winTr.anchoredPosition = new Vector3(-200, winTr.anchoredPosition.y);
         winTr.sizeDelta = new Vector2(400,100);
         cash.gameObject.SetActive(true);
         win.GetComponent<TextMeshProUGUI>().fontSizeMax = 56.0f;

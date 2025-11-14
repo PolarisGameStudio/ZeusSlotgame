@@ -27,8 +27,8 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-hi
-  - m_GUID: 31190de02d7b74ddd9f98bd53c2083f5
-    m_Address: NotoSans-Bold Atlas Material B8FEFE
+  - m_GUID: 2120e5e7768f24734a190559f669be11
+    m_Address: NotoSans-Bold Atlas Material FEFEC0
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-hi

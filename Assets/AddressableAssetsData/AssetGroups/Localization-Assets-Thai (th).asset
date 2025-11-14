@@ -32,8 +32,8 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-th
-  - m_GUID: b74ece88e50004fa98eaa88287b9a15e
-    m_Address: NotoSansThai-Bold Atlas Material B8FEFE
+  - m_GUID: fa3603e84ddaf4614b9abe77d060abfe
+    m_Address: NotoSansThai-Bold Atlas Material FEFEC0
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-th

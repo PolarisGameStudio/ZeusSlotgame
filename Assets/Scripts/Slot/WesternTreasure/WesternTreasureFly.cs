@@ -198,24 +198,36 @@ public class WesternTreasureFly : MonoBehaviour
         {
             treeManager.spinResult.wildNum = 40000;
             treeManager.spinResult.curTreeLevel = 4;
-            // PlayGirlAni(1);
-            // yield return new WaitForSeconds(1.0f);
+            PlayGirlAni(1);
+            yield return new WaitForSeconds(1.0f);
             PlayAnimation(2);
             // AudioManager.Instance.AsyncPlayEffectAudio("treelevelup");
             yield return new WaitForSeconds(0.6f);
             ChangeSkin(4);
             yield return new WaitForSeconds(1);
-            // PlayGirlAni(0);
+            PlayGirlAni(0);
             //此粒子特效先关闭
             //SetTriggerEffect(true);
             PlayAnimation(3);
             AudioManager.Instance.AsyncPlayEffectAudio("treelevelup");
             yield return new WaitForSeconds(0.5f);
-            Messenger.Broadcast<string>(GameConstants.PlayFullScreenAnimation, "JackPotStart");
+            if (JackPotAni!=null)
+            {
+                //为糖果做的特殊处理
+                JackPotAni.AnimationState.SetAnimation(0, "animation", false);
+            }
+            else
+            {
+                Messenger.Broadcast<string>(GameConstants.PlayFullScreenAnimation, "JackPotStart");
+            }
             AudioManager.Instance.AsyncPlayEffectAudio("JackPotStart1");
-            yield return new WaitForSeconds(4.3f);
+            yield return new WaitForSeconds(5.21f);
             // SetTriggerEffect(false);
             treeManager.OpenJackpotGame();
+            if (JackPotAni!=null)
+            {
+                JackPotAni.AnimationState.SetAnimation(0, animationName, true);
+            }
         }
     }
 
@@ -262,14 +274,14 @@ public class WesternTreasureFly : MonoBehaviour
             }
         }
 
-        // if(GirlGraphic != null)
-        // {
-        //     GirlGraphic.startingAnimation = "hu xi";
-        //     if(GirlGraphic.AnimationState != null)
-        //     {
-        //         GirlGraphic.AnimationState.Complete += OnGirlPlayComplete;
-        //     }
-        // }
+        if(GirlGraphic != null)
+        {
+            GirlGraphic.startingAnimation = "hu xi";
+            if(GirlGraphic.AnimationState != null)
+            {
+                GirlGraphic.AnimationState.Complete += OnGirlPlayComplete;
+            }
+        }
     }
 
     private void OnComplete(Spine.TrackEntry entry)
@@ -316,6 +328,7 @@ public class WesternTreasureFly : MonoBehaviour
     //0-->循环呼吸 1-->挥魔法棒
     public void PlayGirlAni(int id)
     {
+        if(GirlGraphic == null) return;
         //动画重置一下
         GirlGraphic.AnimationState.ClearTracks();
         if (id==0)
@@ -333,11 +346,6 @@ public class WesternTreasureFly : MonoBehaviour
     {
         //skeletonGraphic.AnimationState.SetEmptyAnimations(0); 
         skeletonGraphic.AnimationState.SetAnimation(0,animationName,true);
-        if (JackPotAni!=null)
-        {
-            JackPotAni.AnimationState.SetAnimation(0, animationName, true);
-        }
-
         if (GirlGraphic!=null)
         {
             PlayGirlAni(0);

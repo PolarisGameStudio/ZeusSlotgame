@@ -1356,10 +1356,15 @@ public class PlistColumnEditorWindow : EditorWindow
             {
                 valueElement = _xmlDoc.CreateElement(xmlType);
             }
-            else
+            else if (type == PlistNodeType.Boolean)
             {
-                if (type == PlistNodeType.Boolean) value = "true";
-                else if (type == PlistNodeType.Integer) value = "0";
+                // Boolean: 使用自闭合标签，不设置 InnerText
+                // xmlType 应为 "true" 或 "false"
+                valueElement = _xmlDoc.CreateElement(xmlType);
+                value = xmlType; 
+            }else
+            {
+                if (type == PlistNodeType.Integer) value = "0";
                 else if (type == PlistNodeType.Real) value = "0.0";
                 else value = "NewValue";
                 valueElement = _xmlDoc.CreateElement(xmlType);
@@ -1396,12 +1401,17 @@ public class PlistColumnEditorWindow : EditorWindow
             {
                 // 如果是添加容器，只创建空的XML元素
                 valueElement = _xmlDoc.CreateElement(xmlType);
+            }else if (type == PlistNodeType.Boolean)
+            {
+                // Boolean: 使用自闭合标签，不设置 InnerText
+                // xmlType 应为 "true" 或 "false"
+                valueElement = _xmlDoc.CreateElement(xmlType);
+                value = xmlType; 
             }
             else
             {
                 // 如果是添加值类型，才设置默认值并写入InnerText
-                if (type == PlistNodeType.Boolean) value = "true";
-                else if (type == PlistNodeType.Integer) value = "0";
+                if (type == PlistNodeType.Integer) value = "0";
                 else if (type == PlistNodeType.Real) value = "0.0";
                 else value = "NewValue";
 

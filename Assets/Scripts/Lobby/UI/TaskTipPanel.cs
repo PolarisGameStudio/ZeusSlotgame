@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -12,7 +13,6 @@ public class TaskTipPanel : MonoBehaviour
     public Sprite[] sliderSprites = new Sprite[2];
     public Sprite[] backgroundSprites = new Sprite[2];
     public Image image_icon;
-    public List<Sprite> iconSprites = new List<Sprite>();
     private UIText txtInfo;
 
     private UIText progress;
@@ -85,7 +85,17 @@ public class TaskTipPanel : MonoBehaviour
         // background.sprite = backgroundSprites[TaskToBGSpriteIndex.TryGetValue(task.TaskType, out int index) ? index : 0];
         background.sprite = backgroundSprites[index];
         //设置图标
-        image_icon.sprite = GetSpriteByType(task.TaskType);
+        if (task.TaskType != TaskConstants.CollectLoginDaysTask_Key)
+        {
+            ItemManager.Instance.GetTaskIcon(task.TaskType, (icon) =>
+            {
+                image_icon.sprite = icon;
+            });
+        }
+        else
+        {
+            image_icon.gameObject.SetActive(false);
+        }
         slider.fillAmount = 0f;
         slider.sprite = sliderSprites[index];
         if (index>0)
@@ -101,54 +111,6 @@ public class TaskTipPanel : MonoBehaviour
         HandleShowProgressBar(f, task.GetProgressDesc());
         DelayShowSelf();
     }
-    
-    Sprite GetSpriteByType(int taskType)
-    {
-        Sprite sp = null;
-        if (taskType < 0)
-        {
-            Debug.LogError("TaskTipPanel GetSpriteByType taskType out of range: " + taskType);
-            return sp;
-        }
-
-        switch (taskType)
-        {
-            case TaskConstants.AccumulateCashTask_Key:
-            case TaskConstants.CollectCashFromZeroTask_Key:
-                sp = iconSprites[0];
-                break;
-            case TaskConstants.CollectFreeGameTriggerCountTask_Key:
-                sp = iconSprites[1];
-                break;
-            case TaskConstants.CollectJackpotGameCountTask_Key:
-                sp = iconSprites[2];
-                break;
-            case TaskConstants.CollectSymbolCountTask_Key:
-                sp = iconSprites[3];
-                break;
-            case TaskConstants.CollectWildSymbolCountTask_Key:
-                sp = iconSprites[4];
-                break;
-            case TaskConstants.CollectTriggerSpinWinCountTask_Key:
-                sp = iconSprites[5];
-                break;
-            case TaskConstants.CollectSpinCountTask_Key:
-                sp = iconSprites[6];
-                break;
-            case TaskConstants.WatchADTimeTask_Key:
-                sp = iconSprites[7];
-                break;
-            case TaskConstants.CollectCardTask_Key:
-            case TaskConstants.CollectNewCardCountTask_Key:
-            case TaskConstants.CollectNewCardTypeCountTask_Key:
-                sp = iconSprites[8];
-                break;
-        }
-
-        return sp;
-    }
-
-
     void HandleShowProgressBar(float f,string info)
     {
         if (particlePar!=null)

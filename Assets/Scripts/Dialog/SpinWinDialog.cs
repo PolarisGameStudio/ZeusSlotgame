@@ -126,6 +126,7 @@ public class SpinWinDialog : UIDialog
 			x2Image.gameObject.SetActive(true);
 			Transform numImage = Utilities.RealFindObj<Transform>(CollectBtn.transform, "number");
 			numImage.gameObject.SetActive(true);
+			RewardAdMultiple = 2;
 		}
 		else
 		{

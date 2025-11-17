@@ -14,9 +14,10 @@ public class RecordItem: MonoBehaviour
     public RecordItemData itemData;
     private Image paltformImg;
     private Button redeemBtn;
-
+    private Image moneyIMG;
     private void Awake()
     {
+        moneyIMG = Utils.Utilities.RealFindObj<Image>(transform, "inProgress/bottom/moneyIMG");
         cashTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "cashTMP");
         progressTMP = Utils.Utilities.RealFindObj<TextMeshProUGUI>(transform, "inProgress/bottom/progressTMP");
         progressBar = Utils.Utilities.RealFindObj<Image>(transform, "inProgress/bottom/checking/progressBar");
@@ -35,6 +36,12 @@ public class RecordItem: MonoBehaviour
 
     public void Refresh()
     {
+        //设置任务图标排除任务类型
+        ItemManager.Instance.GetIcon("1007", (icon) =>
+        {
+            moneyIMG.sprite = icon;
+        });
+       
         cashTMP.text = OnLineEarningMgr.Instance.GetCashStr(itemData.cash,needIcon:false);
         progressTMP.text = $"{itemData.curProgress}/{itemData.targetProgress}";
         if (progressBar != null)

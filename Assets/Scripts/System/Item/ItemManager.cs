@@ -29,6 +29,15 @@ namespace System
             //初始化道具数据
         }
         
+        public async void GetIcon(string iconName,Action<Sprite> callback)
+        {
+            Sprite icon = await AddressableManager.Instance.LoadAssetAsync<Sprite>(resourcePath +"TaskIcon/"+ iconName);
+            if (icon!=null)
+            {
+                callback?.Invoke(icon);
+            }
+        }
+        
         //加载task图标
         public async void GetTaskIcon(int taskType,Action<Sprite> callback)
         {

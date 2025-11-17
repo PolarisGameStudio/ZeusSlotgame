@@ -313,6 +313,11 @@ namespace Activity
             {
                 progressInfo = string.Format("<color=#FFFF00>({0}/{1})</color>",Task.HasCollectNum,Task.TargetNum);
             }
+            //info如果以句号结尾，则不需要再加句号
+            if (info.EndsWith("。") || info.EndsWith("."))
+            {
+                return info + progressInfo;
+            }
             return info+". "+progressInfo;
         }
 

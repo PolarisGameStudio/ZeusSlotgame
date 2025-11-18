@@ -36,7 +36,7 @@ namespace Activity
                 _spine.AnimationState.SetAnimation(0, "idle", true);
             }
             // _animator = GetComponent<Animator>();
-            Transform img_icon = Util.FindObject<Transform>(transform, "img_icon");
+            Transform img_icon = Util.FindObject<Transform>(transform, "HiddenNode/img_icon");
             if (img_icon != null)
             {
                 for (int i = 0; i < img_icon.childCount; i++)

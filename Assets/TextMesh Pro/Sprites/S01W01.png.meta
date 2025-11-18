@@ -132,12 +132,12 @@ TextureImporter:
       name: S01W01_0
       rect:
         serializedVersion: 2
-        x: 6
-        y: 11
-        width: 181
-        height: 319
+        x: 25
+        y: 15
+        width: 174
+        height: 316
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -153,12 +153,12 @@ TextureImporter:
       name: S01W01_1
       rect:
         serializedVersion: 2
-        x: 223
-        y: 98
-        width: 185
-        height: 141
+        x: 235
+        y: 108
+        width: 170
+        height: 131
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

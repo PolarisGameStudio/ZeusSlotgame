@@ -227,7 +227,7 @@ namespace Activity
             {
                 Debug.Log("Free button clicked");
                 //免费激活buff
-                ActiveBuffActive();
+                ActiveBuffActive(false);
             }else if (go == CloseBtn.gameObject)
             {
                 Debug.Log("Free button clicked");
@@ -239,11 +239,14 @@ namespace Activity
             }
         }
         
-        void ActiveBuffActive()
+        void ActiveBuffActive(bool isFree = true)
         {
             if (_buff != null)
             {
-                PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,_buff.buffName);
+                if (!isFree)
+                {
+                    PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,_buff.buffName);
+                }
                 Messenger.Broadcast<int>(BuffConstant.OnBuffActive,_buff.buffId);
                 Close();
             }

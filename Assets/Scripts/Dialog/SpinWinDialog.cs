@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Ads;
 using Classic;
+using TMPro;
+using UnityEngine.Localization;
 using Utils;
 
 public class SpinWinDialog : UIDialog 
@@ -92,6 +94,9 @@ public class SpinWinDialog : UIDialog
 			UpdateTextUI(coins);
 			tween = null;
 		});
+		int popCount = OnLineEarningMgr.Instance.AddPopSpinWinCount();
+		isFirstTime = popCount==1;
+		isSecondTime = popCount==2;
 		if (!PlatformManager.Instance.IsWhiteBao())
 		{
 			totalCash = OnLineEarningMgr.Instance.GetSpinWinReward((int)spinWinType);
@@ -103,9 +108,6 @@ public class SpinWinDialog : UIDialog
 			});
 		}
 		cashText.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
-		int popCount = OnLineEarningMgr.Instance.AddPopSpinWinCount();
-		isFirstTime = popCount==1;
-		isSecondTime = popCount==2;
 		if (isFirstTime)
 		{
 			Debug.Log("SpinWinDialogNew OnStart isFirstTime");
@@ -114,6 +116,7 @@ public class SpinWinDialog : UIDialog
 			CloseBtnOnAd.gameObject.SetActive(false);
 			//显示免费的收集按钮
 			CollectBtn.gameObject.SetActive(true);
+			
 		}else if (isSecondTime)
 		{
 			Debug.Log("SpinWinDialogNew OnStart isSecondTime");
@@ -162,6 +165,10 @@ public class SpinWinDialog : UIDialog
 			Debug.Log("Scale animation complete111");
 			CloseBtnOnAd.enabled = false;
 			CloseBtnOnAd.gameObject.SetActive(false);
+			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(CloseBtnOnAd.transform, "claim");
+			LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
+			int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
+			claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
 			// CloseBtnOnAd.transform.localScale = Vector3.zero;
 			new DelayAction(0.7f, null, () =>
 			{
@@ -223,6 +230,16 @@ public class SpinWinDialog : UIDialog
 	{
 		this.curCash = cash;
 		this.cashText.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
+		if (isFirstTime||isSecondTime||ADManager.Instance.CheckHideSpinWin())
+		{
+			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(CollectBtn.transform, "Claim");
+			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
+		}
+		else
+		{
+			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchAdBtn.transform, "Claim");
+			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
+		}
 	}
 	
 	private void PlayWinTypeEffect()
@@ -363,6 +380,7 @@ public class SpinWinDialog : UIDialog
         // //插屏广告
         else if (type == 1)
         {
+	        totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
             DoneADCallBack();
         }
     }
@@ -370,7 +388,7 @@ public class SpinWinDialog : UIDialog
     //广告播放失败
     void AdIsPlayFailed(int type)
     {
-        AdIsPlaySuccessful(type);
+	    AdIsPlaySuccessful(1);
     }
     
     void RewardADIsPlaySuccess()
@@ -385,6 +403,7 @@ public class SpinWinDialog : UIDialog
     {
         if (msg == ADEntrances.Interstitial_Entrance_CLOSESPINWIN)
         {
+	        totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
             this.DoneADCallBack();
         }
     }

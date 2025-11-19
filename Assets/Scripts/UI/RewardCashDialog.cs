@@ -4,6 +4,7 @@ using Libs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 namespace Classic
 {
@@ -64,7 +65,9 @@ namespace Classic
         private void SetCashCoins(int cash)
         {
             this.curCash = cash;
-            this.TMP_Money.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
+            this.TMP_Money.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash,needBigNum:true));
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnWatch.transform, "Claim");
+            claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
         }
 
         //激励广告

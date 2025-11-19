@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Classic;
 using Ads;
+using TMPro;
+using UnityEngine.Localization;
 using Utils;
 
 public class WesternTreasureMiniDialog : UIDialog
@@ -96,6 +98,10 @@ public class WesternTreasureMiniDialog : UIDialog
         {
             EndBtn.enabled = false;
             EndBtn.gameObject.SetActive(false);
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(EndBtn.transform, "claim");
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
+            int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
+            claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
             // EndBtn.transform.localScale = Vector3.zero;
             new DelayAction(0.7f, null, () =>
             {
@@ -113,6 +119,8 @@ public class WesternTreasureMiniDialog : UIDialog
     {
         this.curCash = cash;
         this.BonusGameWinCash.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
+        TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
+        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
     }
     void OnEnable()
     {
@@ -136,6 +144,7 @@ public class WesternTreasureMiniDialog : UIDialog
         //插屏广告
         else if (type == 1)
         {
+            totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
             DoneADCallBack();
         }
     }
@@ -148,6 +157,7 @@ public class WesternTreasureMiniDialog : UIDialog
     {
         if (msg == ADEntrances.Interstitial_Entrance_JACKPOTEND)
         {
+            totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
             //插屏广告未满足条件，直接关闭
             DoneADCallBack();
         }

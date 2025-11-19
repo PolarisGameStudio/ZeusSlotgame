@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Ads;
+using UnityEngine.Localization;
 using Utils;
 
 public class LuckyCashDialog : UIDialog
@@ -59,6 +60,10 @@ public class LuckyCashDialog : UIDialog
         {
             BtnNotWatch.enabled = false;
             BtnNotWatch.gameObject.SetActive(false);
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnNotWatch.transform, "claim");
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
+            int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
+            claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
             // BtnNotWatch.transform.localScale = Vector3.zero;
             new DelayAction(0.7f, null, () =>
             {
@@ -85,6 +90,7 @@ public class LuckyCashDialog : UIDialog
     {
         if (msg == ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH)
         {
+            totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
             SetCoins();
         }
     }
@@ -128,6 +134,8 @@ public class LuckyCashDialog : UIDialog
     {
         this.curCash = cash;
         this.TMP_Money.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
+        TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnWatch.transform, "Claim");
+        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
     }
     
     void AdIsPlaySuccessful(int type)
@@ -137,11 +145,11 @@ public class LuckyCashDialog : UIDialog
         if (type == (int)ADType.RewardAD)
         {
             multiple = RewardAdMultiple;
+            totalCash *= multiple;
         }else if (type == (int)ADType.InterstitialAD)
         {
-            multiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
+            totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
         }
-        totalCash *= multiple;
         SetCoins();
     }
     void AdIsPlayFailed(int type)

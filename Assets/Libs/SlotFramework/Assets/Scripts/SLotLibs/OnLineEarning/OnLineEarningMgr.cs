@@ -35,6 +35,7 @@ public class OnLineEarningMgr
     private const string OPEN_KEY = "OPEN";
     private const string POP_PLAN_CONFIG_KEY = "InfiniteModelConfig";
     private const string IsWhitePackage_KEY = "IsWhitePackage";
+    private const string ClaimMultiple_KEY = "ClaimMultiple";
 
     private const string THREE_HUNDRED_CONFIG_KEY = "300ModelConfig";
     private const string ON_LINE_EARNING_MODEL_KEY = "OnLineEarningModel"; //网赚模式 0--》无限模式  1--》300模式
@@ -78,7 +79,8 @@ public class OnLineEarningMgr
     //300和区间模式下，奖励弹板的弹出条件数数 curRewardCount >= PopRewardLimit
     public int curRewardCount = 0;
     public float popRewardRate = 1f;
-    
+    public float claimMultipleRate = 1f;
+
     public const string PopSpinWinCountKey = "PopSpinWinCountKey";
     public int PopSpinWinCount
     {
@@ -104,6 +106,7 @@ public class OnLineEarningMgr
         }
         isWhitePackage = Utils.Utilities.GetBool(config,IsWhitePackage_KEY,false);
         OnLineEarningModel = Utils.Utilities.GetInt(config,ON_LINE_EARNING_MODEL_KEY,0);
+        claimMultipleRate= Utils.Utilities.GetFloat(config,ClaimMultiple_KEY,0);
         if (OnLineEarningModel == 0)
         {
             Dictionary<string,object> PopPlanConfigDict = Utils.Utilities.GetValue<Dictionary<string,object>>(config,POP_PLAN_CONFIG_KEY,null);
@@ -271,7 +274,10 @@ public class OnLineEarningMgr
     {
         return _intervalDataPattern;
     }
-    
+    public float GetClaimRewardRate()
+    {
+        return claimMultipleRate;
+    }
     #region Cash
 
     private string language = "";

@@ -7,6 +7,7 @@ using Libs;
 using TMPro;
 using DG.Tweening;
 using Ads;
+using UnityEngine.Localization;
 using Utils;
 
 public class FreeGameEndDialog : UIDialog 
@@ -78,6 +79,10 @@ public class FreeGameEndDialog : UIDialog
         {
             EndBtn.enabled = false;
             EndBtn.gameObject.SetActive(false);
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(EndBtn.transform, "claim");
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
+            int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
+            claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
             // EndBtn.transform.localScale = Vector3.zero;
             new DelayAction(0.7f, null, () =>
             {
@@ -150,6 +155,7 @@ public class FreeGameEndDialog : UIDialog
         // //插屏广告
         else if (type == 1)
         {
+            totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
             DoneADCallBack();
         }
     }
@@ -163,6 +169,7 @@ public class FreeGameEndDialog : UIDialog
     {
         if (msg == ADEntrances.Interstitial_Entrance_CLOSEFREESPINEND)
         {
+            totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
             this.DoneADCallBack();
         }
     }
@@ -275,6 +282,8 @@ public class FreeGameEndDialog : UIDialog
     {
         this.curCash = cash;
         this.FreeGameWinCash.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
+        TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
+        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
     }
     public void OnClickStopUpdate()
     {

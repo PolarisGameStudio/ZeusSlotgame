@@ -68,9 +68,8 @@ public class FreeGameEndDialog : UIDialog
     {
         base.Start();
         DelayShowClaimBtn();
-        RewardAdMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-        Text adMultiple = Util.FindObject<Text>(WatchADBtn.transform, "num");
-        adMultiple.text = "" + RewardAdMultiple;
+       
+        
     }
 
     void DelayShowClaimBtn()
@@ -262,6 +261,11 @@ public class FreeGameEndDialog : UIDialog
                 SetCashCoins(totalCash);
                 Cashtween = null;
             });
+            RewardAdMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
+            Text adMultiple = Util.FindObject<Text>(WatchADBtn.transform, "num");
+            adMultiple.text = "" + RewardAdMultiple;
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
+            claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
         }
     }
     
@@ -282,8 +286,7 @@ public class FreeGameEndDialog : UIDialog
     {
         this.curCash = cash;
         this.FreeGameWinCash.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
-        TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
-        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
+      
     }
     public void OnClickStopUpdate()
     {

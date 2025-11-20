@@ -108,6 +108,7 @@ public class SpinWinDialog : UIDialog
 			});
 		}
 		cashText.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
+		bool showCashOnCollectBtn = false;
 		if (isFirstTime)
 		{
 			Debug.Log("SpinWinDialogNew OnStart isFirstTime");
@@ -116,7 +117,8 @@ public class SpinWinDialog : UIDialog
 			CloseBtnOnAd.gameObject.SetActive(false);
 			//显示免费的收集按钮
 			CollectBtn.gameObject.SetActive(true);
-			
+			showCashOnCollectBtn = true;
+
 		}else if (isSecondTime)
 		{
 			Debug.Log("SpinWinDialogNew OnStart isSecondTime");
@@ -130,6 +132,7 @@ public class SpinWinDialog : UIDialog
 			Transform numImage = Utilities.RealFindObj<Transform>(CollectBtn.transform, "number");
 			numImage.gameObject.SetActive(true);
 			RewardAdMultiple = 2;
+			showCashOnCollectBtn = true;
 		}
 		else
 		{
@@ -144,6 +147,7 @@ public class SpinWinDialog : UIDialog
 				//显示免费的收集按钮
 				CollectBtn.gameObject.SetActive(true);
 				CloseBtnOnAd.gameObject.SetActive(false);
+				showCashOnCollectBtn = true;
 			}
 			else
 			{
@@ -155,6 +159,16 @@ public class SpinWinDialog : UIDialog
 				CollectBtn.gameObject.SetActive(false);
 				DelayShowCloseOnAdBtn();
 			}
+		}
+		if (showCashOnCollectBtn)
+		{
+			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(CollectBtn.transform, "Claim");
+			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
+		}
+		else
+		{
+			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchAdBtn.transform, "Claim");
+			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
 		}
 	}
 	
@@ -230,16 +244,7 @@ public class SpinWinDialog : UIDialog
 	{
 		this.curCash = cash;
 		this.cashText.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
-		if (isFirstTime||isSecondTime||ADManager.Instance.CheckHideSpinWin())
-		{
-			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(CollectBtn.transform, "Claim");
-			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
-		}
-		else
-		{
-			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchAdBtn.transform, "Claim");
-			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
-		}
+		
 	}
 	
 	private void PlayWinTypeEffect()

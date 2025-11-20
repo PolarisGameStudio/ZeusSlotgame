@@ -102,6 +102,8 @@ public class LuckyCashDialog : UIDialog
         Text adMultiple = Util.FindObject<Text>(BtnWatch.transform, "num");
         adMultiple.text = "" + RewardAdMultiple;
         CashRollUp();
+        TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnWatch.transform, "Claim");
+        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
     }
 
     private Tween Cashtween = null;
@@ -134,8 +136,7 @@ public class LuckyCashDialog : UIDialog
     {
         this.curCash = cash;
         this.TMP_Money.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
-        TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnWatch.transform, "Claim");
-        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
+      
     }
     
     void AdIsPlaySuccessful(int type)

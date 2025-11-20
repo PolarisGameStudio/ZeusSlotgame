@@ -33,6 +33,8 @@ namespace Classic
         {
             this.totalCash = money;
             CashRollUp();
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnWatch.transform, "Claim");
+            claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash,needIcon:false,needBigNum:true);
         }
 
         private Tween Cashtween = null;
@@ -66,8 +68,6 @@ namespace Classic
         {
             this.curCash = cash;
             this.TMP_Money.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash,needBigNum:true));
-            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnWatch.transform, "Claim");
-            claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
         }
 
         //激励广告

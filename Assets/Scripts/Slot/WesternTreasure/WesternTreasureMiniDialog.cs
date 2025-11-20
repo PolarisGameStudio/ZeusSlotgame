@@ -82,6 +82,8 @@ public class WesternTreasureMiniDialog : UIDialog
                 SetCashCoins(totalCash);
                 Cashtween = null;
             });
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
+            claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardADMultiple,needIcon:false,needBigNum:true);
         }
         BonusGameWinCash.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao() && totalCash > 0);
     }
@@ -119,8 +121,6 @@ public class WesternTreasureMiniDialog : UIDialog
     {
         this.curCash = cash;
         this.BonusGameWinCash.SetText(OnLineEarningMgr.Instance.GetMoneyStr(cash));
-        TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
-        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(cash,needIcon:false,needBigNum:true);
     }
     void OnEnable()
     {

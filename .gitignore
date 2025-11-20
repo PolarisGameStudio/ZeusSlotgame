@@ -52,3 +52,7 @@ Logs/
 .pre-commit
 
 Assets/AddressableAssetsData/Android/
+
+Assets/AddressableAssetsData/link.xml
+
+Assets/AddressableAssetsData/link.xml.meta

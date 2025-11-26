@@ -7,11 +7,14 @@ namespace Activity
     public class H5RewardActivity:BaseActivity
     {
         private const string TimeIntervalKey = "TimeInterval";
+        private const string IsNativeShowKey = "IsNativeShow";
+
         public int TimeInterval = 0;
-       
+        public bool isNativeShow = false;
         public H5RewardActivity(Dictionary<string, object> data) : base(data)
         {
             TimeInterval = Utils.Utilities.GetValue(data, TimeIntervalKey, 0);
+            isNativeShow = Utils.Utilities.GetBool(data, IsNativeShowKey, false);
         }
 
         public override void AddListener()
@@ -64,9 +67,19 @@ namespace Activity
 
         public bool CheckCanShow()
         {
-            return isOpen && OnLineEarningMgr.Instance.CanShowH5();
+            return isOpen && OnLineEarningMgr.Instance.CanShowH5() && CheckIsNativeShow();
         }
 
+        public bool CheckIsNativeShow()
+        {
+            //自然用户显示原生按钮
+            if (PlatformManager.Instance.GetH5UserType() == 0)
+            {
+                return isNativeShow;
+            }
+            return true;
+        }
+        
         public override void OnClickIcon()
         {
             base.OnClickIcon();

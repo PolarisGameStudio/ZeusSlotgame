@@ -424,6 +424,7 @@ namespace Libs
         #region AndroidCallUnity
 
         //h5初始化结果，只要调用就是成功
+        //amount = 1为归因用户，amount=0为自然用户
         public void H5InitResult(string msg)
         {
             if (string.IsNullOrEmpty(msg))

@@ -85,7 +85,8 @@ namespace Activity
         private void UpdateSpinCount()
         {
             CheckActive();
-            icon.RefreshProgress(0);
+            if (icon != null)
+                icon.RefreshProgress(0);
         }
         
         public override void OnClickIcon()

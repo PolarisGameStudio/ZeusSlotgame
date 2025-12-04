@@ -47,5 +47,6 @@ namespace Libs
         public const int CollectSymbolCountTask_Key = 23; //收集指定一种symbol的任务
         public const int CollectLoginDaysTask_Key = 24; //收集登录天数任务
         public const int CollectLuckyGiftAdTask_Key = 25; //收集LuckyGift广告次数任务
+        public const int CollectInQueneTask_Key = 26; //收集队列任务
     }
 }

@@ -130,7 +130,7 @@ public class RedeemItem : MonoBehaviour
         if (itemData.SequentialTask.State == (int)TaskState.ONGOING)
         {
             paltformImg.gameObject.SetActive(false);
-            UpdateSequentialUI();
+            // UpdateSequentialUI();
             //显示childTask的ui进度显示
             SetSequentialChildTaskUI();
         }
@@ -172,7 +172,7 @@ public class RedeemItem : MonoBehaviour
         inProgress.gameObject.SetActive(false);
         redeemBtn.gameObject.SetActive(false);
         condition.gameObject.SetActive(true);
-        conditionTMP.text = "["+itemData.SequentialChildTask.GetChildInfo()+"]"+TaskManager.Instance.GetTaskInfo(task);
+        conditionTMP.text = TaskManager.Instance.GetTaskInfo(task);
     }
     
     void SetProgressText(BaseTask task)

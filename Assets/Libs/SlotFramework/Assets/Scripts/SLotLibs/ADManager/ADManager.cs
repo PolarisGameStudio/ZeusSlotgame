@@ -555,5 +555,41 @@ namespace Ads
             Debug.Log($"WesternTreasureFly GetBuffExtraCount: {extraCount}");
             return extraCount;
         }
+
+        /// <summary>
+        /// 根据entranceName判断广告类型
+        /// </summary>
+        /// <param name="entranceName">广告入口名称</param>
+        /// <returns>广告类型：0=激励视频，1=插屏广告，2=AdMob</returns>
+        public int GetAdTypeFromEntrance(string entranceName)
+        {
+            if (string.IsNullOrEmpty(entranceName))
+            {
+                return (int)ADType.RewardAD; // 默认返回激励视频
+            }
+
+            // 根据ADEntrances的定义，判断广告类型
+            // 插屏广告的entranceName通常以"Close"开头，或者是特定的插屏广告入口
+            // 激励视频广告的entranceName通常是功能名称，如"LuckyCash", "SpinWin"等
+            
+            // 检查是否是插屏广告
+            if (entranceName.StartsWith("Close") ||
+                entranceName == "BonusGameStart" ||
+                entranceName == "FreeGameStart" ||
+                entranceName == "JackpotStart" ||
+                entranceName == "JackpotEnd" ||
+                entranceName == "CardLotteryAD" ||
+                entranceName == "LuckyGfitActivityAdNode" ||
+                entranceName == "WithDrawClose" ||
+                entranceName == "WheelLuckBubble")
+            {
+                return (int)ADType.InterstitialAD;
+            }
+            // 其他情况默认为激励视频广告（RewardAD）
+            else
+            {
+                return (int)ADType.RewardAD;
+            }
+        }
     }
 }

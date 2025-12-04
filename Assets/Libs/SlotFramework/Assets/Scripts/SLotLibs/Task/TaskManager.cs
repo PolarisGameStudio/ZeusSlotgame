@@ -12,9 +12,23 @@ namespace Libs
     {
         public TaskDataProgress taskDataProgress = new TaskDataProgress();
         public Dictionary<int, BaseTask> taskDict = new Dictionary<int, BaseTask>();
+        public Dictionary<int,CollectInQueueTask> inQueueTaskDict = new Dictionary<int, CollectInQueueTask>();
+        private Coroutine timeCor;
         public void OnInit()
         {
             LoadProgressData();
+        }
+
+        //注册CollectInQueueTask
+        void SetInQueueTask(BaseTask task)
+        {
+            if (task is CollectInQueueTask collectInQueueTask)
+            {
+                if (!inQueueTaskDict.ContainsKey(task.TaskId))
+                {
+                    inQueueTaskDict[task.TaskId] = collectInQueueTask;
+                }
+            }
         }
 
         void LoadProgressData()
@@ -85,6 +99,7 @@ namespace Libs
             BaseTask task = TaskFactory.CreateTask(dict, parentTask);
             CloneTaskProgress(task);
             taskDict[taskId] = task;
+            SetInQueueTask(task);
             return task;
         }
 
@@ -124,6 +139,13 @@ namespace Libs
             {
                 return info;
             }
+            
+            //对此任务单独处理
+            if(Task is CollectInQueueTask)
+            {
+                return info;
+            }
+            
             //去除info字符串中”()“之间包含的字符串的内容：譬如"info(fjsdffs)cds"处理后变为"infocds"
             info = info.Substring(0, info.IndexOf("(")) + info.Substring(info.IndexOf(")") + 1);
             //info中有‘.’字符，需要替换为‘.’
@@ -149,7 +171,7 @@ namespace Libs
 
 
         //获取任务信息描述
-        public string GetTaskInfos(BaseTask task)
+        public string GetTaskInfos(BaseTask task,bool isComplete = false)
         {
             string info = "";
             LocalizedString title = null;
@@ -201,9 +223,33 @@ namespace Libs
                     title = new LocalizedString(LocalizationManager.Instance.tableName, "CollectLuckyGift");
                     title.Arguments = new object[] {task.TargetNum};
                     break;
+                case TaskConstants.CollectInQueneTask_Key:
+                    if (isComplete)
+                    {
+                        title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawinquenecompleted");
+                    }
+                    else
+                    {
+                        title = new LocalizedString(LocalizationManager.Instance.tableName, "withdrawinqueue");
+                        title.Arguments = new object[] {task.TargetNum - task.HasCollectNum};
+                    }
+                    break;
             }
             info = title.GetLocalizedString();
             return info;
+        }
+
+        private void Update()
+        {
+            //遍历所有队列inQueue任务，调用其Update方法
+            foreach (var taskItem in inQueueTaskDict)
+            {
+                if (taskItem.Value.IsConditionOK() || taskItem.Value.State!=(int)TaskState.ONGOING)
+                {
+                    continue;
+                }
+                taskItem.Value.OnUpdate();
+            }
         }
     }
 }

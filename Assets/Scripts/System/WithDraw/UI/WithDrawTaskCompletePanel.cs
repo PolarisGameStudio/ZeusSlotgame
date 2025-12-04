@@ -32,7 +32,7 @@ namespace Classic
 
         public void SetTaskInfo()
         {
-            infotext.text = TaskManager.Instance.GetTaskInfos(task);
+            infotext.text = TaskManager.Instance.GetTaskInfos(task,true);
         }
     }
 }

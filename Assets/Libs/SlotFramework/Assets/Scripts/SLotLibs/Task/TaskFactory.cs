@@ -64,6 +64,9 @@ namespace Libs
                 case TaskConstants.CollectLuckyGiftAdTask_Key:
                     task = new CollectLuckyGiftAdTask(taskInfoDict, parentTask);
                     break;
+                case TaskConstants.CollectInQueneTask_Key:
+                    task = new CollectInQueueTask(taskInfoDict, parentTask);
+                    break;
             }
             return task;
         }

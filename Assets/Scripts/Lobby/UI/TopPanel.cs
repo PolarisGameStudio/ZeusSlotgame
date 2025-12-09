@@ -197,10 +197,10 @@ namespace Classic
         }
         public void H5ButtonClick()
         {
-            if (HandSpin!=null)
-            {
-                HandSpin.gameObject.SetActive(false);
-            }
+            // if (HandSpin!=null)
+            // {
+            //     HandSpin.gameObject.SetActive(false);
+            // }
             // PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.ShowWithDrawGuide);
         }
     }

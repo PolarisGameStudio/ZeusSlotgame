@@ -72,14 +72,14 @@ namespace Classic
 
         private void OnEnable()
         {
-            Messenger.AddListener(SlotControllerConstants.OnSpinEnd,onSpinEnd);
+            // Messenger.AddListener(SlotControllerConstants.OnSpinEnd,onSpinEnd);
             Messenger.AddListener(GameConstants.GetTopPanelScaleAdaption, AssignmentProperty);
         }
 
         private void OnDisable()
         {
             Messenger.RemoveListener(GameConstants.GetTopPanelScaleAdaption, AssignmentProperty);
-            Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd,onSpinEnd);
+            // Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd,onSpinEnd);
         }
 
         public void Init()
@@ -187,13 +187,13 @@ namespace Classic
 
         private void onSpinEnd()
         {
-            /*if((int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==3)
-            {
-                if (HandSpin!=null)
-                {
-                    HandSpin.gameObject.SetActive(true);
-                }
-            }*/
+            // if((int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==3)
+            // {
+            //     if (HandSpin!=null)
+            //     {
+            //         HandSpin.gameObject.SetActive(true);
+            //     }
+            // }
         }
         public void H5ButtonClick()
         {

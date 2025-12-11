@@ -187,21 +187,21 @@ namespace Classic
 
         private void onSpinEnd()
         {
-            if((int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==3)
+            /*if((int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==3)
             {
                 if (HandSpin!=null)
                 {
                     HandSpin.gameObject.SetActive(true);
                 }
-            }
+            }*/
         }
         public void H5ButtonClick()
         {
-            if (HandSpin!=null)
+            /*if (HandSpin!=null)
             {
                 HandSpin.gameObject.SetActive(false);
             }
-            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.ShowWithDrawGuide);
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.ShowWithDrawGuide);*/
         }
     }
 }

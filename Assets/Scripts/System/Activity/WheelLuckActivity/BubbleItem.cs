@@ -58,6 +58,8 @@ namespace Activity
             RefreshIcon();
             
             _activity.BuryPoint(WheelLuckActivity.WheelShowAD3Count);
+            
+            WheelLuckActivity.OnClickBubble = null;
         }
 
         protected void OnDisable()

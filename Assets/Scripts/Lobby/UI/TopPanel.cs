@@ -187,13 +187,13 @@ namespace Classic
 
         private void onSpinEnd()
         {
-            if((int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==3)
-            {
-                // if (HandSpin!=null)
-                // {
-                //     HandSpin.gameObject.SetActive(true);
-                // }
-            }
+            // if((int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter()==3)
+            // {
+            //     if (HandSpin!=null)
+            //     {
+            //         HandSpin.gameObject.SetActive(true);
+            //     }
+            // }
         }
         public void H5ButtonClick()
         {

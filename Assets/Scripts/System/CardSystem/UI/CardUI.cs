@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using Libs;
 using TMPro;
 using UnityEngine;
@@ -78,6 +79,13 @@ namespace CardSystem
                 GameObject star = Util.FindObject<GameObject>(img_xing.transform, "" + j);
                 star.SetActive(true);
             }
+
+            DOVirtual.DelayedCall(0.1f, () =>
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(img_xing.GetComponent<RectTransform>());
+            });
+            
+            Util.FindObject<Transform>(this.transform, "btn_collect/bg_normal");
             
             GameObject img_bg_1 = Util.FindObject<GameObject>(this.transform, "img_bg/" + level);
             img_bg_1.SetActive(true);

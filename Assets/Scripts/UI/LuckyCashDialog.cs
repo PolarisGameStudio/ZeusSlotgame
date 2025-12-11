@@ -62,8 +62,15 @@ public class LuckyCashDialog : UIDialog
             BtnNotWatch.gameObject.SetActive(false);
             TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnNotWatch.transform, "claim");
             LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
-            int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
-            claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
+            if (!PlatformManager.Instance.IsWhiteBao())
+            {
+                int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
+                claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
+            }
+            else
+            {
+                claim.text = localizedString.GetLocalizedString();
+            }
             // BtnNotWatch.transform.localScale = Vector3.zero;
             new DelayAction(0.7f, null, () =>
             {

@@ -85,6 +85,11 @@ public class WesternTreasureMiniDialog : UIDialog
             TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
             claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardADMultiple,needIcon:false,needBigNum:true);
         }
+        else
+        {
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
+            claim.gameObject.SetActive(false);
+        }
         BonusGameWinCash.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao() && totalCash > 0);
     }
     
@@ -102,8 +107,15 @@ public class WesternTreasureMiniDialog : UIDialog
             EndBtn.gameObject.SetActive(false);
             TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(EndBtn.transform, "claim");
             LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
-            int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
-            claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
+            if (!PlatformManager.Instance.IsWhiteBao())
+            {
+                int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
+                claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
+            }
+            else
+            {
+                claim.text = localizedString.GetLocalizedString();
+            }
             // EndBtn.transform.localScale = Vector3.zero;
             new DelayAction(0.7f, null, () =>
             {

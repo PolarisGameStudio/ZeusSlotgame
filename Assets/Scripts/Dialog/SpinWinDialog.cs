@@ -164,11 +164,13 @@ public class SpinWinDialog : UIDialog
 		{
 			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(CollectBtn.transform, "Claim");
 			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
+			claim.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
 		}
 		else
 		{
 			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchAdBtn.transform, "Claim");
 			claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
+			claim.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
 		}
 	}
 	
@@ -181,8 +183,15 @@ public class SpinWinDialog : UIDialog
 			CloseBtnOnAd.gameObject.SetActive(false);
 			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(CloseBtnOnAd.transform, "claim");
 			LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
-			int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
-			claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
+			if (!PlatformManager.Instance.IsWhiteBao())
+			{
+				int rewardRate = (int)(OnLineEarningMgr.Instance.GetClaimRewardRate()*100);
+				claim.text = localizedString.GetLocalizedString()+" "+rewardRate+"%";
+			}
+			else
+			{
+				claim.text = localizedString.GetLocalizedString();
+			}
 			// CloseBtnOnAd.transform.localScale = Vector3.zero;
 			new DelayAction(0.7f, null, () =>
 			{

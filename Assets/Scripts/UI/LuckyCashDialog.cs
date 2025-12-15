@@ -33,6 +33,7 @@ public class LuckyCashDialog : UIDialog
     private TaskTipPanel _taskTipPanel;
     protected override void Awake()
     {
+        Messenger.Broadcast<float,float>(GameConstants.SetBackGroundAudio,0,0.3f);
         AudioManager.Instance.AsyncPlayEffectAudio("Bonus_win");
         TMP_Money = Util.FindObject<TextMeshProUGUI>(transform, "Anchor/Animation/TMP_Money");
         BtnWatch = Util.FindObject<Button>(transform, "Anchor/Animation/BtnWatch");

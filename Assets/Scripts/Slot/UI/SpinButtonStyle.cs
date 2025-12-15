@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Classic;
 using TMPro;
 using System.Collections.Generic;
+using Core;
 using DG;
 using DG.Tweening;
 
@@ -105,6 +106,10 @@ public class SpinButtonStyle : MonoBehaviour
     private void Start()
     {
         InitNumOfMenuBtn();
+        if (Auto!=null)
+        {
+            Auto.gameObject.SetActive(CanShowAutoSpinButton());
+        }
         RefreshNewUserGuide(UserManager.GetInstance().UserProfile().IsFirstGameSession);
     }
 
@@ -179,7 +184,11 @@ public class SpinButtonStyle : MonoBehaviour
             }
             spinNumText.text = autoSpinNum + "";
         }
-            
+
+        if (Auto!=null)
+        {
+            Auto.gameObject.SetActive(CanShowAutoSpinButton());
+        }    
     }
 
     /// <summary>
@@ -292,6 +301,26 @@ public class SpinButtonStyle : MonoBehaviour
 
     }
 
+    public bool CanShowAutoSpinButton()
+    {
+        if (ApplicationConfig.GetInstance().SpinPattern == 0)
+        {
+            return false;
+        }
+        if (ApplicationConfig.GetInstance().SpinPattern == 1)
+        {
+            if (UserManager.GetInstance().UserProfile().GetTotalSpinCounter() >= ApplicationConfig.GetInstance().SpinShowAutoLimit)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void EndAutoRun()
     {
         if(state == SpinButtonState.FREE)
@@ -324,7 +353,6 @@ public class SpinButtonStyle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (isTouching)
         {
             Libs.EventSystemUtils.IsOpen = false;  //静态变量
@@ -609,7 +637,7 @@ public class SpinButtonStyle : MonoBehaviour
                     else
                     {
                         //此处进行判断第一次点击时直接切换为autoSpin模式
-                        if (BaseSlotMachineController.Instance.MachineSpinTime==0)
+                        if (BaseSlotMachineController.Instance.MachineSpinTime==0 && CanShowAutoSpinButton())
                         {
                             OnAutoSpinClick();
                             return;

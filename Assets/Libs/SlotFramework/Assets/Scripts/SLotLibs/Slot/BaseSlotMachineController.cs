@@ -329,7 +329,9 @@ public class BaseSlotMachineController : MonoBehaviour
 
         Messenger.AddListener<Transform, Libs.CoinsBezier.BezierType, System.Action>(GameConstants.CollectBonusWithType, CreateCoinBezierFrom);
         Messenger.AddListener<Transform, Transform, Libs.CoinsBezier.BezierType, System.Action> (GameConstants.CollectBonusWithTypeAndTarget, CreateCoinBezierFromTo);
-		Messenger.AddListener(GameConstants.CollectBonusFromInputMouse, CreateCoinBezierFromInputMouse);
+		Messenger.AddListener(GameConstants.CollectBonusFromInputMouse, CreateCoinBezierFromInputMouse);		
+		Messenger.AddListener<float,float>(GameConstants.SetBackGroundAudio, SetBackGroundAudio);
+
 
 		InitAnimationActions ();
 		BeginStay ();
@@ -569,6 +571,7 @@ public class BaseSlotMachineController : MonoBehaviour
         Messenger.RemoveListener<Transform, Libs.CoinsBezier.BezierType, System.Action>(GameConstants.CollectBonusWithType, CreateCoinBezierFrom);
 		Messenger.RemoveListener(GameConstants.CollectBonusFromInputMouse, CreateCoinBezierFromInputMouse);
 		Messenger.RemoveListener<Transform, Transform, Libs.CoinsBezier.BezierType, System.Action> (GameConstants.CollectBonusWithTypeAndTarget, CreateCoinBezierFromTo);
+		Messenger.RemoveListener<float,float>(GameConstants.SetBackGroundAudio, SetBackGroundAudio);
 
         //UnregisterPaymentListeners ();
         Libs.AudioEntity.Instance.StopAllAudio();//LQ 清空所有的Audioclip
@@ -2070,6 +2073,12 @@ public class BaseSlotMachineController : MonoBehaviour
 		//	Messenger.Broadcast<int> (SlotControllerConstants.OnWinCoinsForDisplay, winCoinsForDisplay);
 		//}
 	}
+
+	public void SetBackGroundAudio(float time,float value)
+	{
+		reelManager.SetBackGroundAudio(time,value);
+	}
+	
 	public void CreateCoinBezierFrom (Transform dialogTransformVector)
 	{
 		Transform targetTransformVector;

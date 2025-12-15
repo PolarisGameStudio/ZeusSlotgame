@@ -22,6 +22,7 @@ namespace Classic
         private bool HasClicked = false;
         protected override void Awake()
         {
+            Messenger.Broadcast<float,float>(GameConstants.SetBackGroundAudio,0,0.3f);
             AudioManager.Instance.AsyncPlayEffectAudio("Bonus_win");
             TMP_Money = Util.FindObject<TextMeshProUGUI>(transform, "Anchor/Animation/TMP_Money");
             BtnWatch.onClick.AddListener(OnButtonClick);
@@ -108,7 +109,10 @@ namespace Classic
             Libs.AudioEntity.Instance.StopAllEffect();
             Libs.AudioEntity.Instance.PlayCoinCollectionEffect();
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
-            new DelayAction(1f, null, () => { this.Close(); }).Play();
+            new DelayAction(1f, null, () => { 
+                Messenger.Broadcast<float,float>(GameConstants.SetBackGroundAudio,0,1f);
+                this.Close();        
+            }).Play();
         }
     }
 }

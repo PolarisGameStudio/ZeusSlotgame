@@ -1374,4 +1374,6 @@ public static class GameConstants
 	
 	public const string TriggerBonusGame = "TriggerBonusGame";
 	public const string PlayFullScreenAnimation= "PlayFullScreenAnimation";
+	
+	public const string SetBackGroundAudio = "SetBackGroundAudio";
 }

@@ -30,6 +30,7 @@ namespace Classic
                     End();
                     return;
                 }
+                Messenger.Broadcast<float,float>(GameConstants.SetBackGroundAudio,0,0.3f);
                 Messenger.Broadcast<int,Action>(SlotGameDialogManager.OpenPopRewardBigDialog,rewardCash,PopBigRewardQuit);
             }
         }
@@ -42,6 +43,7 @@ namespace Classic
         private void PopBigRewardQuit()
         {
             OnLineEarningMgr.Instance.PopBigDialogEnd();
+            Messenger.Broadcast<float,float>(GameConstants.SetBackGroundAudio,0,1f);
             ExitState();
             //开启morecash弹窗
             // Messenger.Broadcast<int>(SlotGameDialogManager.OpenGetMoreCashDialog,rewardCash);

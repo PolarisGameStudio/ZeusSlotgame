@@ -15,6 +15,10 @@ namespace Core
 	
 		private float totalBetCoins = 0.01f;
 
+		//spin模式配置：0不显示auto按钮 1spin达到多少次显示auto按钮 2一直显示auto按钮
+		public int SpinPattern { get; set; }
+		//spin显示auto按钮的限制次数
+		public int SpinShowAutoLimit { get; set; }
 		public int MaxBetCoins{ get; set;}
 		public int ShowCoinsMultiplier{ set; get; }
 
@@ -132,6 +136,8 @@ namespace Core
 
 			this.EnaMaxBetChangeDialogLevel = appConfig.EnaMaxBetChangeDialogLevel;
 			this.FastTimeScale = appConfig.FastTimeScale;
+			this.SpinPattern = appConfig.SpinPattern;
+			this.SpinShowAutoLimit = appConfig.SpinShowAutoLimit;
         }
 
         bool IsNullOrEmpty(string str)
@@ -156,6 +162,8 @@ namespace Core
 		public readonly static string APPLICATION_CONFIG_Menu_Feature_Button_STATUS_KEY = "MenuFeatureButtonStatus";
 		public readonly static string APPLICATION_CONFIG_Fast_Time_Scale_KEY = "MachineSpeedRatio";
 		public readonly static string APPLICATION_CONFIG_STARTING_BONUS_KEY = "StartingBonus";
+		public readonly static string APPLICATION_CONFIG_SPIN_PATTERN_KEY = "SpinPattern";
+		public readonly static string APPLICATION_CONFIG_SPIN_SHOW_AUTO_LIMIT_KEY = "SpinShowAutoLimit";
 
 		public static ApplicationConfig ParseAppConfig (Dictionary<string, object> appConfigDict)
 		{
@@ -190,6 +198,10 @@ namespace Core
 				appConfig.ShowCoinsMultiplier = coinsMultiplier;
 			
 			appConfig.FastTimeScale = Utilities.GetFloat(appConfigDict, APPLICATION_CONFIG_Fast_Time_Scale_KEY, -1f);
+			
+			appConfig.SpinPattern = Utilities.GetInt(appConfigDict, APPLICATION_CONFIG_SPIN_PATTERN_KEY, 0);
+			appConfig.SpinShowAutoLimit = Utilities.GetInt(appConfigDict, APPLICATION_CONFIG_SPIN_SHOW_AUTO_LIMIT_KEY, 0);
+			
 			return appConfig;
 		}
     }

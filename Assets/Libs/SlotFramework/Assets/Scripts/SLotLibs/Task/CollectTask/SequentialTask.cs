@@ -14,21 +14,59 @@ namespace Libs
         public Action<BaseTask, int> OnSwitchChildTask;
         public SequentialTask(Dictionary<string, object> taskInfoDict, BaseTask parentTask = null) : base(taskInfoDict, parentTask)
         {
+            CheckTaskState();
             SetChildTaskIndex();
         }
 
         private void SetChildTaskIndex()
         {
-            for (int i = 0; i < ChildTasks.Count; i++)
+            //检测是否所有子任务都完成
+            if (CheckAllChildTasksCompleted())
             {
-                if (ChildTasks[i].State == (int)TaskState.AHEAD||ChildTasks[i].State == (int)TaskState.ONGOING)
+                ChildIndex = ChildTasks.Count - 1;
+            }
+            else
+            {
+                for (int i = 0; i < ChildTasks.Count; i++)
                 {
-                    ChildIndex = i;
-                    break;
+                    if (ChildTasks[i].State == (int)TaskState.AHEAD||ChildTasks[i].State == (int)TaskState.ONGOING)
+                    {
+                        ChildIndex = i;
+                        break;
+                    }
                 }
             }
         }
+
+        public void CheckTaskState()
+        {
+            if (State != (int)TaskState.ONGOING)
+            {
+                return;
+            }
+            //任务全部完成，并且满足时间期限
+            if (IsConditionOK())
+            {
+                State = (int)TaskState.CLOSE;
+            }
+        }
         
+        public void OnActivate()
+        {
+            StartTime = TimeUtils.ConvertDateTimeLong(DateTime.Now);
+            EndTime = StartTime + DurationTime;
+        }
+
+
+        public bool IsAllChildComplete()
+        {
+            return CheckAllChildTasksCompleted();
+        }
+        public override bool IsConditionOK()
+        {
+            return base.IsConditionOK() && StartTime+DurationTime <= TimeUtils.ConvertDateTimeLong(DateTime.Now);
+        }
+
         protected override void HandleChildTaskCompleted(BaseTask childTask)
         {
             if (State != (int)TaskState.ONGOING)
@@ -80,8 +118,12 @@ namespace Libs
             OnProgressUpdated?.Invoke(this, (int)HasCollectNum);
             if (IsTaskConditionOK)
             {
-                //完成任务
-                CompleteTask();
+                //等待时间满足要求
+                if (StartTime+DurationTime<=TimeUtils.ConvertDateTimeLong(DateTime.Now))
+                {
+                    //完成任务
+                    CompleteTask();
+                }
             }
             else
             {

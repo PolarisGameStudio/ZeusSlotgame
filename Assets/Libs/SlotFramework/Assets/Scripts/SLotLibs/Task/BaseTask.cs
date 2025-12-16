@@ -30,8 +30,12 @@ namespace Libs
         public int TaskId;
         public int AddNumber;
         public long HasCollectNum;
+        //任务开始时间
         public long StartTime;
+        //任务结束时间
         public long EndTime;
+        //任务持续时间，可配置
+        public long DurationTime;
         //玩家点击任务完成后，可以领取奖励的时间
         public long CanRewardTime;
         public int State;
@@ -70,7 +74,8 @@ namespace Libs
             StartTime= Utils.Utilities.GetLong(taskInfoDict, TaskConstants.StartTime_Key, 0);
             EndTime= Utils.Utilities.GetLong(taskInfoDict, TaskConstants.EndTime_Key, 0);
             CanRewardTime= Utils.Utilities.GetLong(taskInfoDict, TaskConstants.CanRewardTime_Key, 0);
-            
+            DurationTime= Utils.Utilities.GetLong(taskInfoDict, TaskConstants.DurationTime_Key, 0);
+
             HasCollectNum = Utils.Utilities.GetLong(taskInfoDict, TaskConstants.CollectNumber_Key, 0);
             TargetNum = Utils.Utilities.GetLong(taskInfoDict, TaskConstants.TargetNum_Key, 0);
             SpinTotalNum = Utils.Utilities.GetInt(taskInfoDict, TaskConstants.SpinTotalNum_Key, 0);
@@ -303,6 +308,7 @@ namespace Libs
             if (taskDict == null) return;
             HasCollectNum = Utilities.GetLong(taskDict, TaskConstants.CollectNumber_Key, 0);
             CanRewardTime = Utilities.GetLong(taskDict, TaskConstants.CanRewardTime_Key, 0);
+            StartTime = Utilities.GetLong(taskDict, TaskConstants.StartTime_Key, 0);
             SpinTotalNum = Utilities.GetInt(taskDict, TaskConstants.SpinTotalNum_Key, 0);
             State = Utilities.GetInt(taskDict, TaskConstants.TaskState_Key, 0);
             IsTaskConditionOK = HasCollectNum >= TargetNum;
@@ -317,6 +323,7 @@ namespace Libs
             data[TaskConstants.CanRewardTime_Key] = CanRewardTime;
             data[TaskConstants.SpinTotalNum_Key] = SpinTotalNum;
             data[TaskConstants.TaskState_Key] = State;
+            data[TaskConstants.StartTime_Key] = StartTime;
             return data;
         }
 

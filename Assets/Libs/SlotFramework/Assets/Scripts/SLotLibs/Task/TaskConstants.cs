@@ -22,6 +22,7 @@ namespace Libs
         public const string CollectCashNum_Key = "collectCashNum";
         public const string StartTime_Key = "startTime";
         public const string EndTime_Key = "endTime";
+        public const string DurationTime_Key = "durationTime";
         public const string CanRewardTime_Key = "canRewardTime";
         public const string IsSequential_Key = "isSequential";
         public const string CanAutoComplete_Key = "canAutoComplete";

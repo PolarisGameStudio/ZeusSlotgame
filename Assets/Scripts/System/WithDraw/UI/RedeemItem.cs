@@ -16,6 +16,7 @@ public class RedeemItem : MonoBehaviour
     //序号
     private int index;
     public TextMeshProUGUI cashTMP;
+    public TextMeshProUGUI taskTimeCor;
     public Image paltformImg;
     public Button redeemBtn;
     public RectTransform inProgress;
@@ -131,20 +132,33 @@ public class RedeemItem : MonoBehaviour
         {
             paltformImg.gameObject.SetActive(false);
             UpdateSequentialUI();
-            //显示childTask的ui进度显示
-            SetSequentialChildTaskUI();
+            //检测是否所有子任务都完成了
+            if (itemData.SequentialChildTask.IsAllChildComplete())
+            {
+                inProgress.gameObject.SetActive(false);
+                redeemBtn.gameObject.SetActive(false);
+                condition.gameObject.SetActive(true);
+                LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"waittimetips");
+                conditionTMP.text = localizedString.GetLocalizedString();
+            }
+            else
+            {
+                //显示childTask的ui进度显示
+                SetSequentialChildTaskUI();
+            }
+           
         }
         else if (itemData.SequentialTask.State == (int)TaskState.CLOSE)
         {
             //暂留接口，暂时无需处理
         }
     }
-
     
     public void UpdateSequentialUI()
     {
         sequentialTaskObj.SetActive(true);
         sequentialTaskProgressTMP.text =itemData.SequentialTask.GetChildInfo();
+        StartTimeCoroutine(taskTimeCor);
     }
     
     public void SetSequentialChildTaskUI()
@@ -233,6 +247,37 @@ public class RedeemItem : MonoBehaviour
 
     private WaitForSecondsRealtime waitOneSceond = new WaitForSecondsRealtime(1);
     
+    //开启协程
+    private void StartTimeCoroutine(TextMeshProUGUI CountDownText)
+    {
+        if (timeCor != null)
+        {
+            CoroutineUtil.Instance.StopCoroutine(timeCor);
+        }
+        timeCor = CoroutineUtil.Instance.StartCoroutine(Co_UpdateSequentialTime(CountDownText,itemData.SequentialChildTask));
+    }
+    
+    private IEnumerator Co_UpdateSequentialTime(TextMeshProUGUI CountDownText,BaseTask childTask)
+    {
+        while (!childTask.IsConditionOK())
+        {
+            long now = TimeUtils.ConvertDateTimeLong(DateTime.Now);
+            long endTime = childTask.StartTime+childTask.DurationTime;
+            long remainTime = endTime - now;
+            if (remainTime <= 0)
+            {
+                CountDownText.text = "00:00:00";
+            }
+            else
+            {
+                TimeSpan timeSpan = TimeSpan.FromSeconds(remainTime);
+                CountDownText.text = TimeUtils.GetLeftTime_Day_And_HMS(timeSpan);
+            }
+            yield return waitOneSceond;
+        }
+        //任务时间到，刷新UI
+        childTask.CompleteTask();
+    }
     
     void RecoverToComplete()
     {

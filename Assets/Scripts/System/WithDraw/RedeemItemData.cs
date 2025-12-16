@@ -61,7 +61,7 @@ namespace System
             SequentialTask.OnProgressUpdated += OnSequentialTaskProgressUpdated;
             SequentialTask.OnTaskCompleted += OnSequentialTaskCompleted;
             SequentialTask.OnSwitchChildTask+= OnSwitchChildTask;
-            UpdateState();
+            // UpdateState();
             AddListeners();
         }
         ~RedeemItemData()
@@ -89,8 +89,8 @@ namespace System
         
         public void OnInit(RedeemItem item)
         {
-            BindUI(item);
             UpdateState();
+            BindUI(item);
         }
         
         public void BindUI(RedeemItem item)
@@ -110,7 +110,7 @@ namespace System
 
         public void UpdateState()
         {
-            if (CashTask.State == (int)TaskState.ONGOING)
+            if(CashTask.State == (int)TaskState.ONGOING)
             {
                 CurTask = CashTask;
                 state = RedeemItemState.InTaskProgress1;
@@ -118,7 +118,14 @@ namespace System
             {
                 CurTask = SequentialTask;
                 state = RedeemItemState.InTaskProgress2;
+                //绑定子任务事件
                 BindSequentialTaskEvents();
+                //打开弹窗绑定数据时，需要判断当前任务是否完成以切换至下一个子任务
+                //由于添加了时间条件无法实时改变任务状态，现在添加检测当前子任务是否已完成，假如任务已完成，执行完成方法
+                if (SequentialChildTask.IsConditionOK())
+                {
+                    SequentialChildTask.CompleteTask();
+                }
             }
             else
             {
@@ -137,6 +144,7 @@ namespace System
                 CurTask = SequentialTask;
                 state = RedeemItemState.InTaskProgress2;
                 BindSequentialTaskEvents();
+                SequentialChildTask.OnActivate();
             }
         }
 
@@ -193,6 +201,8 @@ namespace System
             {
                 UnBindSequentialTaskEvents();
                 SequentialChildTask = SequentialTask.GetOnGoingChildTask() as SequentialTask;
+                //此处记录SequentialChildTask激活时间,为了显示至下一天倒计时
+                SequentialChildTask.OnActivate();
                 BindSequentialTaskEvents();
                 if (itemUI!=null)
                 {

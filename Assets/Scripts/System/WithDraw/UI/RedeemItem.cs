@@ -158,7 +158,12 @@ public class RedeemItem : MonoBehaviour
     {
         sequentialTaskObj.SetActive(true);
         sequentialTaskProgressTMP.text =itemData.SequentialTask.GetChildInfo();
-        StartTimeCoroutine(taskTimeCor);
+        //对taskTimeCor进行显隐的判断，只有Task配置了durationTime才能显示
+        taskTimeCor.gameObject.SetActive(itemData.SequentialChildTask.DurationTime > 0);
+        if (itemData.SequentialChildTask.DurationTime > 0)
+        {
+            StartTimeCoroutine(taskTimeCor);
+        }
     }
     
     public void SetSequentialChildTaskUI()

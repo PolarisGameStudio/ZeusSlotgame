@@ -80,6 +80,10 @@ MonoBehaviour:
     m_Address: Prefab/Other
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 88be8e5a33eab4a0d96c5a7ba28dc006
+    m_Address: Tutorial/Prefab/TutorialOverlay.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

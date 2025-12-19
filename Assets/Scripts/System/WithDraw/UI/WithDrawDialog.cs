@@ -40,6 +40,7 @@ public class WithDrawDialog : UIDialog
         }
         
         closeBtn.onClick.AddListener(OnCloseBtnClick);
+
     }
     private void OnCloseBtnClick()
     {
@@ -67,6 +68,20 @@ public class WithDrawDialog : UIDialog
         if (panelRecord!=null)
         {
             recordPanelItem = panelRecord.AddComponent<WithDrawRecordPanelItem>();
+        }
+        //添加withdrawitem引导
+        if (TutorialManager.ShouldShow(TutorialManager.TutorialStep.WithDrawItem))
+        {
+            // 使用null让系统自动使用DialogCanvas作为父节点
+            // 如果需要指定父节点，确保节点存在：transform.Find("Anchor")?.transform
+            //开始WithDrawItem引导
+            TutorialManager.Start(TutorialManager.TutorialStep.WithDrawItem, transform.Find("Anchor")?.transform, (step) => {
+                Debug.Log($"[WithDrawDialog] WithDrawItem引导已完成");
+            });
+        }
+        else
+        {
+            Debug.Log("[WithDrawDialog] WithDrawItem引导已完成，跳过");
         }
     }
 

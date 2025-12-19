@@ -170,13 +170,18 @@ namespace Activity
                 mask.gameObject.SetActive(true);
                 int reward = activity.GetRandomReward();
                 int slotIndex = itemList.Count;
+
+                // 递增玩家历史获得的 item 总数
+                int totalItemCount = activity.IncrementTotalItemCount();
+
                 itemObj.transform.SetParent(slotTransforms[slotIndex], true);
-                item.Initialize(this, reward, slotIndex, activity.ItemScaleDuration, activity.ItemStayDuration);
+                // 传递 totalItemCount 和 freeCount 配置
+                item.Initialize(this, reward, slotIndex, totalItemCount, activity.ItemScaleDuration, activity.ItemStayDuration, activity.FreeCount);
 
                 itemList.Add(item);
                 SaveProgressData();
 
-                Debug.Log($"[LuckyGiftActivityIcon] Item created, current count: {itemList.Count}");
+                Debug.Log($"[LuckyGiftActivityIcon] Item created - slotIndex: {slotIndex}, totalItemCount: {totalItemCount}, current count: {itemList.Count}");
             });
         }
         
@@ -205,10 +210,10 @@ namespace Activity
             {
                 if (item != null)
                 {
-                    progressData.AddItem(item.GetReward(), item.GetSlotIndex());
+                    progressData.AddItem(item.GetReward(), item.GetSlotIndex(), item.GetTotalItemCount());
                 }
             }
-            
+
             progressData.SaveData();
         }
         
@@ -235,7 +240,7 @@ namespace Activity
                     Debug.LogError($"[LuckyGiftActivityIcon] Failed to load item prefab: {itemPrefabPath}");
                     return;
                 }
-                
+
                 foreach (var itemData in progressData.itemList)
                 {
                     if (itemData.slotIndex < 0 || itemData.slotIndex >= slotTransforms.Length)
@@ -243,13 +248,13 @@ namespace Activity
                         Debug.LogWarning($"[LuckyGiftActivityIcon] Invalid slotIndex: {itemData.slotIndex}, skipping");
                         continue;
                     }
-                    
+
                     if (slotTransforms[itemData.slotIndex] == null)
                     {
                         Debug.LogWarning($"[LuckyGiftActivityIcon] Slot transform at index {itemData.slotIndex} is null, skipping");
                         continue;
                     }
-                    
+
                     GameObject itemObj = Instantiate(asset, slotTransforms[itemData.slotIndex], false);
                     LuckyGiftActivityItem item = itemObj.GetComponent<LuckyGiftActivityItem>();
                     if (item == null)
@@ -257,14 +262,15 @@ namespace Activity
                         item = itemObj.AddComponent<LuckyGiftActivityItem>();
                     }
 
-                    item.InitializeWithoutAnimation(this, itemData.reward, itemData.slotIndex);
+                    // 传递 totalItemCount 和 freeCount 配置
+                    item.InitializeWithoutAnimation(this, itemData.reward, itemData.slotIndex, itemData.totalItemCount, activity.FreeCount);
                     itemObj.transform.localPosition = Vector3.zero;
                     itemObj.transform.localScale = Vector3.one;
                     itemList.Add(item);
-                    
-                    Debug.Log($"[LuckyGiftActivityIcon] Item restored: reward={itemData.reward}, slotIndex={itemData.slotIndex}");
+
+                    Debug.Log($"[LuckyGiftActivityIcon] Item restored: reward={itemData.reward}, slotIndex={itemData.slotIndex}, totalItemCount={itemData.totalItemCount}");
                 }
-                
+
                 Debug.Log($"[LuckyGiftActivityIcon] Restored {itemList.Count} items from progress data");
             });
         }
@@ -283,7 +289,19 @@ namespace Activity
 
             isProcessingItem = true;
             currentAdItem = item;
-            item.PlayAd();
+
+            // 前 freeCount 个历史 item（免费）无需观看广告，直接发放奖励
+            if (item.GetTotalItemCount() <= activity.FreeCount)
+            {
+                Debug.Log($"[LuckyGiftActivityIcon] 第 {item.GetTotalItemCount()} 个历史 item 是免费的（FreeCount={activity.FreeCount}），无需广告，直接发放奖励");
+                HandleAdResult();
+            }
+            else
+            {
+                // 其他item需要观看广告
+                Debug.Log($"[LuckyGiftActivityIcon] 第 {item.GetTotalItemCount()} 个历史 item 需要观看广告（FreeCount={activity.FreeCount}）");
+                item.PlayAd();
+            }
         }
 
         /// <summary>

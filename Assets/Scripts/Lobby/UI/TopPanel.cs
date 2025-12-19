@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Libs;
 using UnityEngine.UI;
-
+using Tutorial;
 
 namespace Classic
 {

@@ -10,15 +10,17 @@ namespace Activity
     {
         public int reward;
         public int slotIndex;
-        
+        public int totalItemCount; // 玩家历史上获得的第几个 item（从 1 开始）
+
         public LuckyGiftActivityItemData()
         {
         }
-        
-        public LuckyGiftActivityItemData(int reward, int slotIndex)
+
+        public LuckyGiftActivityItemData(int reward, int slotIndex, int totalItemCount)
         {
             this.reward = reward;
             this.slotIndex = slotIndex;
+            this.totalItemCount = totalItemCount;
         }
     }
     
@@ -56,9 +58,9 @@ namespace Activity
         /// <summary>
         /// 添加item数据
         /// </summary>
-        public void AddItem(int reward, int slotIndex)
+        public void AddItem(int reward, int slotIndex, int totalItemCount)
         {
-            itemList.Add(new LuckyGiftActivityItemData(reward, slotIndex));
+            itemList.Add(new LuckyGiftActivityItemData(reward, slotIndex, totalItemCount));
         }
         
         /// <summary>

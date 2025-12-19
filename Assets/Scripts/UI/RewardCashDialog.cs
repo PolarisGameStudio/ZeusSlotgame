@@ -111,7 +111,21 @@ namespace Classic
             Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
             new DelayAction(1f, null, () => { 
                 Messenger.Broadcast<float,float>(GameConstants.SetBackGroundAudio,0,1f);
-                this.Close();        
+                this.Close();  
+                // 检查WithDrawButton引导是否已完成
+                if (TutorialManager.ShouldShow(TutorialManager.TutorialStep.WithDrawButton))
+                {
+                    Transform banner = GameObject.Find("BannerCanvas").transform;
+                    //开始第二个WithdrawButton引导
+                    TutorialManager.Start(TutorialManager.TutorialStep.WithDrawButton, banner, (step)=>{
+                        //打开withdrawdialog
+                        WithDrawManager.Instance.ShowWithDrawDialog();
+                    });
+                }
+                else
+                {
+                    Debug.Log("[WithDrawPanel] WithDrawButton引导已完成，跳过");
+                }      
             }).Play();
         }
     }

@@ -9,6 +9,10 @@ using Core;
 using DG;
 using DG.Tweening;
 
+// 测试TutorialManager是否可见
+#if UNITY_EDITOR
+// [UnityEditor.InitializeOnLoad]
+#endif
 
 public class SpinButtonStyle : MonoBehaviour
 {
@@ -187,7 +191,23 @@ public class SpinButtonStyle : MonoBehaviour
 
         if (Auto!=null)
         {
-            Auto.gameObject.SetActive(CanShowAutoSpinButton());
+            if (CanShowAutoSpinButton())
+            {
+                Auto.gameObject.SetActive(true);
+                // 检查WithDrawButton引导是否已完成
+                if (TutorialManager.ShouldShow(TutorialManager.TutorialStep.AutoSpin))
+                {
+                    Transform banner = GameObject.Find("BannerCanvas").transform;
+                    //开始第二个WithdrawButton引导
+                    TutorialManager.Start(TutorialManager.TutorialStep.AutoSpin, banner, (step)=>{
+                        OnAutoSpinClick();
+                    });
+                }
+                else
+                {
+                    Debug.Log("[WithDrawPanel] AutoSpin引导已完成，跳过");
+                }      
+            }
         }    
     }
 
@@ -198,8 +218,38 @@ public class SpinButtonStyle : MonoBehaviour
     private void RefreshNewUserGuide(bool state)
     {
         // Messenger.Broadcast<bool>(GameConstants.ShowButtonMask,state);
-        Guide.gameObject.SetActive(state);
+        // 触发首次Spin引导开始
+        // 使用新的Prefab方案，无需传入RectTransform
+        if (!state)
+        {
+            return;
+        }
+        // 检查FirstSpin引导是否已完成
+        if (TutorialManager.ShouldShow(TutorialManager.TutorialStep.FirstSpin))
+        {
+            Transform banner = GameObject.Find("BannerCanvas").transform;
+            TutorialManager.Start(TutorialManager.TutorialStep.FirstSpin, banner, (step)=>{
+                //执行一次点击spin方法
+                //不是第一次 spin，改为正常点击 spin
+                if (BaseSlotMachineController.Instance.DoSpin())
+                {
+                    WaitStopSpin();
+                    StateButtonImage.sprite = SpiningNormal;
+                }
+                else
+                {
+                    StateButtonImage.sprite = SpinNormal;
+                    SpinText.sprite = SpinTexts[0];
+                }
+                Messenger.Broadcast(GameConstants.NOW_SPIN_CLICK);
+            });
+        }
+        else
+        {
+            Debug.Log("[SpinButtonStyle] FirstSpin引导已完成，跳过");
+        }
     }
+
     /// <summary>
     /// 初始化Spin按钮菜单信息
     /// </summary>
@@ -395,7 +445,7 @@ public class SpinButtonStyle : MonoBehaviour
                     //spin按钮长按点击开启autospin
                     if(!m_isAutoSpin) return;
                     bool isLongPress = lastTime > 0 && Time.time > lastTime + 0.9;
-                    if (!longPressActive && !Guide.activeInHierarchy)
+                    if (!longPressActive)
                     {
                         if (isLongPress)
                         {

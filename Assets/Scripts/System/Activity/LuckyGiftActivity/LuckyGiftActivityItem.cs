@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using Ads;
-using Classic;
 using Libs;
 using TMPro;
 using UnityEngine;
@@ -30,12 +28,16 @@ namespace Activity
 
         private Button button;
         private TextMeshProUGUI rewardText;
-        
+
         // 动画及点击状态
         private bool isAnimating = false;
         private bool isClicked = false;
         private RectTransform bgGuang;
         private Image bgAD;
+        private Image biankuanguang;
+        // Animator组件（状态机）
+        private Animator animator;
+        private const string BIANKUANG_TRIGGER = "biankuang"; // 切换到biankuang动画的trigger名称
         
         private void Awake()
         {
@@ -48,11 +50,21 @@ namespace Activity
             particleEffect = Utilities.RealFindObj<ParticleSystem>(transform, "particleEffect");
             bgGuang = Utilities.RealFindObj<RectTransform>(transform, "bg_guang");
             bgAD = Utilities.RealFindObj<Image>(transform, "imagead");
+            biankuanguang = Utilities.RealFindObj<Image>(transform, "biankuangguang");
+
             // 查找rewardtext子物体
             rewardText = Utilities.RealFindObj<TextMeshProUGUI>(transform, "text_reward");
             if (rewardText == null)
             {
                 rewardText = Utilities.RealFindObj<TextMeshProUGUI>(transform, "text_reward");
+            }
+
+            // 获取Animator组件
+            animator = GetComponent<Animator>();
+            if (animator != null)
+            {
+                // Entry会自动播放Rotate动画，初始禁用Animator
+                animator.enabled = false;
             }
         }
 
@@ -75,6 +87,13 @@ namespace Activity
             this.scaleDuration = scaleDuration;
             this.stayDuration = stayDuration;
             bgGuang.gameObject.SetActive(true);
+
+            // 启用Animator，Entry会自动播放Rotate动画
+            if (animator != null)
+            {
+                animator.enabled = true;
+            }
+
             // 设置奖励文本
             UpdateRewardDisplay();
 
@@ -108,6 +127,12 @@ namespace Activity
                 bgAD.gameObject.SetActive(totalItemCount > freeCount);
             }
 
+            // 无动画初始化时，直接启用Animator并切换到biankuang
+            if (animator != null)
+            {
+                animator.enabled = true;
+                SwitchToBiankuangAnimation();
+            }
             Debug.Log($"[LuckyGiftActivityItem] InitializeWithoutAnimation - slotIndex: {slotIndex}, totalItemCount: {totalItemCount}, freeCount: {freeCount}, showAd: {totalItemCount > freeCount}");
         }
 
@@ -117,6 +142,9 @@ namespace Activity
         private IEnumerator PlayCreateAnimation()
         {
             isAnimating = true;
+
+            // Animator Entry会自动播放Rotate动画，无需手动触发
+
             transform.localScale = Vector3.zero;
             yield return transform.DOScale(2*Vector3.one, scaleDuration).SetUpdate(true).WaitForCompletion();
             yield return new WaitForSeconds(stayDuration);
@@ -134,10 +162,17 @@ namespace Activity
             bgGuang.gameObject.SetActive(false);
             isAnimating = false;
 
-            // 动画完成后，检查是否需要显示 LuckyGift 引导（玩家历史上第一个 item）
+            // 检查是否需要显示 LuckyGift 引导（玩家历史上第一个 item）
             if (totalItemCount == 1)
             {
+                // 第一个item不切换动画，禁用Animator停止所有动画
+                StopAnimation();
                 CheckAndShowLuckyGiftTutorial();
+            }
+            else
+            {
+                // 其他item从Rotate切换到biankuang
+                SwitchToBiankuangAnimation();
             }
         }
 
@@ -201,6 +236,9 @@ namespace Activity
             {
                 transform.DOKill();
             }
+
+            // 禁用Animator
+            StopAnimation();
         }
 
         private void UpdateRewardDisplay()
@@ -222,7 +260,7 @@ namespace Activity
         private void CheckAndShowLuckyGiftTutorial()
         {
             // 检查是否需要显示 LuckyGift 引导
-            if (!TutorialManager.ShouldShow(TutorialManager.TutorialStep.LuckyGift))
+            if (!global::TutorialManager.ShouldShow(global::TutorialManager.TutorialStep.LuckyGift))
             {
                 Debug.Log("[LuckyGiftActivityItem] LuckyGift 引导已完成，跳过");
                 return;
@@ -238,8 +276,8 @@ namespace Activity
             Transform parentNode = GetTutorialParentNode();
 
             // 显示引导
-            TutorialManager.Start(
-                TutorialManager.TutorialStep.LuckyGift,
+            global::TutorialManager.Start(
+                global::TutorialManager.TutorialStep.LuckyGift,
                 parentNode,
                 (step) => {
                     Debug.Log("[LuckyGiftActivityItem] LuckyGift 引导已完成");
@@ -270,6 +308,46 @@ namespace Activity
             // 方案3：使用 null（自动使用 DialogCanvas）
             Debug.Log("[LuckyGiftActivityItem] 使用默认节点");
             return null;
+        }
+
+        /// <summary>
+        /// 切换到biankuang动画（飞行到指定位置后）
+        /// </summary>
+        private void SwitchToBiankuangAnimation()
+        {
+            if (animator == null)
+            {
+                Debug.LogWarning("[LuckyGiftActivityItem] Animator组件未找到");
+                return;
+            }
+
+            // 显示biankuanguang Image
+            if (biankuanguang != null)
+            {
+                biankuanguang.gameObject.SetActive(true);
+            }
+
+            // 触发biankuang trigger，从Any State切换到biankuang动画
+            animator.SetTrigger(BIANKUANG_TRIGGER);
+            Debug.Log($"[LuckyGiftActivityItem] 触发Trigger切换到biankuang动画: {BIANKUANG_TRIGGER}");
+        }
+
+        /// <summary>
+        /// 停止所有动画
+        /// </summary>
+        private void StopAnimation()
+        {
+            if (animator != null)
+            {
+                animator.enabled = false;
+                Debug.Log("[LuckyGiftActivityItem] 已禁用Animator，停止所有动画");
+            }
+
+            // 隐藏biankuanguang Image
+            if (biankuanguang != null)
+            {
+                biankuanguang.gameObject.SetActive(false);
+            }
         }
     }
 }

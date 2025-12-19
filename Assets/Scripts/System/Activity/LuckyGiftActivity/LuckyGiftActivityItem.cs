@@ -17,8 +17,10 @@ namespace Activity
         private LuckyGiftActivityIcon icon;
         // 奖励数值
         private int reward;
-        // 槽位索引
+        // 槽位索引（当前在 Icon 上的位置：0, 1, 2）
         private int slotIndex;
+        // 玩家历史上获得的第几个 item（从 1 开始）
+        private int totalItemCount;
         // 创建动画时长
         private float scaleDuration;
         private float stayDuration;
@@ -33,7 +35,8 @@ namespace Activity
         private bool isAnimating = false;
         private bool isClicked = false;
         private RectTransform bgGuang;
-
+        private Image bgAD;
+        
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
@@ -44,6 +47,7 @@ namespace Activity
             }
             particleEffect = Utilities.RealFindObj<ParticleSystem>(transform, "particleEffect");
             bgGuang = Utilities.RealFindObj<RectTransform>(transform, "bg_guang");
+            bgAD = Utilities.RealFindObj<Image>(transform, "imagead");
             // 查找rewardtext子物体
             rewardText = Utilities.RealFindObj<TextMeshProUGUI>(transform, "text_reward");
             if (rewardText == null)
@@ -55,16 +59,32 @@ namespace Activity
         /// <summary>
         /// 初始化item
         /// </summary>
-        public void Initialize(LuckyGiftActivityIcon icon, int reward, int slotIndex, float scaleDuration, float stayDuration)
+        /// <param name="icon">所属 Icon</param>
+        /// <param name="reward">奖励数值</param>
+        /// <param name="slotIndex">槽位索引（0, 1, 2）</param>
+        /// <param name="totalItemCount">玩家历史上获得的第几个 item（从 1 开始）</param>
+        /// <param name="scaleDuration">缩放动画时长</param>
+        /// <param name="stayDuration">停留时长</param>
+        /// <param name="freeCount">前几个历史 item 免费</param>
+        public void Initialize(LuckyGiftActivityIcon icon, int reward, int slotIndex, int totalItemCount, float scaleDuration, float stayDuration, int freeCount)
         {
             this.icon = icon;
             this.reward = reward;
             this.slotIndex = slotIndex;
+            this.totalItemCount = totalItemCount;
             this.scaleDuration = scaleDuration;
             this.stayDuration = stayDuration;
             bgGuang.gameObject.SetActive(true);
             // 设置奖励文本
             UpdateRewardDisplay();
+
+            // 前 freeCount 个历史 item（免费）不显示广告图片
+            if (bgAD != null)
+            {
+                bgAD.gameObject.SetActive(totalItemCount > freeCount);
+            }
+
+            Debug.Log($"[LuckyGiftActivityItem] Initialize - slotIndex: {slotIndex}, totalItemCount: {totalItemCount}, freeCount: {freeCount}, showAd: {totalItemCount > freeCount}");
 
             StartCoroutine(PlayCreateAnimation());
         }
@@ -72,14 +92,23 @@ namespace Activity
         /// <summary>
         /// 初始化item（无需动画，用于数据恢复）
         /// </summary>
-        public void InitializeWithoutAnimation(LuckyGiftActivityIcon icon, int reward, int slotIndex)
+        public void InitializeWithoutAnimation(LuckyGiftActivityIcon icon, int reward, int slotIndex, int totalItemCount, int freeCount)
         {
             this.icon = icon;
             this.reward = reward;
             this.slotIndex = slotIndex;
+            this.totalItemCount = totalItemCount;
             bgGuang.gameObject.SetActive(false);
             UpdateRewardDisplay();
             isAnimating = false;
+
+            // 前 freeCount 个历史 item（免费）不显示广告图片
+            if (bgAD != null)
+            {
+                bgAD.gameObject.SetActive(totalItemCount > freeCount);
+            }
+
+            Debug.Log($"[LuckyGiftActivityItem] InitializeWithoutAnimation - slotIndex: {slotIndex}, totalItemCount: {totalItemCount}, freeCount: {freeCount}, showAd: {totalItemCount > freeCount}");
         }
 
         /// <summary>
@@ -104,6 +133,12 @@ namespace Activity
             icon.mask.gameObject.SetActive(false);
             bgGuang.gameObject.SetActive(false);
             isAnimating = false;
+
+            // 动画完成后，检查是否需要显示 LuckyGift 引导（玩家历史上第一个 item）
+            if (totalItemCount == 1)
+            {
+                CheckAndShowLuckyGiftTutorial();
+            }
         }
 
         /// <summary>
@@ -154,6 +189,11 @@ namespace Activity
 
         public void SetSlotIndex(int newIndex) => slotIndex = newIndex;
 
+        /// <summary>
+        /// 获取玩家历史上获得的第几个 item
+        /// </summary>
+        public int GetTotalItemCount() => totalItemCount;
+
         private void OnDestroy()
         {
             // 停止所有动画
@@ -174,6 +214,62 @@ namespace Activity
             {
                 particleEffect.gameObject.SetActive(false);
             }
+        }
+
+        /// <summary>
+        /// 检查并显示 LuckyGift 引导
+        /// </summary>
+        private void CheckAndShowLuckyGiftTutorial()
+        {
+            // 检查是否需要显示 LuckyGift 引导
+            if (!TutorialManager.ShouldShow(TutorialManager.TutorialStep.LuckyGift))
+            {
+                Debug.Log("[LuckyGiftActivityItem] LuckyGift 引导已完成，跳过");
+                return;
+            }
+
+            Debug.Log("[LuckyGiftActivityItem] 开始显示 LuckyGift 引导");
+
+            // 暂停 AutoSpin（通过消息机制）
+            Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_SUSPEND);
+            Debug.Log("[LuckyGiftActivityItem] 已广播 AUTO_SPIN_SUSPEND 消息");
+
+            // 获取父节点
+            Transform parentNode = GetTutorialParentNode();
+
+            // 显示引导
+            TutorialManager.Start(
+                TutorialManager.TutorialStep.LuckyGift,
+                parentNode,
+                (step) => {
+                    Debug.Log("[LuckyGiftActivityItem] LuckyGift 引导已完成");
+
+                    // 恢复 AutoSpin（通过消息机制）
+                    Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
+                    Debug.Log("[LuckyGiftActivityItem] 已广播 AUTO_SPIN_RESUME 消息");
+
+                    // 引导完成后添加呼吸动画提示用户点击
+                    OnItemClick();
+                }
+            );
+        }
+
+        /// <summary>
+        /// 获取 Tutorial 的父节点
+        /// </summary>
+        private Transform GetTutorialParentNode()
+        {
+            // 方案2：查找 BannerCanvas
+            GameObject bannerCanvas = GameObject.Find("BannerCanvas");
+            if (bannerCanvas != null)
+            {
+                Debug.Log("[LuckyGiftActivityItem] 使用 BannerCanvas");
+                return bannerCanvas.transform;
+            }
+
+            // 方案3：使用 null（自动使用 DialogCanvas）
+            Debug.Log("[LuckyGiftActivityItem] 使用默认节点");
+            return null;
         }
     }
 }

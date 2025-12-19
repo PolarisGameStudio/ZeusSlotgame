@@ -37,6 +37,7 @@ namespace Activity
         
         public RectTransform mask;
 
+        
 
         private void Awake()
         {

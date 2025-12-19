@@ -74,7 +74,7 @@ public class WithDrawPanel : MonoBehaviour
     public void OnSpinEnd()
     {
         //首次登录
-        if (UserManager.GetInstance().UserProfile().IsFirstGameSession&& gameObject.activeInHierarchy)
+        if (UserManager.GetInstance().UserProfile().IsFirstGameSession && gameObject.activeInHierarchy)
         {
             contentGroup.gameObject.SetActive(true);
             withdrawTip.gameObject.SetActive(false);

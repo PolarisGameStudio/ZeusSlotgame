@@ -17,7 +17,7 @@ public class RedeemItem : MonoBehaviour
     private int index;
     public TextMeshProUGUI cashTMP;
     public TextMeshProUGUI taskTimeCor;
-    public TextMeshProUGUI taskTimeTip;
+    public TextMeshProUGUI taskTimeInfoTMP;
     public Image paltformImg;
     public Button redeemBtn;
     public RectTransform inProgress;
@@ -161,7 +161,7 @@ public class RedeemItem : MonoBehaviour
         sequentialTaskProgressTMP.text =itemData.SequentialTask.GetChildInfo();
         //对taskTimeCor进行显隐的判断，只有Task配置了durationTime才能显示
         taskTimeCor.gameObject.SetActive(itemData.SequentialChildTask.DurationTime > 0);
-        taskTimeTip.gameObject.SetActive(itemData.SequentialChildTask.DurationTime > 0);
+        taskTimeInfoTMP.gameObject.SetActive(itemData.SequentialChildTask.DurationTime > 0);
         if (itemData.SequentialChildTask.DurationTime > 0)
         {
             StartTimeCoroutine(taskTimeCor);

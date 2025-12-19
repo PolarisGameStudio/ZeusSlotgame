@@ -15,12 +15,16 @@ namespace Activity
         public int MaxReward { get; private set; } = 500;
         public float ItemScaleDuration { get; private set; } = 0.5f;
         public float ItemStayDuration { get; private set; } = 1f;
+        public int FreeCount { get; private set; } = 1; // 免费item数量，默认1个
+
+        // 玩家历史获得的 item 总数（从本地存储读取，递增）
+        private int totalItemCount;
+        private const string TotalItemCountKey = "LuckyGiftActivity_TotalItemCount";
 
         // 当前累计的spin次数
         private int curSpin;
         // 与触发条件相关的spin累计
         private int lastTriggerSpin;
-
         // 活动是否已经激活
         public bool IsActivated { get; private set; }
 
@@ -30,6 +34,10 @@ namespace Activity
         {
             ParseConfig(data);
             curSpin = (int)UserManager.GetInstance().UserProfile().GetTotalSpinCounter();
+
+            // 从本地存储加载玩家历史获得的 item 总数
+            totalItemCount = PlayerPrefs.GetInt(TotalItemCountKey, 0);
+            Debug.Log($"[LuckyGiftActivity] 从本地加载 TotalItemCount: {totalItemCount}");
         }
 
         private void ParseConfig(Dictionary<string, object> data)
@@ -38,8 +46,9 @@ namespace Activity
             TriggerSpinLimit = Utilities.GetInt(data, "TriggerSpinLimit", 5);
             MinReward = Utilities.GetInt(data, "Min", 100) * OnLineEarningMgr.Instance.GetCashMultiple();
             MaxReward = Utilities.GetInt(data, "Max", 500) * OnLineEarningMgr.Instance.GetCashMultiple();
-            
-            Debug.Log($"[LuckyGiftActivityAdNode] Config loaded - UnlockSpinLimit: {UnlockSpinLimit}, TriggerSpinLimit: {TriggerSpinLimit}, MinReward: {MinReward}, MaxReward: {MaxReward}");
+            FreeCount = Utilities.GetInt(data, "FreeCount", 1); // 从配置读取免费item数量，默认1个
+
+            Debug.Log($"[LuckyGiftActivity] Config loaded - UnlockSpinLimit: {UnlockSpinLimit}, TriggerSpinLimit: {TriggerSpinLimit}, MinReward: {MinReward}, MaxReward: {MaxReward}, FreeCount: {FreeCount}");
         }
 
         /// <summary>
@@ -153,6 +162,27 @@ namespace Activity
         public int GetCurrentSpin()
         {
             return curSpin;
+        }
+
+        /// <summary>
+        /// 递增并保存玩家历史获得的 item 总数
+        /// </summary>
+        /// <returns>新的 totalItemCount 值（递增后的值）</returns>
+        public int IncrementTotalItemCount()
+        {
+            totalItemCount++;
+            PlayerPrefs.SetInt(TotalItemCountKey, totalItemCount);
+            PlayerPrefs.Save();
+            Debug.Log($"[LuckyGiftActivity] TotalItemCount 递增为: {totalItemCount}");
+            return totalItemCount;
+        }
+
+        /// <summary>
+        /// 获取玩家历史获得的 item 总数
+        /// </summary>
+        public int GetTotalItemCount()
+        {
+            return totalItemCount;
         }
     }
 }

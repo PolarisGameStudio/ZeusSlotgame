@@ -12,5 +12,6 @@ namespace System
         public const string ActiveAdSpinCount = "ActiveAdSpinCount";
         public const string DoneWithDrawAction = "DoneWithDrawAction";
         public const string WithDrawDialogOpened = "WithDrawDialogOpened";
+        public const string CloseWithDrawGuideMsg = "CloseWithDrawGuideMsg";
     }
 }

@@ -62,13 +62,16 @@ public class WithDrawPanel : MonoBehaviour
             Messenger.AddListener(global::SpinButtonStyle.ENABLESPIN, OnSpinEnd);
             Messenger.AddListener(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL, OnShowTip);
         }
+        //添加关闭guide的事件监听
         Messenger.AddListener<int>(WithDrawConstants.DoneWithDrawAction, DoneWithDrawAction);
+        Messenger.AddListener(System.WithDrawConstants.CloseWithDrawGuideMsg, HideGuide);
     }
 
     public void OnDisable()
     {
         Messenger.RemoveListener(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL, OnShowTip);
         Messenger.RemoveListener<int>(WithDrawConstants.DoneWithDrawAction, DoneWithDrawAction);
+        Messenger.RemoveListener(System.WithDrawConstants.CloseWithDrawGuideMsg, HideGuide);
     }
 
     public void OnSpinEnd()
@@ -345,5 +348,17 @@ public class WithDrawPanel : MonoBehaviour
     public virtual void SetCashText()
     {
         cashText.text = OnLineEarningMgr.Instance.GetMoneyStr(initNum,needIcon:false);
-    } 
+    }
+
+    /// <summary>
+    /// 隐藏Guide
+    /// </summary>
+    private void HideGuide()
+    {
+        if (Guide != null)
+        {
+            Guide.SetActive(false);
+            Debug.Log("[WithDrawPanel] Guide已隐藏");
+        }
+    }
 }

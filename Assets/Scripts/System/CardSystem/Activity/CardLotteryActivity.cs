@@ -15,13 +15,13 @@ namespace CardSystem.Activity
         public override void AddListener()
         {
             base.AddListener();
-            Messenger.AddListener(Task.UpdateTaskDataMsg,UpdateProgress);
+            // Messenger.AddListener(Task.UpdateTaskDataMsg,UpdateProgress);
         }
         
         public override void RemoveListener()
         {
             base.RemoveListener();
-            Messenger.RemoveListener(Task.UpdateTaskDataMsg,UpdateProgress);
+            // Messenger.RemoveListener(Task.UpdateTaskDataMsg,UpdateProgress);
         }
 
         protected override void ParseTaskData()
@@ -41,7 +41,7 @@ namespace CardSystem.Activity
         {
             icon = go.AddComponent<CardLotteryIcon>();
             icon.OnInit(id, iconData);
-            CheckShowIcon();
+            // CheckShowIcon();
             return icon;
         }
 
@@ -57,27 +57,27 @@ namespace CardSystem.Activity
             }
         }
         
-        private void UpdateProgress()
-        {
-            //如果是第一次展示卡牌系统，则不累积任务进度
-            if (CardSystemManager.Instance.isFirstShow)
-            {
-                Task.HasCollectNum = 0;
-                return;
-            }
-            if (Task.IsTaskConditionOK)
-            {
-                Task.HasCollectNum = 0;
-                Task.IsTaskConditionOK = false;
-                //任务进度完成了
-                CardSystemManager.Instance.ShowLotteryDialog();
-            }
-            if (icon!= null && icon is CardLotteryIcon cardLotteryIcon)
-            {
-                //显示图标
-                cardLotteryIcon.RefreshProgress(GetProgress());
-            }
-        }
+        // private void UpdateProgress()
+        // {
+        //     // //如果是第一次展示卡牌系统，则不累积任务进度
+        //     // if (CardSystemManager.Instance.isFirstShow)
+        //     // {
+        //     //     Task.HasCollectNum = 0;
+        //     //     return;
+        //     // }
+        //     // if (Task.IsTaskConditionOK)
+        //     // {
+        //     //     Task.HasCollectNum = 0;
+        //     //     Task.IsTaskConditionOK = false;
+        //     //     //任务进度完成了
+        //     //     CardSystemManager.Instance.ShowLotteryDialog();
+        //     // }
+        //     // if (icon!= null && icon is CardLotteryIcon cardLotteryIcon)
+        //     // {
+        //     //     //显示图标
+        //     //     cardLotteryIcon.RefreshProgress(GetProgress());
+        //     // }
+        // }
 
         public float GetProgress()
         {

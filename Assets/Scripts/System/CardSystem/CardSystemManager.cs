@@ -82,7 +82,7 @@ namespace CardSystem
                 
                 //创建活动，注册活动入口
                 CreateCardActivity(plist);
-                
+               
                 //解析卡牌进度条配置
                 ParseCardProgressConfig(plist);
             }
@@ -387,6 +387,11 @@ namespace CardSystem
 
         void UpdateSpinCount()
         {
+            if (spinLimit==0)
+            {
+                Messenger.RemoveListener(GameConstants.DO_SPIN,UpdateSpinCount);
+                return;
+            }
             spinCount++;
             // Debug.Log("CardSystemManager UpdateSpinCount spinCount: " + spinCount);
             if (spinCount >= spinLimit)
@@ -403,7 +408,7 @@ namespace CardSystem
                 // }
                 isFirstShow = false;
                 ShowActivityIcon();
-                ShowLotteryDialog();
+                //ShowLotteryDialog();
             }
         }
 

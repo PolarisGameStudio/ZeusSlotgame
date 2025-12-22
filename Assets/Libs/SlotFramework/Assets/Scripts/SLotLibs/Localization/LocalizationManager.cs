@@ -131,7 +131,7 @@ public class LocalizationManager: MonoSingleton<LocalizationManager>
                 index= new List<int>(){9,10,26};
                 break;
             case CountryType.EN:
-                index= new List<int>(){5,7,8};
+                index= new List<int>(){8,5,7};
                 break;
             case CountryType.ID:
                 index= new List<int>(){9,11,12};
@@ -152,19 +152,19 @@ public class LocalizationManager: MonoSingleton<LocalizationManager>
                 index= new List<int>(){28,33,0};
                 break;
             case CountryType.TR:
-                index= new List<int>(){38};
+                index= new List<int>(){8,38,6};
                 break;
             case CountryType.TH:
-                index= new List<int>(){39};
+                index= new List<int>(){8,39,6};
                 break;
             case CountryType.PH:
                 index= new List<int>(){40,41,42};
                 break;
             case CountryType.MY:
-                index= new List<int>(){44};
+                index= new List<int>(){8,44,6};
                 break;
             default:
-                index= new List<int>(){5,7,8};
+                index= new List<int>(){8,7,5};
                 break;
         }
 

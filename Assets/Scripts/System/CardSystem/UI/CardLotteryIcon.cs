@@ -32,7 +32,7 @@ namespace CardSystem
                 Debug.LogError("WithDrawTaskActivity is null, activityId: " + activityId);
                 this.OnDestroy();
             }
-            RefreshProgress(activity.GetProgress());
+            // RefreshProgress(activity.GetProgress());
         }
 
         private void Awake()

@@ -118,6 +118,8 @@ namespace Classic
                     Transform banner = GameObject.Find("BannerCanvas").transform;
                     //开始第二个WithdrawButton引导
                     TutorialManager.Start(TutorialManager.TutorialStep.WithDrawButton, banner, (step)=>{
+                        //通知withdrawpanel关闭guide
+                        Messenger.Broadcast(System.WithDrawConstants.CloseWithDrawGuideMsg);
                         //打开withdrawdialog
                         WithDrawManager.Instance.ShowWithDrawDialog();
                     });

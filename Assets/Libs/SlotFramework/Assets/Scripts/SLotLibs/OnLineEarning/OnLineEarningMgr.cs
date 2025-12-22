@@ -319,6 +319,10 @@ public class OnLineEarningMgr
             throw new System.ArgumentOutOfRangeException("newCash");
         }
         cash = newCash;
+        //检查当前cash是否满足WithDraw模块redeemItemDict第一个平台，第一档位RedeemItemData的RewardCash的提现金额
+        //若满足则广播弹出WithDrawPromptDialog,只弹出一次，即使重启app也只弹出一次
+        System.WithDrawManager.Instance.CheckAndShowWithDrawPrompt(cash);
+
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"Cash",cash.ToString());
         SaveProgressData();
     }

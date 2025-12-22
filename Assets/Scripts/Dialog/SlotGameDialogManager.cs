@@ -389,6 +389,17 @@ namespace Classic
                     dialog.SetData(cash);
                 }));
         }
+
+        protected override void OpenWithDrawPromptDialog(int cash)
+        {
+            bool isPortrait = BaseGameConsole.ActiveGameConsole().IsInSlotMachine() &&
+                              SkySreenUtils.CurrentOrientation == ScreenOrientation.Portrait;
+            UIManager.Instance.OpenSystemDialog(
+                new OpenConfigParam<WithDrawPromptDialog>(isPortrait,uiPopupStrategy: new MachineUIPopupStrategy(),dialogInitCallBack: (dialog) =>
+                {
+                    dialog.SetData(cash);
+                }));
+        }
         
         protected override void OpenWithDrawTaskCompletePanel(BaseTask task)
         {

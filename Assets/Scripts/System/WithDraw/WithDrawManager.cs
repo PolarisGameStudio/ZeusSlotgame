@@ -18,7 +18,7 @@ namespace System
         private const string PlatformKey = "Platform";
         private const string TaskFinishTime = "TaskFinishTime";
         private const string LoginDays = "LoginDays";
-        
+
         private const string CurrentSpinTimes = "BASE_RESULT_CHANGE_SPIN_TIMES";
         
         //用于区分当前点击的是哪一个任务绑定的UI
@@ -33,6 +33,7 @@ namespace System
         private bool _isActiveCloseAd;//是否激活提现界面关闭广告
         public bool CanPlayAd;//是否激活提现界面关闭广告
         public bool isFirstWithDraw = false;
+        public bool hasShownWithDrawPrompt = false;
         public static bool WithDrawUIShow = false;
         public bool NeedLoginDays = false;
         public static WithDrawManager Instance{
@@ -124,6 +125,7 @@ namespace System
                 if (data!=null)
                 {
                     isFirstWithDraw = data.isFirstWithDraw;
+                    hasShownWithDrawPrompt = data.hasShownWithDrawPrompt;
                     progressData.LoadData(data);
                 }
             }
@@ -506,6 +508,57 @@ namespace System
             
             return targetCash;
         }
-        
+
+        /// <summary>
+        /// 检查当前cash是否满足WithDraw模块redeemItemDict第一个平台，第一档位RedeemItemData的RewardCash的提现金额
+        /// 若满足则广播弹出WithDrawPromptDialog,只弹出一次，即使重启app也只弹出一次
+        /// </summary>
+        /// <param name="currentCash">当前cash金额</param>
+        public void CheckAndShowWithDrawPrompt(int currentCash)
+        {
+            // 检查是否已经弹出过
+            if (hasShownWithDrawPrompt)
+            {
+                return;
+            }
+
+            // 检查配置是否就绪
+            if (!isConfigReady || redeemItemDict == null || redeemItemDict.Count == 0)
+            {
+                return;
+            }
+
+            // 获取第一个平台的key
+            string firstPlatformKey = PlatformKey + "0";
+            if (!redeemItemDict.ContainsKey(firstPlatformKey))
+            {
+                return;
+            }
+
+            // 获取第一个平台的提现任务列表
+            List<RedeemItemData> firstPlatformItems = redeemItemDict[firstPlatformKey];
+            if (firstPlatformItems == null || firstPlatformItems.Count == 0)
+            {
+                return;
+            }
+
+            // 获取第一档位的RewardCash（列表已按index排序，第一个元素是最高index，即第一档位）
+            RedeemItemData firstRedeemItem = firstPlatformItems[0];
+            int requiredCash = firstRedeemItem.RewardCash*OnLineEarningMgr.Instance.GetCashMultiple();;
+
+            // 检查当前cash是否满足提现金额
+            if (currentCash >= requiredCash)
+            {
+                // 广播弹出WithDrawPromptDialog
+                Messenger.Broadcast<int>(GameDialogManager.OpenWithDrawPromptDialogMsg, requiredCash);
+
+                // 标记已经弹出过，通过WithDrawSystemProgressData永久保存
+                hasShownWithDrawPrompt = true;
+                SaveProgressData();
+
+                Debug.Log($"[WithDrawManager] ShowWithDrawPrompt: currentCash={currentCash}, requiredCash={requiredCash}");
+            }
+        }
+
     }
 }

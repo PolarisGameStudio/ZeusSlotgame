@@ -20,7 +20,7 @@ public class WithDrawDialog : UIDialog
     public ToggleGroup panelToggleGroup;
     public Toggle redeemToggle, recordToggle;
     public Button closeBtn;
-    
+
     public GameObject panelRedeem;
     public GameObject panelRecord;
     public GameObject tip;
@@ -117,7 +117,7 @@ public class WithDrawDialog : UIDialog
         Messenger.RemoveListener<string>(WithDrawConstants.ShowTipMsg,ShowTip);
         Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseAD,ShowVideoCallBack);
         Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseADFailed,ShowVideoCallBack);
-        Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+        Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
         WithDrawManager.WithDrawUIShow = false;
     }
     private void HandleNotMeetConditionMsg(string arg0)

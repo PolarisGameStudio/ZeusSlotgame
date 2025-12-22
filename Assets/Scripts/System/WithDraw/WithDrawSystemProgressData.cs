@@ -10,17 +10,20 @@ namespace System
         public int FreeSymbolNum = 0;
         public int S01SymbolNum = 0;
         public bool isFirstWithDraw = false;
+        public bool hasShownWithDrawPrompt = false;
 
         public override void LoadData(WithDrawSystemProgressData progressData)
         {
             FreeSymbolNum = progressData.FreeSymbolNum;
             S01SymbolNum = progressData.S01SymbolNum;
             isFirstWithDraw= progressData.isFirstWithDraw;
+            hasShownWithDrawPrompt = progressData.hasShownWithDrawPrompt;
         }
 
         public override void SaveData()
         {
             isFirstWithDraw= WithDrawManager.Instance.isFirstWithDraw;
+            hasShownWithDrawPrompt = WithDrawManager.Instance.hasShownWithDrawPrompt;
             StoreManager.Instance.SaveDataJson(fileName,this);
         }
 

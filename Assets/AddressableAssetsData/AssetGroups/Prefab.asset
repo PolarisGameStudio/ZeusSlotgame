@@ -119,6 +119,8 @@ MonoBehaviour:
     m_SerializedLabels: []
   - m_GUID: b4c9820cea79d42cc96bdd73f5fe904d
     m_Address: Prefab/UI/RewardCashDialog_p.prefab
+  - m_GUID: c48ee26983fa24b7d9123388b198af81
+    m_Address: Prefab/UI/WithDrawPromptDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

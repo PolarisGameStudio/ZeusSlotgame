@@ -29,7 +29,7 @@ namespace System.Activity.DailyTaskActivity
 
         private DailyTaskData _dailyTaskData;
 
-        
+        public Animator animator;
         private void Start()
         {
             getBtn.onClick.AddListener(OnTaskBtnClick);
@@ -65,12 +65,18 @@ namespace System.Activity.DailyTaskActivity
         
         private void RefreshMask()
         {
+            
             if (_dailyTaskData.Task.State == (int)TaskState.ONGOING)
             {
                 getBtn.interactable = false;
                 finishIcon.gameObject.SetActive(false);
                 maskObj.gameObject.SetActive(false);
-                effectImage.gameObject.SetActive(false);
+                // animator.enabled = false;
+                // effectImage.gameObject.SetActive(false);
+                if (animator != null)
+                {
+                    animator.SetTrigger("Idle");
+                }
                 return;
             }
             
@@ -79,14 +85,22 @@ namespace System.Activity.DailyTaskActivity
                 getBtn.interactable = false;
                 maskObj.gameObject.SetActive(true);
                 finishIcon.gameObject.SetActive(false);
-                effectImage.gameObject.SetActive(false);
+                // effectImage.gameObject.SetActive(false);
+                if (animator != null)
+                {
+                    animator.SetTrigger("Idle");
+                }
             }
             else
             {
                 getBtn.interactable = true;
                 finishIcon.gameObject.SetActive(true);
                 maskObj.gameObject.SetActive(false);
-                effectImage.gameObject.SetActive(true);
+                // effectImage.gameObject.SetActive(true);
+                if (animator != null)
+                {
+                    animator.SetTrigger("Finish");
+                }
             }
             
         }

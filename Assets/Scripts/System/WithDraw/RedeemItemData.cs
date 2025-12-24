@@ -71,10 +71,20 @@ namespace System
         private void AddListeners()
         {
             Messenger.AddListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
+            //监听CashTask进度更新
+            if (CashTask != null)
+            {
+                Messenger.AddListener(CashTask.UpdateTaskDataMsg, OnCashTaskProgressUpdated);
+            }
         }
         private void RemoveListeners()
         {
             Messenger.RemoveListener(SlotControllerConstants.OnSpinEnd, OnSpinEnd);
+            //取消监听CashTask进度更新
+            if (CashTask != null)
+            {
+                Messenger.RemoveListener(CashTask.UpdateTaskDataMsg, OnCashTaskProgressUpdated);
+            }
         }
 
         bool haveTaskCompleted = false;
@@ -86,7 +96,24 @@ namespace System
                 waitForSpinEnd = true;
             }
         }
-        
+
+        /// <summary>
+        /// CashTask进度更新回调，仅在InTaskProgress1状态时刷新UI
+        /// </summary>
+        void OnCashTaskProgressUpdated()
+        {
+            //只有当前处于CashTask进行阶段才刷新UI
+            if (state != RedeemItemState.InTaskProgress1)
+            {
+                return;
+            }
+
+            if (itemUI != null)
+            {
+                itemUI.RefreshUI();
+            }
+        }
+
         public void OnInit(RedeemItem item)
         {
             UpdateState();

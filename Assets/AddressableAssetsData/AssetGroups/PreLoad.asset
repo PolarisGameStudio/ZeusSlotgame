@@ -80,18 +80,13 @@ MonoBehaviour:
     m_Address: Prefab/Other
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 033b05c36124c44899abb27fa4402054
-    m_Address: Tutorial/Prefab/Tutorial_FirstSpin.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - PreLoad
-  - m_GUID: 61d140dc689bd4a51a8c269b705aa59e
-    m_Address: Tutorial/Prefab/Tutorial_LuckyGift.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - PreLoad
   - m_GUID: a6bbb8634e8d04f7a8bab5c2ebadc94a
     m_Address: Tutorial/Prefab/Tutorial_WithDrawButton.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad
+  - m_GUID: 033b05c36124c44899abb27fa4402054
+    m_Address: Tutorial/Prefab/Tutorial_FirstSpin.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad
@@ -102,6 +97,11 @@ MonoBehaviour:
     - PreLoad
   - m_GUID: 4569fcf1888d740a6bfd4f015fa18d50
     m_Address: Tutorial/Prefab/Tutorial_AutoSpin.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad
+  - m_GUID: 61d140dc689bd4a51a8c269b705aa59e
+    m_Address: Tutorial/Prefab/Tutorial_LuckyGift.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad

@@ -13,5 +13,9 @@ namespace System
         public const string DoneWithDrawAction = "DoneWithDrawAction";
         public const string WithDrawDialogOpened = "WithDrawDialogOpened";
         public const string CloseWithDrawGuideMsg = "CloseWithDrawGuideMsg";
+
+        // 红点相关
+        public const string ShowRecordRedPoint = "ShowRecordRedPoint";
+        public const string RecordRedPointKey = "WithDrawRecordRedPoint";
     }
 }

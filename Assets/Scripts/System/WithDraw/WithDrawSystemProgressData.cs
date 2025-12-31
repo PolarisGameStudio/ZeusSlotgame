@@ -11,6 +11,7 @@ namespace System
         public int S01SymbolNum = 0;
         public bool isFirstWithDraw = false;
         public bool hasShownWithDrawPrompt = false;
+        public bool showRecordRedPoint = false; // 是否显示record红点
 
         public override void LoadData(WithDrawSystemProgressData progressData)
         {
@@ -18,12 +19,14 @@ namespace System
             S01SymbolNum = progressData.S01SymbolNum;
             isFirstWithDraw= progressData.isFirstWithDraw;
             hasShownWithDrawPrompt = progressData.hasShownWithDrawPrompt;
+            showRecordRedPoint = progressData.showRecordRedPoint;
         }
 
         public override void SaveData()
         {
             isFirstWithDraw= WithDrawManager.Instance.isFirstWithDraw;
             hasShownWithDrawPrompt = WithDrawManager.Instance.hasShownWithDrawPrompt;
+            showRecordRedPoint = WithDrawManager.Instance.showRecordRedPoint;
             StoreManager.Instance.SaveDataJson(fileName,this);
         }
 

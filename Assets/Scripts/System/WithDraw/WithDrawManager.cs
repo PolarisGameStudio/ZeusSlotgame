@@ -34,6 +34,7 @@ namespace System
         public bool CanPlayAd;//是否激活提现界面关闭广告
         public bool isFirstWithDraw = false;
         public bool hasShownWithDrawPrompt = false;
+        public bool showRecordRedPoint = false; // 是否显示record红点
         public static bool WithDrawUIShow = false;
         public bool NeedLoginDays = false;
         public static WithDrawManager Instance{
@@ -126,6 +127,7 @@ namespace System
                 {
                     isFirstWithDraw = data.isFirstWithDraw;
                     hasShownWithDrawPrompt = data.hasShownWithDrawPrompt;
+                    showRecordRedPoint = data.showRecordRedPoint;
                     progressData.LoadData(data);
                 }
             }
@@ -319,6 +321,11 @@ namespace System
                 return;
             }
             recordItemDict.Add(itemData);
+            // 添加新记录时，设置红点状态为显示
+            showRecordRedPoint = true;
+            SaveProgressData();
+            // 广播消息通知显示红点
+            Messenger.Broadcast(WithDrawConstants.ShowRecordRedPoint);
         }
 
         public bool HasData(int taskId)

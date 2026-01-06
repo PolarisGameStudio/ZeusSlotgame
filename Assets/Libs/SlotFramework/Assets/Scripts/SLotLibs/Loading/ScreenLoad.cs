@@ -74,17 +74,17 @@ namespace Classic
             // 4. 预加载机器资源 (权重: 0.20)
             yield return PreloadMachineAssets();
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"PreloadMachineAssets");
-            // 5. 预加载机器配置所需资源 (权重: 0.20)
+            // 5. 预加载机器配置所需资源 (权重: 0.15)
             yield return PreLoadMachineConfig();
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"PreLoadMachineConfig");
             // 6. 加载主场景 (权重: 0.05)
             yield return LoadMainScene();
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"LoadMainSceneEnd");
 
-            // 清理资源
-            Resources.UnloadUnusedAssets();
+            // 清理资源（异步，避免卡顿）
+            yield return Resources.UnloadUnusedAssets();
             GC.Collect();
-            
+
             // 确保进度显示100%
             UpdateRealProgress(1f);
             yield return new WaitUntil(() => Mathf.Approximately(currentProgress, 1f));
@@ -190,18 +190,12 @@ namespace Classic
         #region 资源预加载
         private IEnumerator PreloadCoreAssets()
         {
-            // 使用AddressableManager加载图集
-            yield return AddressableManager.Instance.LoadAssetsByLabelCoroutine<SpriteAtlas>(
-                "PreLoad",
-                atlases => Debug.Log($"加载了{atlases.Count}个图集"),
-                error => Debug.LogError(error),
-                progress => UpdateRealProgress(0.15f + progress * 0.3f)); // 0.15-0.3
-            // 使用AddressableManager加载PreLoad组资源
+            // 使用AddressableManager加载PreLoad组资源（图集作为依赖会自动加载）
             yield return AddressableManager.Instance.LoadAssetsByLabelCoroutine<GameObject>(
                 "PreLoad",
                 objects => Debug.Log($"加载了{objects.Count}个核心预制体"),
                 error => Debug.LogError(error),
-                progress => UpdateRealProgress(0.3f + progress * 0.65f)); // 0.3-0.50
+                progress => UpdateRealProgress(0.15f + progress * 0.45f)); // 0.15-0.60 (权重: 0.45)
         }
 
         private IEnumerator PreloadMachineAssets()
@@ -211,7 +205,7 @@ namespace Classic
                 "Machines",
                 machines => Debug.Log($"加载了{machines.Count}个机器资源"),
                 error => Debug.LogError(error),
-                progress => UpdateRealProgress(0.65f + progress * 0.15f)); // 0.65-0.80
+                progress => UpdateRealProgress(0.60f + progress * 0.20f)); // 0.60-0.80 (权重: 0.20)
         }
         #endregion
 
@@ -221,7 +215,7 @@ namespace Classic
             float baseProgress = 0.80f;
             // 获取基础配置
             config = BaseGameConsole.ActiveGameConsole().SlotMachineConfig(SlotName);
-            UpdateRealProgress(baseProgress + 0.05f);
+            UpdateRealProgress(baseProgress + 0.05f); // 0.85
             yield return null;
 
             if (config != null)
@@ -230,23 +224,23 @@ namespace Classic
                 try
                 {
                     config.ParseDict();
-                    UpdateRealProgress(baseProgress + 0.1f);
+                    UpdateRealProgress(baseProgress + 0.10f); // 0.90
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError($"Config parsing failed: {ex.Message}");
                 }
-                
+
                 // 初始化Spine资源
                 if (config.UseSpine)
                 {
                     config.ClearSpineData();
                     yield return StartCoroutine(config.InitSpineAsset(
-                        progress => UpdateRealProgress(baseProgress + 0.1f + progress * 0.1f)
+                        progress => UpdateRealProgress(baseProgress + 0.10f + progress * 0.05f) // 0.90-0.95
                     ));
                 }
             }
-            
+
             UpdateRealProgress(0.95f); // 0.80 + 0.15
         }
         #endregion

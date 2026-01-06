@@ -117,10 +117,6 @@ MonoBehaviour:
     m_Address: Prefab/UI/WithDrawTaskCompletePanel_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 2424df812f69b4770b567d172bd5777a
-    m_Address: Prefab/UI/RewardCashDialog_p.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: c48ee26983fa24b7d9123388b198af81
     m_Address: Prefab/UI/WithDrawPromptDialog_p.prefab
     m_ReadOnly: 0

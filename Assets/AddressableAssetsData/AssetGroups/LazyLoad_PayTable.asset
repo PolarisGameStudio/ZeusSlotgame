@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: LazyLoad_PayTable
+  m_EditorClassIdentifier: 
+  m_GroupName: LazyLoad_PayTable
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 9660ad1f6f65944fd88790f02105ea95
+  m_SerializeEntries:
+  - m_GUID: b0bb2507f856d41e1901742065ba15f6
+    m_Address: Prefabs/Dialog/Paytable/PayLineElement.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 403549112e9104f3ea4da1261cc0a1a6
+    m_Address: Prefabs/Dialog/Paytable/PayLines.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ea5f2bb3c905c4832a00d96a841b24be
+    m_Address: Prefabs/Dialog/Paytable/PayLineSymbol.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 382cd1868e9d74583850206423867696, type: 2}
+    - {fileID: 11400000, guid: 40d97c710685a437c9beae1e135b47b4, type: 2}

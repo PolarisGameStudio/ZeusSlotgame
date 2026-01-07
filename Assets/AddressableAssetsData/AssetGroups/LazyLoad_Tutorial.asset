@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: LazyLoad_Tutorial
+  m_EditorClassIdentifier: 
+  m_GroupName: LazyLoad_Tutorial
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 01fab6229a3e64233929c8ab5bbf84d5
+  m_SerializeEntries:
+  - m_GUID: 4569fcf1888d740a6bfd4f015fa18d50
+    m_Address: Tutorial/Prefab/Tutorial_AutoSpin.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Tutorial
+  - m_GUID: 033b05c36124c44899abb27fa4402054
+    m_Address: Tutorial/Prefab/Tutorial_FirstSpin.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Tutorial
+  - m_GUID: 61d140dc689bd4a51a8c269b705aa59e
+    m_Address: Tutorial/Prefab/Tutorial_LuckyGift.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Tutorial
+  - m_GUID: a6bbb8634e8d04f7a8bab5c2ebadc94a
+    m_Address: Tutorial/Prefab/Tutorial_WithDrawButton.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Tutorial
+  - m_GUID: 9390a3ed1eae54b87b7bedbf5540a1a5
+    m_Address: Tutorial/Prefab/Tutorial_WithDrawItem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Tutorial
+  - m_GUID: 71edacf29d8f34926a1ccf238ce5e6b0
+    m_Address: Assets/AssetResources/Altas/Tutotial.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Tutorial
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: c0250ca7e6dfd49779753a9b9fa478a6, type: 2}
+    - {fileID: 11400000, guid: 51d1e94b374dd443995e448ddf1256cb, type: 2}

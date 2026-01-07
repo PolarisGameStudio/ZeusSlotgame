@@ -62,6 +62,21 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Machines
+  - m_GUID: fc85509ff8f8341c1b0e6ab48f63afce
+    m_Address: Assets/AssetResources/Altas/FreeSpinEnd.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Machines
+  - m_GUID: ab50260319e6344a48ae34bd32fda9e7
+    m_Address: Assets/AssetResources/Altas/FreespinRetrigger.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Machines
+  - m_GUID: ef1c0bc729aa8486083b409f359429f5
+    m_Address: Assets/AssetResources/Altas/FreeSpinStart.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Machines
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

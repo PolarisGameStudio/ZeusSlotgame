@@ -441,7 +441,7 @@ public class SpinWinDialog : UIDialog
     {
         //此处直接加钱
         OnLineEarningMgr.Instance.IncreaseCash(totalCash);
-        PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
+        // PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
         if (showAni)
         {
             Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(

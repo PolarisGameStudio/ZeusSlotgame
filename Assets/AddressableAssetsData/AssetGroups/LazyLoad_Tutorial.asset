@@ -42,11 +42,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Tutorial
-  - m_GUID: 71edacf29d8f34926a1ccf238ce5e6b0
-    m_Address: Assets/AssetResources/Altas/Tutotial.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Tutorial
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

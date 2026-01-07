@@ -195,7 +195,7 @@ MonoBehaviour:
     - PreLoad_Essential
     - Activity
     - Tutorial
-    - Altas_Core
+    - Atlas_Core
     - PreLoad_UI
   m_SchemaTemplates: []
   m_GroupTemplateObjects:

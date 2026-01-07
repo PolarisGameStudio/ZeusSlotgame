@@ -21,21 +21,25 @@ MonoBehaviour:
     m_Address: Common.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels:
+    - Altas_Core
     - Atlas_Core
   - m_GUID: 1351f069f94404811b39d2cf6b2166a7
     m_Address: Platform.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Atlas_Core
-  - m_GUID: 9efd5ee609e804c79a224ca8283d7d21
-    m_Address: WithDrawDialog.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels:
+    - Altas_Core
     - Atlas_Core
   - m_GUID: 8d789373733524da9a759ad1a062c6ff
     m_Address: LuckyCashDialog.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels:
+    - Altas_Core
+    - Atlas_Core
+  - m_GUID: 4e816f9d145fa42168b88e430513ea75
+    m_Address: WithDrawDialog.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Altas_Core
     - Atlas_Core
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}

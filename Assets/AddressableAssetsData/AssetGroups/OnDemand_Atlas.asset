@@ -41,8 +41,8 @@ MonoBehaviour:
     m_Address: Assets/AssetResources/Altas/Paytable.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 78d1e850a472afc48b9a864df0517003
-    m_Address: Assets/AssetResources/Altas/WheelLuckActivity.spriteatlas
+  - m_GUID: 0c4f11041af8041de8a31a11fb8b3ab4
+    m_Address: Assets/AssetResources/Altas/WithDrawTask.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 733fd3cae977f4cfdb107126930a3eec
@@ -51,14 +51,6 @@ MonoBehaviour:
     m_SerializedLabels: []
   - m_GUID: 8fdfd0089d8f24a9181f22441e924489
     m_Address: Assets/AssetResources/Altas/5OFKind.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 6b7cd65c77b0b4875b5bf64ebb2ee762
-    m_Address: Assets/AssetResources/Altas/DailyTaskActivity.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 44ae00cbf3af94e32a3995ac77da9332
-    m_Address: Assets/AssetResources/Altas/DailyTaskActivityBg.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 16e51fd74b8e14dbc81727832c0bba83

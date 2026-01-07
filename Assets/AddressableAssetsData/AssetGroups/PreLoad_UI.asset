@@ -37,11 +37,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad_UI
-  - m_GUID: abb30d62790864445bda6061f22e0e85
-    m_Address: Prefab/UI/RewardCashDialog_p.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - PreLoad_UI
   - m_GUID: 17298a074682240b7986fe5f2e641cdf
     m_Address: Prefab/UI/ExtraRewardCashDialog_p.prefab
     m_ReadOnly: 0
@@ -50,9 +45,15 @@ MonoBehaviour:
   - m_GUID: b2096c672f18a48e08ba4354c1474ca2
     m_Address: Prefab/UI/WithDrawDialog_p.prefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - PreLoad_UI
   - m_GUID: 57a94dc9e7111404891fd243d00f79ae
     m_Address: Prefab/UI/LuckyCashDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: c4b937df283f04e1285a5d9ff2355288
+    m_Address: Prefab/UI/RewardCashDialog_p.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad_UI

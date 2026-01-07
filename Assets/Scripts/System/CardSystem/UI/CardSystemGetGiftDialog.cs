@@ -38,7 +38,7 @@ namespace CardSystem
             
             _tips.text = $"x{money}";
             
-            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
+            // PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
             
             Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);
         }

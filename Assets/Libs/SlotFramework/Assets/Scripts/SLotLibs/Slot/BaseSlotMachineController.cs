@@ -274,6 +274,7 @@ public class BaseSlotMachineController : MonoBehaviour
     {
 #if !UNITY_EDITOR
 	    PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.EnterGame);
+		PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"game_home");
 #endif
 
         OnSlotMachineControllerAwake ();
@@ -846,6 +847,7 @@ public class BaseSlotMachineController : MonoBehaviour
 		
 		UserManager.GetInstance().UserProfile ().IncreaseSpinCounter();
 		PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"Spin",UserManager.GetInstance().UserProfile().GetTotalSpinCounter());
+		PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,UserManager.GetInstance().UserProfile().GetTotalSpinCounter());
 		if (!isFreeRun) {
 			UserManager.GetInstance ().IncreaseBalanceAndSendMessage (-(currentBetting));
 			reelManager.IsSpinCostCoins = true;

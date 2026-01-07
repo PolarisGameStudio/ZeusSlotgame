@@ -94,7 +94,7 @@ namespace Classic
         {
             //加钱动画播放完毕
             OnLineEarningMgr.Instance.IncreaseCash(initCash);
-            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
+            // PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
             Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(
                 GameConstants.CollectBonusWithType, cashFlyPosition, Libs.CoinsBezier.BezierType.DailyBonus, null);
             Messenger.Broadcast(SlotControllerConstants.OnCashChangeForDisPlay);

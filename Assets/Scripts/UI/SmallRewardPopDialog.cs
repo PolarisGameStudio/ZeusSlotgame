@@ -50,7 +50,7 @@ public class SmallRewardPopDialog : UIDialog
         if (cash>0)
         {
             OnLineEarningMgr.Instance.IncreaseCash(cash);
-            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
+            // PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.UpdateLevel,OnLineEarningMgr.Instance.GetCashTime());
             new DelayAction(0.5f, null, () =>
             {
                 Messenger.Broadcast<Transform, Libs.CoinsBezier.BezierType, System.Action>(

@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: LazyLoad_WithDraw
+  m_EditorClassIdentifier: 
+  m_GroupName: LazyLoad_WithDraw
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 3d7dbd3c7cb2b4be79f770f175e95517
+  m_SerializeEntries:
+  - m_GUID: 07d4ff7ace5b54ae0a7b10409a1ab223
+    m_Address: Prefab/UI/AccountDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 45d78b9fe63e7470e8c418a3431960df
+    m_Address: Prefab/UI/AccountEnsureDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: eca406020ed7e6948b65a8daaf651cb9
+    m_Address: Prefab/UI/AccountLoginTipsDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: dec0d6635f9c04a02a41485234c08ec9
+    m_Address: Prefab/UI/WithDrawTipDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 05e3776f58fbf4c3aad877e60371849c
+    m_Address: Prefab/UI/WithDrawTaskCompletePanel_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ccf23c2f8ca324d30b3c861d0bd7d5e7
+    m_Address: Prefab/UI/TaskTipDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 906728fbe07254c739eadf34f62e94e2, type: 2}
+    - {fileID: 11400000, guid: e428d711d51804ae4b1c7c89a41bac40, type: 2}

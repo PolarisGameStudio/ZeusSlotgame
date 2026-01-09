@@ -77,6 +77,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Machines
+  - m_GUID: f3d781cc764a54cab8278fd31270ce19
+    m_Address: Assets/AssetResources/Animation/SpineAni/BG_Tree
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Machines
+  - m_GUID: 1cb2d7b15e2df4992ba7f5d4eced33ea
+    m_Address: Assets/AssetResources/Animation/SpineAni/ZhuanChang
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Machines
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:

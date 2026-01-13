@@ -108,6 +108,16 @@ public class SpinWinDialog : UIDialog
 			});
 		}
 		cashText.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
+
+		if (PlatformManager.Instance.IsWhiteBao())
+		{
+			WatchAdBtn.gameObject.SetActive(false);
+			CloseBtnOnAd.gameObject.SetActive(false);
+			//显示免费的收集按钮
+			CollectBtn.gameObject.SetActive(true);
+			return;
+		}
+		
 		bool showCashOnCollectBtn = false;
 		if (isFirstTime)
 		{
@@ -160,6 +170,7 @@ public class SpinWinDialog : UIDialog
 				DelayShowCloseOnAdBtn();
 			}
 		}
+		
 		if (showCashOnCollectBtn)
 		{
 			TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(CollectBtn.transform, "Claim");

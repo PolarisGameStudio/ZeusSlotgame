@@ -84,6 +84,17 @@ public class WesternTreasureMiniDialog : UIDialog
             });
             TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
             claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardADMultiple,needIcon:false,needBigNum:true);
+        } 
+        else
+        {
+            adMultiple.gameObject.SetActive(false);
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
+            claim.text = localizedString.GetLocalizedString();
+            TextMeshProUGUI ad = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "ad");
+            ad.gameObject.SetActive(false);
+            TextMeshProUGUI x2 = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "x2");
+            x2.gameObject.SetActive(false);
         }
         BonusGameWinCash.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao() && totalCash > 0);
     }
@@ -91,7 +102,10 @@ public class WesternTreasureMiniDialog : UIDialog
     protected override void Start()
     {
         base.Start();
-        DelayShowClaimBtn();
+        if(!PlatformManager.Instance.IsWhiteBao())
+        {
+            DelayShowClaimBtn();
+        }
     }
     
     void DelayShowClaimBtn()

@@ -67,9 +67,10 @@ public class FreeGameEndDialog : UIDialog
     protected override void Start()
     {
         base.Start();
-        DelayShowClaimBtn();
-       
-        
+        if(!PlatformManager.Instance.IsWhiteBao())
+        {
+            DelayShowClaimBtn();
+        }
     }
 
     void DelayShowClaimBtn()
@@ -266,6 +267,19 @@ public class FreeGameEndDialog : UIDialog
             adMultiple.text = "" + RewardAdMultiple;
             TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
             claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
+        }
+        else
+        {
+            //白包不显示广告按钮
+            Text adMultiple = Util.FindObject<Text>(WatchADBtn.transform, "num");
+            adMultiple.gameObject.SetActive(false);
+            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName,"Claim");
+            claim.text = localizedString.GetLocalizedString();
+            TextMeshProUGUI ad = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "ad");
+            ad.gameObject.SetActive(false);
+            TextMeshProUGUI x2 = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "x2");
+            x2.gameObject.SetActive(false);
         }
     }
     

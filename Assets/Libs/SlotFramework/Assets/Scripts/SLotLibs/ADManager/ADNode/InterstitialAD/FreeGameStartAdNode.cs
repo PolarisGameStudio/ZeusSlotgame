@@ -35,7 +35,7 @@ namespace Ads
             //重置计数条件
             ResetCondition();
             //重置OnLineEarning模块LuckyCash弹出的条件计数
-            Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
+            // Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
         }
     }
 }

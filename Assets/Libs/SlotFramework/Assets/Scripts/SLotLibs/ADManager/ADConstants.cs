@@ -68,6 +68,7 @@ namespace Ads
         public const string CloseFreeGameEndMsg = "CloseFreeGameEndMsg";
         public const string JackpotGameStartMsg = "JackpotGameStartMsg";
         public const string JackpotGameEndMsg = "JackpotGameEndMsg";
+        public const string ResetSpinWinMsg = "ResetSpinWinMsg";
         #endregion
     }
 }

@@ -12,11 +12,13 @@ namespace Ads
         public override void AddListener()
         {
             Messenger.AddListener(ADConstants.CloseSpinWinMsg, UpdateCondition);
+            Messenger.AddListener(ADConstants.ResetSpinWinMsg, ResetCondition);
         }
 
         public override  void RemoveListener()
         {
             Messenger.RemoveListener(ADConstants.CloseSpinWinMsg, UpdateCondition);
+            Messenger.RemoveListener(ADConstants.ResetSpinWinMsg, ResetCondition);
         }
 
         ~CloseSpinWinAdNode()
@@ -35,7 +37,7 @@ namespace Ads
             //重置CloseSpinWin广告的条件
             ResetCondition();
             //重置OnLineEarning模块LuckyCash弹出的条件计数
-            Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
+            // Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
         }
     }
 }

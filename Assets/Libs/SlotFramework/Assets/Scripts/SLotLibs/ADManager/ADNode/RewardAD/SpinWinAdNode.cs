@@ -15,7 +15,7 @@ namespace Ads
             //重置CloseSpinWin广告的条件
             ResetCondition();
             //重置OnLineEarning模块LuckyCash弹出的条件计数
-            Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
+            // Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
         }
         public override int GetMultiple()
         {

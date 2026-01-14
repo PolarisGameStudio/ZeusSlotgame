@@ -10,20 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Font
+  m_Name: LazyLoad_Tutorial
   m_EditorClassIdentifier: 
-  m_GroupName: Font
+  m_GroupName: LazyLoad_Tutorial
   m_Data:
     m_SerializedData: []
-  m_GUID: 3d7dbd3c7cb2b4be79f770f175e95517
+  m_GUID: 01fab6229a3e64233929c8ab5bbf84d5
   m_SerializeEntries:
-  - m_GUID: 66babe820327d4c189148be7216e6555
-    m_Address: Fonts
+  - m_GUID: 71edacf29d8f34926a1ccf238ce5e6b0
+    m_Address: Assets/AssetResources/Altas/Tutotial.spriteatlas
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Tutorial
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 906728fbe07254c739eadf34f62e94e2, type: 2}
-    - {fileID: 11400000, guid: e428d711d51804ae4b1c7c89a41bac40, type: 2}
+    - {fileID: 11400000, guid: c0250ca7e6dfd49779753a9b9fa478a6, type: 2}
+    - {fileID: 11400000, guid: 51d1e94b374dd443995e448ddf1256cb, type: 2}

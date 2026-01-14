@@ -10,39 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Prefab
+  m_Name: LazyLoad_PayTable
   m_EditorClassIdentifier: 
-  m_GroupName: Prefab
+  m_GroupName: LazyLoad_PayTable
   m_Data:
     m_SerializedData: []
   m_GUID: 9660ad1f6f65944fd88790f02105ea95
   m_SerializeEntries:
-  - m_GUID: 0256dcec212724ac28b2c894e08a6ff5
-    m_Address: Prefab/UI/KindOfSymbolDialog_p.prefab
+  - m_GUID: b0bb2507f856d41e1901742065ba15f6
+    m_Address: Prefabs/Dialog/Paytable/PayLineElement.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 7721b08bc6e7c4a8bb7efd665c4b0324
-    m_Address: Prefab/UI/KindOfSymbolDialog.prefab
+  - m_GUID: 403549112e9104f3ea4da1261cc0a1a6
+    m_Address: Prefabs/Dialog/Paytable/PayLines.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: fabc5fe05a4064631b9adcde64227789
-    m_Address: Prefabs/DebugController.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: fcc294e993bf4444aa34e7bb5fcc20ca
-    m_Address: Prefabs/DebugTest.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 47f38299333a348a18e5d42be1377073
-    m_Address: Prefabs/DebugTestListItem.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 52c3b3c62a3c947bc8fa4030ac6878e5
-    m_Address: Prefabs/webmSpriteElement.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: fdd3fc736c4db427ebca36e96da53363
-    m_Address: Prefab/UI/GiftBoxDialog_p.prefab
+  - m_GUID: ea5f2bb3c905c4832a00d96a841b24be
+    m_Address: Prefabs/Dialog/Paytable/PayLineSymbol.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

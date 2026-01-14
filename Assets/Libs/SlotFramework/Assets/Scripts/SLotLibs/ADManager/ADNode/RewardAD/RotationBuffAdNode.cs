@@ -12,7 +12,7 @@ namespace Ads
         {
             base.DoAction();
             //重置OnLineEarning模块LuckyCash弹出的条件计数
-            Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
+            // Messenger.Broadcast(OnLineEarningConstants.ResetLuckyCashMsg);
         }
     }
 }

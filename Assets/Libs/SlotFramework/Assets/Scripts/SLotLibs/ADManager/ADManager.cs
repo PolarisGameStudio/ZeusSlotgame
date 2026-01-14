@@ -380,6 +380,7 @@ namespace Ads
                 return;
             }
             this.requestEntranceName = entranceName;
+            Messenger.Broadcast(ADConstants.ResetSpinWinMsg);
             
 #if UNITY_EDITOR
             ShowLoadingADsUI(2f,() =>

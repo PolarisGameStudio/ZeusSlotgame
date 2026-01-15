@@ -11,6 +11,7 @@ namespace System
         public int S01SymbolNum = 0;
         public bool isFirstWithDraw = false;
         public bool hasShownWithDrawPrompt = false;
+        public bool hasCompletedCashTask = false;  // 是否完成过提现任务
 
         public override void LoadData(WithDrawSystemProgressData progressData)
         {
@@ -18,12 +19,14 @@ namespace System
             S01SymbolNum = progressData.S01SymbolNum;
             isFirstWithDraw= progressData.isFirstWithDraw;
             hasShownWithDrawPrompt = progressData.hasShownWithDrawPrompt;
+            hasCompletedCashTask = progressData.hasCompletedCashTask;
         }
 
         public override void SaveData()
         {
             isFirstWithDraw= WithDrawManager.Instance.isFirstWithDraw;
             hasShownWithDrawPrompt = WithDrawManager.Instance.hasShownWithDrawPrompt;
+            hasCompletedCashTask = WithDrawManager.Instance.HasCompletedAnyCashTask();
             StoreManager.Instance.SaveDataJson(fileName,this);
         }
 

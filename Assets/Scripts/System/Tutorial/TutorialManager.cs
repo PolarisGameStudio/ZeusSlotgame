@@ -334,6 +334,12 @@ public class TutorialManager : MonoSingleton<TutorialManager>
     /// </summary>
     public bool ShouldShowStep(TutorialStep step)
     {
+        // 检查引导功能是否启用
+        if (!enableTutorials)
+        {
+            return false;
+        }
+
         // 检查配置中是否包含对应step
         if (prefabConfig == null || prefabConfig.GetStepConfig(step) == null)
         {

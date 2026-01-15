@@ -378,7 +378,10 @@ public class BaseSlotMachineController : MonoBehaviour
             slotMachineConfig.ParseDict();
 
 			SendEnterSlotAutopilotLog();
-           
+
+            // 上报提现奖励状态（进入游戏时）
+            OnLineEarningMgr.Instance.ReportWithdrawRewardStatusOnEnterGame();
+
             //初始化 bet 数据
             DataManager.GetInstance().InitBetData(slotMachineConfig);
             currentBetting = UserManager.GetInstance().getBetByBalance(slotMachineConfig);

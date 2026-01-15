@@ -136,8 +136,14 @@ public class LuckyCashDialog : UIDialog
         // Text adMultiple = Util.FindObject<Text>(BtnWatch.transform, "num");
         // adMultiple.text = "" + RewardAdMultiple;
         CashRollUp();
+
+        // 设置 BtnWatch 按钮文本为 "Claim" 多语言
         TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(BtnWatch.transform, "Claim");
-        claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
+        if (claim != null)
+        {
+            LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName, "Claim");
+            claim.text = localizedString.GetLocalizedString();
+        }
     }
 
     private Tween Cashtween = null;

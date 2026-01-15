@@ -286,7 +286,9 @@ public class BaseGameConsole :MonoBehaviour
 		BuffManager.Instance.OnInit();
 		//提现系统初始化
 		WithDrawManager.Instance.OnInit();
-		
+		//滑块倍率系统初始化
+		System.SliderMultiplier.SliderMultiplierManager.Instance.OnInit();
+
 		yield return GameConstants.FrameTime;;
 		//活动系统初始化
 		ActivityManager.Instance.OnInit();

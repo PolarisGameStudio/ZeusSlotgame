@@ -326,6 +326,10 @@ public class OnLineEarningMgr
         // System.WithDrawManager.Instance.CheckAndShowWithDrawPrompt(cash);
 
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,"Cash",cash.ToString());
+
+        // 上报提现奖励状态
+        ReportWithdrawRewardStatus(cash);
+
         SaveProgressData();
     }
     
@@ -724,6 +728,37 @@ public class OnLineEarningMgr
     public bool IsWhiteBao()
     {
         return isWhitePackage;
+    }
+
+    /// <summary>
+    /// 上报提现奖励状态
+    /// 参数1: 是否提现过（0=未提现，1=已提现）
+    /// 参数2: 未提现时距离第一个提现档位的差值（美元，最小10）
+    /// </summary>
+    private void ReportWithdrawRewardStatus(int currentCash)
+    {
+        // 检查是否已提现
+        bool hasWithdrawn = System.WithDrawManager.Instance.HasCompletedAnyCashTask();
+
+        if (hasWithdrawn)
+        {
+            // 已提现：只上报状态，不上报差值
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.IsWithdrawReward, "1");
+        }
+        else
+        {
+            // 未提现：上报状态和差值
+            int differenceInUSD = System.WithDrawManager.Instance.GetCashDifferenceToFirstRedeemInUSD(currentCash);
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.IsWithdrawReward, "0", differenceInUSD.ToString());
+        }
+    }
+
+    /// <summary>
+    /// 进入游戏时上报提现奖励状态（供 BaseSlotMachineController 调用）
+    /// </summary>
+    public void ReportWithdrawRewardStatusOnEnterGame()
+    {
+        ReportWithdrawRewardStatus(cash);
     }
 }
 

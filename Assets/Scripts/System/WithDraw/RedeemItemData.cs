@@ -167,6 +167,12 @@ namespace System
             {
                 //切换到第二个任务
                 CashTask.CompleteTask();
+                //上报现金任务完成
+                WithDrawManager.Instance.SendTaskMsg(CashTask.TaskId);
+
+                // 广播提现任务完成事件（用于SliderMultiplier系统）
+                Messenger.Broadcast(WithDrawConstants.OnCashTaskCompleted);
+
                 SequentialTask.ActiveChildTask();
                 CurTask = SequentialTask;
                 state = RedeemItemState.InTaskProgress2;

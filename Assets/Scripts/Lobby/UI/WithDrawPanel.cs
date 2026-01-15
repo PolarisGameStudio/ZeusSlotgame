@@ -220,7 +220,7 @@ public class WithDrawPanel : MonoBehaviour
             // 【已注释】不再显示 withdrawTip，改由 WithDrawPromptDialog 代替
             // withdrawTip.gameObject.SetActive(true);
 
-            contentGroup.gameObject.SetActive(false);
+            Guide.SetActive(false);
 
             // // 停止之前的引导协程
             // if (showGuideCor1!=null)

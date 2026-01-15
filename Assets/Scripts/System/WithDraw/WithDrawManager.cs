@@ -534,6 +534,74 @@ namespace System
         }
 
         /// <summary>
+        /// 获取第一个提现档位的目标金额（已转换为当前货币）
+        /// </summary>
+        public int GetFirstRedeemItemCash()
+        {
+            if (redeemItemDict == null || redeemItemDict.Count == 0)
+            {
+                Debug.LogError("[WithDrawManager] GetFirstRedeemItemCash: redeemItemDict is null or empty");
+                return 0;
+            }
+
+            // 获取第一个平台（PlatformKey + 0）
+            string firstPlatformKey = PlatformKey + "0";
+            if (!redeemItemDict.ContainsKey(firstPlatformKey))
+            {
+                Debug.LogError($"[WithDrawManager] GetFirstRedeemItemCash: Platform key '{firstPlatformKey}' not found");
+                return 0;
+            }
+
+            List<RedeemItemData> firstPlatformItems = redeemItemDict[firstPlatformKey];
+            if (firstPlatformItems == null || firstPlatformItems.Count == 0)
+            {
+                Debug.LogError("[WithDrawManager] GetFirstRedeemItemCash: First platform items is null or empty");
+                return 0;
+            }
+
+            // 返回第一个档位的 RewardCash（已经是当前货币）
+            return firstPlatformItems[0].RewardCash;
+        }
+
+        /// <summary>
+        /// 计算当前金额距离第一个提现档位的差值
+        /// 1. 计算差值（当前货币）
+        /// 2. 除以汇率倍数转换为美元
+        /// 3. 与10美元比较，取最大值
+        /// 4. 使用 ExchangeRate 转换回当前国家货币
+        /// 注意：即使差值为0或负数，也返回10美元对应的当前货币
+        /// </summary>
+        public int GetCashDifferenceToFirstRedeemInUSD(int currentCash)
+        {
+            int firstRedeemCash = GetFirstRedeemItemCash();
+            if (firstRedeemCash <= 0)
+            {
+                // 无法获取第一档位，返回10美元对应的当前货币
+                double fallbackDifference = OnLineEarningMgr.Instance.ExchangeRate(10);
+                return (int)Math.Ceiling(fallbackDifference);
+            }
+
+            // 1. 计算差值（当前货币）
+            int difference = firstRedeemCash - currentCash;
+
+            // 2. 转换为美元（除以汇率倍数）
+            int cashMultiple = OnLineEarningMgr.Instance.GetCashMultiple();
+            float differenceInUSD = (float)difference / cashMultiple;
+
+            // 3. 与 10 美元比较，取最大值（即使差值为0或负数，也保证最小为10美元）
+            int finalDifferenceInUSD = (int)Math.Ceiling(differenceInUSD);
+            if (finalDifferenceInUSD < 10)
+            {
+                finalDifferenceInUSD = 10;
+            }
+
+            // 4. 使用 ExchangeRate 转换回当前国家货币
+            double finalDifference = OnLineEarningMgr.Instance.ExchangeRate(finalDifferenceInUSD);
+
+            return (int)Math.Ceiling(finalDifference);
+        }
+
+        /// <summary>
         /// 检查当前cash是否满足WithDraw模块redeemItemDict第一个平台，第一档位RedeemItemData的RewardCash的提现金额
         /// 若满足则广播弹出WithDrawPromptDialog,只弹出一次，即使重启app也只弹出一次
         /// </summary>

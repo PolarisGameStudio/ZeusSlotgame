@@ -22,7 +22,7 @@ namespace Libs
             {
                 return false;
             }
-            if (BaseSlotMachineController.Instance.hasPopReward || BaseSlotMachineController.Instance.isBigWin || BaseSlotMachineController.Instance.isMegaWin || BaseSlotMachineController.Instance.isEpicWin || isWin(totalWin))
+            if (BaseSlotMachineController.Instance.hasPopReward)
             {
                 AddNumber = 1;
                 return true;
@@ -30,13 +30,6 @@ namespace Libs
             return false;
         }
         
-        private bool isWin(long totalWin)
-        {
-            if (totalWin >= BaseSlotMachineController.Instance.reelManager.gameConfigs.EpicWinTag * BaseSlotMachineController.Instance.currentBetting) return true;
-            else if (totalWin >= BaseSlotMachineController.Instance.reelManager.gameConfigs.MegaWinTag * BaseSlotMachineController.Instance.currentBetting) return true;
-            else if (totalWin >= BaseSlotMachineController.Instance.reelManager.gameConfigs.BigWinTag * BaseSlotMachineController.Instance.currentBetting) return true;
-            return false;
-        }
 
         public override string GetDesc()
         {

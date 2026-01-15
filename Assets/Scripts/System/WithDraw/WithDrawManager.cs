@@ -515,6 +515,25 @@ namespace System
         }
 
         /// <summary>
+        /// 判断是否有任意档位完成了 CashTask
+        /// </summary>
+        public bool HasCompletedAnyCashTask()
+        {
+            foreach (var kvp in redeemItemDict)
+            {
+                foreach (var item in kvp.Value)
+                {
+                    if (item.CashTask != null &&
+                        item.CashTask.State == (int)TaskState.CLOSE)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// 检查当前cash是否满足WithDraw模块redeemItemDict第一个平台，第一档位RedeemItemData的RewardCash的提现金额
         /// 若满足则广播弹出WithDrawPromptDialog,只弹出一次，即使重启app也只弹出一次
         /// </summary>

@@ -21,6 +21,56 @@ namespace System.SliderMultiplier
         [Header("Optional: Multiplier Text Display")]
         [SerializeField] private TextMeshProUGUI[] multiplierTexts;     // 可选：5个倍率文本显示
 
+        [Header("Multiplier Region Intervals (Slider X Position)")]
+        [Tooltip("5个倍率区域的X坐标区间配置（滑块的localPosition.x）\n例如：-344~-206, -206~-68, -68~68, 68~206, 206~344")]
+        [SerializeField] private MultiplierRegion[] regionIntervals = new MultiplierRegion[]
+        {
+            new MultiplierRegion(-344f, -206f),   // 区域0: -344 ~ -206
+            new MultiplierRegion(-206f, -68f),    // 区域1: -206 ~ -68
+            new MultiplierRegion(-68f, 68f),      // 区域2: -68 ~ 68
+            new MultiplierRegion(68f, 206f),      // 区域3: 68 ~ 206
+            new MultiplierRegion(206f, 344f)      // 区域4: 206 ~ 344
+        };
+
+        #endregion
+
+        #region 区间配置类
+
+        /// <summary>
+        /// 倍率区域配置（基于滑块X坐标）
+        /// </summary>
+        [System.Serializable]
+        public class MultiplierRegion
+        {
+            [Tooltip("区间起始X坐标（滑块的localPosition.x）")]
+            public float startX;
+
+            [Tooltip("区间结束X坐标（滑块的localPosition.x）")]
+            public float endX;
+
+            public MultiplierRegion(float start, float end)
+            {
+                startX = start;
+                endX = end;
+            }
+
+            /// <summary>
+            /// 判断X坐标是否在当前区间内
+            /// </summary>
+            public bool Contains(float x)
+            {
+                return x >= startX && x < endX;
+            }
+
+            /// <summary>
+            /// 获取区间宽度
+            /// </summary>
+            public float GetWidth()
+            {
+                return endX - startX;
+            }
+        }
+
         #endregion
 
         #region 私有变量
@@ -283,30 +333,55 @@ namespace System.SliderMultiplier
         }
 
         /// <summary>
-        /// 根据滑块位置计算对应的倍率
+        /// 根据滑块位置计算对应的倍率（使用X坐标区间配置）
         /// </summary>
         private int CalculateMultiplierByPosition()
         {
+            // 验证区间配置
+            if (regionIntervals == null || regionIntervals.Length != 5)
+            {
+                Debug.LogError("[SliderMultiplierComponent] regionIntervals is invalid, using default equal distribution");
+                // 默认平均分配（以-344~344为例）
+                float width = (rightBoundary - leftBoundary) / 5;
+                regionIntervals = new MultiplierRegion[]
+                {
+                    new MultiplierRegion(leftBoundary, leftBoundary + width),
+                    new MultiplierRegion(leftBoundary + width, leftBoundary + width * 2),
+                    new MultiplierRegion(leftBoundary + width * 2, leftBoundary + width * 3),
+                    new MultiplierRegion(leftBoundary + width * 3, leftBoundary + width * 4),
+                    new MultiplierRegion(leftBoundary + width * 4, rightBoundary)
+                };
+            }
+
             // 获取滑块当前 X 坐标
             float currentX = sliderTransform.anchoredPosition.x;
 
-            // 计算总宽度
-            float totalWidth = rightBoundary - leftBoundary;
+            // 根据X坐标区间找到对应的区域
+            int sectionIndex = 4; // 默认最后一个区域
+            for (int i = 0; i < regionIntervals.Length; i++)
+            {
+                if (regionIntervals[i].Contains(currentX))
+                {
+                    sectionIndex = i;
+                    break;
+                }
+            }
 
-            // 计算每个区域的宽度（5个区域）
-            float sectionWidth = totalWidth / 5;
-
-            // 计算当前在第几个区域（0-4）
-            int sectionIndex = Mathf.Clamp(
-                Mathf.FloorToInt((currentX - leftBoundary) / sectionWidth),
-                0,
-                4
-            );
+            // 特殊处理：如果X坐标超出最后一个区域，归入最后一个区域
+            if (currentX >= regionIntervals[4].endX)
+            {
+                sectionIndex = 4;
+            }
+            // 特殊处理：如果X坐标小于第一个区域，归入第一个区域
+            else if (currentX < regionIntervals[0].startX)
+            {
+                sectionIndex = 0;
+            }
 
             // 返回对应区域的倍率
             int multiplier = currentConfig[sectionIndex];
 
-            Debug.Log($"[SliderMultiplierComponent] Position={currentX:F2}, Section={sectionIndex}, Multiplier={multiplier}");
+            Debug.Log($"[SliderMultiplierComponent] CurrentX={currentX:F2}, Section={sectionIndex}, Interval=[{regionIntervals[sectionIndex].startX:F0}~{regionIntervals[sectionIndex].endX:F0}], Multiplier={multiplier}");
 
             return multiplier;
         }

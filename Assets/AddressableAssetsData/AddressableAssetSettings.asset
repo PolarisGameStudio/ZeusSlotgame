@@ -197,6 +197,7 @@ MonoBehaviour:
     - Tutorial
     - Altas_Core
     - PreLoad_UI
+    - Atlas_Core
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: eea283052774d49429d305552c946e1e, type: 2}

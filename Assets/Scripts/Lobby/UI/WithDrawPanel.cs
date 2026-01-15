@@ -139,15 +139,24 @@ public class WithDrawPanel : MonoBehaviour
         else
         {
             isDoingWithDraw = false;
-            withdrawTip.gameObject.SetActive(true);
-            contentGroup.gameObject.SetActive(false);
-            if (showGuideCor1!=null)
-            {
-                StopCoroutine(showGuideCor1);
-                showGuideCor1 = null;
-            }
-            //展示tap to cash文本
-            showGuideCor1 = StartCoroutine(ShowGuideText());
+
+            // 广播弹出 WithDrawPromptDialog
+            Messenger.Broadcast<int>(GameDialogManager.OpenWithDrawPromptDialogMsg, targetCash);
+
+            // 【已注释】不再显示 withdrawTip，改由 WithDrawPromptDialog 代替
+            // withdrawTip.gameObject.SetActive(true);
+
+            Guide.SetActive(false);
+
+            // // 停止之前的引导协程
+            // if (showGuideCor1!=null)
+            // {
+            //     StopCoroutine(showGuideCor1);
+            //     showGuideCor1 = null;
+            // }
+
+            // // 显示引导文本（Tap to cash）
+            // showGuideCor1 = StartCoroutine(ShowGuideText());
         }
     }
 

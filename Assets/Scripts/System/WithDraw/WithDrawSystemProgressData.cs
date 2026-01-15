@@ -12,6 +12,7 @@ namespace System
         public bool isFirstWithDraw = false;
         public bool hasShownWithDrawPrompt = false;
         public bool showRecordRedPoint = false; // 是否显示record红点
+        public bool hasCompletedCashTask = false;  // 是否完成过提现任务
 
         public override void LoadData(WithDrawSystemProgressData progressData)
         {
@@ -20,12 +21,14 @@ namespace System
             isFirstWithDraw= progressData.isFirstWithDraw;
             hasShownWithDrawPrompt = progressData.hasShownWithDrawPrompt;
             showRecordRedPoint = progressData.showRecordRedPoint;
+            hasCompletedCashTask = progressData.hasCompletedCashTask;
         }
 
         public override void SaveData()
         {
             isFirstWithDraw= WithDrawManager.Instance.isFirstWithDraw;
             hasShownWithDrawPrompt = WithDrawManager.Instance.hasShownWithDrawPrompt;
+            hasCompletedCashTask = WithDrawManager.Instance.HasCompletedAnyCashTask();
             showRecordRedPoint = WithDrawManager.Instance.showRecordRedPoint;
             StoreManager.Instance.SaveDataJson(fileName,this);
         }

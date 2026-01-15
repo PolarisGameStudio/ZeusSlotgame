@@ -521,5 +521,24 @@ namespace System
             return targetCash;
         }
 
+        /// <summary>
+        /// 判断是否有任意档位完成了 CashTask
+        /// </summary>
+        public bool HasCompletedAnyCashTask()
+        {
+            foreach (var kvp in redeemItemDict)
+            {
+                foreach (var item in kvp.Value)
+                {
+                    if (item.CashTask != null &&
+                        item.CashTask.State == (int)TaskState.CLOSE)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
     }
 }

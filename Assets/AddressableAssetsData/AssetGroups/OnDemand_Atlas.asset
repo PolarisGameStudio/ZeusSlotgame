@@ -53,14 +53,6 @@ MonoBehaviour:
     m_Address: Assets/AssetResources/Altas/5OFKind.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 6b7cd65c77b0b4875b5bf64ebb2ee762
-    m_Address: Assets/AssetResources/Altas/DailyTaskActivity.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 44ae00cbf3af94e32a3995ac77da9332
-    m_Address: Assets/AssetResources/Altas/DailyTaskActivityBg.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 16e51fd74b8e14dbc81727832c0bba83
     m_Address: Assets/AssetResources/Altas/TaskTipsDialog.spriteatlas
     m_ReadOnly: 0

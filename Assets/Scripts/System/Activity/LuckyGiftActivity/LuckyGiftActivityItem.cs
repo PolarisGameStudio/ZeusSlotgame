@@ -262,7 +262,9 @@ namespace Activity
             // 检查是否需要显示 LuckyGift 引导
             if (!global::TutorialManager.ShouldShow(global::TutorialManager.TutorialStep.LuckyGift))
             {
-                Debug.Log("[LuckyGiftActivityItem] LuckyGift 引导已完成，跳过");
+                Debug.Log("[LuckyGiftActivityItem] LuckyGift 引导已完成或未启用，播放边框光动画");
+                // 无法显示引导时，播放边框光动画
+                SwitchToBiankuangAnimation();
                 return;
             }
 

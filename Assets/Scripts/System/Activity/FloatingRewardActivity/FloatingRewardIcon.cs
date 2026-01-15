@@ -169,8 +169,8 @@ namespace Activity
 					adjustedSpeedX = activity.SpeedX * speedScaleX;
 					adjustedSpeedY = activity.SpeedY * speedScaleY;
 				}
-				
-                Debug.Log($"[FloatingRewardIcon] Screen bounds updated - Actual: {actualWidth}x{actualHeight}, Design: {DESIGN_WIDTH}x{DESIGN_HEIGHT}, SpeedScale: {speedScaleX}x{speedScaleY}");
+
+                // Debug.Log($"[FloatingRewardIcon] Screen bounds updated - Actual: {actualWidth}x{actualHeight}, Design: {DESIGN_WIDTH}x{DESIGN_HEIGHT}, SpeedScale: {speedScaleX}x{speedScaleY}");
             }
         }
 

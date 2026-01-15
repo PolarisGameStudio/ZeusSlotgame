@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.SliderMultiplier;
 using TMPro;
 using Activity;
+using Ads;
 namespace System.SliderMultiplier
 {
     /// <summary>
@@ -398,39 +399,41 @@ namespace System.SliderMultiplier
             // 2. 尝试获取 RotationBuffActivity 中激活的 ChangeADMultipleBuff 倍率
             try
             {
-                // 获取 RotationBuffActivity 实例
-                RotationBuffActivity rotationActivity = global::Activity.ActivityManager.Instance
-                    .GetActivityByType(global::Activity.ActivityType.RotationBuff) as RotationBuffActivity;
+                // 累加倍率
+                totalMultiplier += ADManager.Instance.GetMultipleADBuff() - 2;
+                // // 获取 RotationBuffActivity 实例
+                // RotationBuffActivity rotationActivity = global::Activity.ActivityManager.Instance
+                //     .GetActivityByType(global::Activity.ActivityType.RotationBuff) as RotationBuffActivity;
 
-                if (rotationActivity != null && rotationActivity.isInitialized)
-                {
-                    Debug.Log("[SliderMultiplierComponent] RotationBuffActivity found and initialized");
+                // if (rotationActivity != null && rotationActivity.isInitialized)
+                // {
+                //     Debug.Log("[SliderMultiplierComponent] RotationBuffActivity found and initialized");
 
-                    // 遍历 buffList，查找激活的 ChangeADMultipleBuff
-                    foreach (int buffId in rotationActivity.buffList)
-                    {
-                        BuffSystem.BaseBuff buff = BuffSystem.BuffManager.Instance.GetBuffById(buffId);
+                //     // 遍历 buffList，查找激活的 ChangeADMultipleBuff
+                //     foreach (int buffId in rotationActivity.buffList)
+                //     {
+                //         BuffSystem.BaseBuff buff = BuffSystem.BuffManager.Instance.GetBuffById(buffId);
 
-                        // 检查是否是 ChangeADMultipleBuff 且已激活
-                        if (buff != null &&
-                            buff.buffType == BuffSystem.BuffConstant.ChangeADMultipleBuff &&
-                            buff.isActive)
-                        {
-                            BuffSystem.ChangeADMultipleBuff adMultipleBuff = buff as BuffSystem.ChangeADMultipleBuff;
-                            int adMultiple = adMultipleBuff.GetAdMultiple();
+                //         // 检查是否是 ChangeADMultipleBuff 且已激活
+                //         if (buff != null &&
+                //             buff.buffType == BuffSystem.BuffConstant.ChangeADMultipleBuff &&
+                //             buff.isActive)
+                //         {
+                //             BuffSystem.ChangeADMultipleBuff adMultipleBuff = buff as BuffSystem.ChangeADMultipleBuff;
+                //             int adMultiple = adMultipleBuff.GetAdMultiple();
 
-                            // 累加倍率
-                            totalMultiplier += adMultiple-2;
+                //             // 累加倍率
+                //             totalMultiplier += adMultiple-2;
 
-                            Debug.Log($"[SliderMultiplierComponent] Added ChangeADMultipleBuff: {adMultiple}, Total: {totalMultiplier}");
-                            break;  // 只累加一个激活的 Buff
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.Log("[SliderMultiplierComponent] RotationBuffActivity not found or not initialized");
-                }
+                //             Debug.Log($"[SliderMultiplierComponent] Added ChangeADMultipleBuff: {adMultiple}, Total: {totalMultiplier}");
+                //             break;  // 只累加一个激活的 Buff
+                //         }
+                //     }
+                // }
+                // else
+                // {
+                //     Debug.Log("[SliderMultiplierComponent] RotationBuffActivity not found or not initialized");
+                // }
             }
             catch (Exception e)
             {

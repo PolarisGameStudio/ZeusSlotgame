@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: OnDemand_Atlas
+  m_EditorClassIdentifier: 
+  m_GroupName: OnDemand_Atlas
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 5a00c9e2d726b4b02928bc35432941c9
+  m_SerializeEntries:
+  - m_GUID: fd27fdf1c14434fe99f18ec6d963fac0
+    m_Address: Assets/AssetResources/Altas/AccountDialog.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: db35d108a1be34a8793be09c3fc93939
+    m_Address: Assets/AssetResources/Altas/JackPot1.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f26388dd0b0974e61b1ebdc74cbdd3f5
+    m_Address: Assets/AssetResources/Altas/JackPot2.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 487309611efcd4a67ad9bac87d283946
+    m_Address: Assets/AssetResources/Altas/JackPotGame.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a63d7a036882541ef998a539a6a1b134
+    m_Address: Assets/AssetResources/Altas/SettingDialog.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a95fd071cea914bd3aa4a301622d0810
+    m_Address: Assets/AssetResources/Altas/Paytable.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 78d1e850a472afc48b9a864df0517003
+    m_Address: Assets/AssetResources/Altas/WheelLuckActivity.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 733fd3cae977f4cfdb107126930a3eec
+    m_Address: Assets/AssetResources/Altas/RotationBuff.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 8fdfd0089d8f24a9181f22441e924489
+    m_Address: Assets/AssetResources/Altas/5OFKind.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 16e51fd74b8e14dbc81727832c0bba83
+    m_Address: Assets/AssetResources/Altas/TaskTipsDialog.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 4de6b5b4176cc42649b4c8f0aba67431, type: 2}
+    - {fileID: 11400000, guid: 7ae334841358d4bb892737ffae4e79d2, type: 2}

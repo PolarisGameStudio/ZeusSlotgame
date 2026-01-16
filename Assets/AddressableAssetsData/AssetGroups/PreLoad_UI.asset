@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: PreLoad_UI
+  m_EditorClassIdentifier: 
+  m_GroupName: PreLoad_UI
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 80971c933d5494ce98b0835549195793
+  m_SerializeEntries:
+  - m_GUID: bf6fba04022b342d898b280eb6c23743
+    m_Address: Prefab/Shared
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: e3495f7b641676a40bb7b4e242cbee42
+    m_Address: Prefab/UI/SpinWinDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: bb7dce5f0a35448c387708fc5aa4f1e0
+    m_Address: Animation/Animation_Dialog
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: 946b6df54767440f596678d600ff9717
+    m_Address: Prefab/UI/LoadingWaitDialog.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: 17298a074682240b7986fe5f2e641cdf
+    m_Address: Prefab/UI/ExtraRewardCashDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: b2096c672f18a48e08ba4354c1474ca2
+    m_Address: Prefab/UI/WithDrawDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: 57a94dc9e7111404891fd243d00f79ae
+    m_Address: Prefab/UI/LuckyCashDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  - m_GUID: 3bd6c9c33c84047179bb6d6d49c0fde1
+    m_Address: Prefab/UI/RewardCashDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad_UI
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 62427afc1092347d2877bd0e5d45d0ef, type: 2}
+    - {fileID: 11400000, guid: 18e2ad0c67157404e9f5d3076a6ffb8b, type: 2}

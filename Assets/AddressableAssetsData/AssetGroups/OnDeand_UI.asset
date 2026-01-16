@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: OnDeand_UI
+  m_EditorClassIdentifier: 
+  m_GroupName: OnDeand_UI
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 3d18599322210466e9c9cc7e28c1ae6d
+  m_SerializeEntries:
+  - m_GUID: f9bc4a1931021c043a230d323754766f
+    m_Address: Prefab/UI/TipsDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b86865cf5f04d4091860ae8c0cdea736
+    m_Address: Prefab/UI/SettingDialog_p.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 71783851a69ba431581d240fa91cbfc7
+    m_Address: Prefab/UI/BetChangeDialog.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 79dca455ea6d743958036c98e433efa2
+    m_Address: Prefab/UI/SceneExchange.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ffb7d690daad345c387f43a2ecb35d55, type: 2}
+    - {fileID: 11400000, guid: 38beeec2b18414b8f934bbb51014f78d, type: 2}

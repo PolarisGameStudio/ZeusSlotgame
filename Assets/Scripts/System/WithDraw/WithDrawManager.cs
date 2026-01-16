@@ -455,6 +455,11 @@ namespace System
             PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "Redeem", datastr);
             PlayerPrefs.SetInt("Redeem", count);
         }
+
+        public void SendTaskMsg(int taskId)
+        {
+            PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint, "withdrawtask", taskId);
+        } 
         
         /// <summary>
         /// ismin:是否取当前平台的最小档位 为false则取当前平台下一个档位

@@ -587,24 +587,16 @@ namespace System
                 double fallbackDifference = OnLineEarningMgr.Instance.ExchangeRate(10);
                 return (int)Math.Ceiling(fallbackDifference);
             }
-
-            // 1. 计算差值（当前货币）
-            int difference = firstRedeemCash - currentCash;
-
-            // 2. 转换为美元（除以汇率倍数）
             int cashMultiple = OnLineEarningMgr.Instance.GetCashMultiple();
-            float differenceInUSD = (float)difference / cashMultiple;
+            // 1. 计算差值（当前货币）
+            int difference = firstRedeemCash  - currentCash/cashMultiple;
 
-            // 3. 与 10 美元比较，取最大值（即使差值为0或负数，也保证最小为10美元）
-            int finalDifferenceInUSD = (int)Math.Ceiling(differenceInUSD);
-            if (finalDifferenceInUSD < 10)
+            if (difference < 10)
             {
-                finalDifferenceInUSD = 10;
+                difference = 10;
             }
-
             // 4. 使用 ExchangeRate 转换回当前国家货币
-            double finalDifference = OnLineEarningMgr.Instance.ExchangeRate(finalDifferenceInUSD);
-
+            double finalDifference = OnLineEarningMgr.Instance.ExchangeRate(difference);
             return (int)Math.Ceiling(finalDifference);
         }
 

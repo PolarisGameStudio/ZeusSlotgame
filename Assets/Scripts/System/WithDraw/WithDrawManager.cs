@@ -34,6 +34,7 @@ namespace System
         public bool CanPlayAd;//是否激活提现界面关闭广告
         public bool isFirstWithDraw = false;
         public bool hasShownWithDrawPrompt = false;
+        public bool showRecordRedPoint = false;
         public static bool WithDrawUIShow = false;
         public bool NeedLoginDays = false;
         public static WithDrawManager Instance{

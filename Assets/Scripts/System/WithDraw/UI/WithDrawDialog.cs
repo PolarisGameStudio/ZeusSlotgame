@@ -20,6 +20,7 @@ public class WithDrawDialog : UIDialog
     public ToggleGroup panelToggleGroup;
     public Toggle redeemToggle, recordToggle;
     public Button closeBtn;
+    public GameObject RedPoint;
 
     public GameObject panelRedeem;
     public GameObject panelRecord;
@@ -90,6 +91,8 @@ public class WithDrawDialog : UIDialog
         base.Start();
         //默认展示第一个
         redeemToggle.isOn = true;
+        // 初始化红点显示状态
+        UpdateRedPointDisplay();
     }
 
     protected override void OnEnable()
@@ -100,6 +103,7 @@ public class WithDrawDialog : UIDialog
         Messenger.AddListener<int>(ADConstants.PlayWithDrawCloseAD,ShowVideoCallBack);
         Messenger.AddListener<int>(ADConstants.PlayWithDrawCloseADFailed,ShowVideoCallBack);
         Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+        Messenger.AddListener(WithDrawConstants.ShowRecordRedPoint,UpdateRedPointDisplay);
         WithDrawManager.WithDrawUIShow = true;
     }
     private void ShowVideoCallBack(int res)
@@ -118,6 +122,7 @@ public class WithDrawDialog : UIDialog
         Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseAD,ShowVideoCallBack);
         Messenger.RemoveListener<int>(ADConstants.PlayWithDrawCloseADFailed,ShowVideoCallBack);
         Messenger.RemoveListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+        Messenger.RemoveListener(WithDrawConstants.ShowRecordRedPoint,UpdateRedPointDisplay);
         WithDrawManager.WithDrawUIShow = false;
     }
     private void HandleNotMeetConditionMsg(string arg0)
@@ -143,6 +148,8 @@ public class WithDrawDialog : UIDialog
             {
                 redeemPanelItem.Hide();
                 recordPanelItem.Show();
+                // 点击recordToggle时，隐藏红点并保存状态
+                HideRecordRedPoint();
             }
         }
     }
@@ -166,5 +173,21 @@ public class WithDrawDialog : UIDialog
                 tweenerTip.Kill();
                 tweenerTip = null;
             });
+    }
+
+    void UpdateRedPointDisplay()
+    {
+        if (RedPoint != null)
+        {
+            RedPoint.SetActive(WithDrawManager.Instance.showRecordRedPoint);
+        }
+    }
+
+    void HideRecordRedPoint()
+    {
+        // 隐藏红点并保存状态
+        WithDrawManager.Instance.showRecordRedPoint = false;
+        WithDrawManager.Instance.SaveProgressData();
+        UpdateRedPointDisplay();
     }
 }

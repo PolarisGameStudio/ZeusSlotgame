@@ -399,8 +399,13 @@ namespace System.SliderMultiplier
             // 2. 尝试获取 RotationBuffActivity 中激活的 ChangeADMultipleBuff 倍率
             try
             {
-                // 累加倍率
-                totalMultiplier += ADManager.Instance.GetMultipleADBuff() - 2;
+                int adMultiple = ADManager.Instance.GetMultipleADBuff();
+                if (adMultiple>2)
+                {
+                    // 累加倍率
+                    totalMultiplier += adMultiple - 2;
+                }
+                
                 // // 获取 RotationBuffActivity 实例
                 // RotationBuffActivity rotationActivity = global::Activity.ActivityManager.Instance
                 //     .GetActivityByType(global::Activity.ActivityType.RotationBuff) as RotationBuffActivity;

@@ -35,11 +35,10 @@ MonoBehaviour:
     m_SerializedLabels:
     - Altas_Core
     - Atlas_Core
-  - m_GUID: 4e816f9d145fa42168b88e430513ea75
+  - m_GUID: 3c4a6223819274f19b4c27a20721560e
     m_Address: WithDrawDialog.spriteatlas
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Altas_Core
     - Atlas_Core
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 854a929d254d6403b801fd5c05cfb890, type: 2}

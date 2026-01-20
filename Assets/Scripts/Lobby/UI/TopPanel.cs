@@ -88,15 +88,15 @@ namespace Classic
             if (BaseGameConsole.singletonInstance.IsInSlotMachine())
             {
                 BaseGameConsole.singletonInstance.SlotMachineController.MenuTransform = menuPanel.m_MenuBtn.transform;
-                if (OnLineEarningMgr.Instance.isInfiniteOpen())
-                {
+                // if (OnLineEarningMgr.Instance.isInfiniteOpen())
+                // {
                     BaseGameConsole.singletonInstance.SlotMachineController.CoinsTransform = coinsPanel.coinTarget;
                     BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel.cashTarget;
-                }
-                else
-                {
-                    BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel_300.cashTarget;
-                }
+                // }
+                // else
+                // {
+                //     BaseGameConsole.singletonInstance.SlotMachineController.CashTransform = withDrawPanel_300.cashTarget;
+                // }
             }
             
             menuPanel.ResetMenuButton();
@@ -111,24 +111,24 @@ namespace Classic
         void UpdateUI()
         {
             //300模式和区间模式共用一套ui
-            if (!OnLineEarningMgr.Instance.isInfiniteOpen()&& image_300bg!=null)
-            {
-                GetComponent<Image>().sprite = image_300bg;
-            }
-            coinsPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
-            withDrawPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen()&!PlatformManager.Instance.IsWhiteBao());
+            // if (!OnLineEarningMgr.Instance.isInfiniteOpen()&& image_300bg!=null)
+            // {
+            //     GetComponent<Image>().sprite = image_300bg;
+            // }
+            // coinsPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
+            withDrawPanel.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao());
             withDrawPanel.InitMoney(OnLineEarningMgr.Instance.Cash());
-            if (withDrawPanel_300!=null)
-            {
-                withDrawPanel_300.gameObject.SetActive(!OnLineEarningMgr.Instance.isInfiniteOpen()&!PlatformManager.Instance.IsWhiteBao());
-                withDrawPanel_300.InitMoney(OnLineEarningMgr.Instance.Cash());
-            }
-            levelPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
-            if (levelPanel_300!=null)
-            {
-                //只有300模式显示
-                levelPanel_300.gameObject.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen());
-            }
+            // if (withDrawPanel_300!=null)
+            // {
+            //     withDrawPanel_300.gameObject.SetActive(!OnLineEarningMgr.Instance.isInfiniteOpen()&!PlatformManager.Instance.IsWhiteBao());
+            //     withDrawPanel_300.InitMoney(OnLineEarningMgr.Instance.Cash());
+            // }
+            // levelPanel.gameObject.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
+            // if (levelPanel_300!=null)
+            // {
+            //     //只有300模式显示
+            //     levelPanel_300.gameObject.SetActive(OnLineEarningMgr.Instance.isThreeHundredOpen());
+            // }
         }
         
         void OpenSettingPanel()
@@ -170,10 +170,10 @@ namespace Classic
                 withDrawPanel.ShowWithCoinsFly(lastCash);
             }
 
-            if (withDrawPanel_300!=null&& withDrawPanel_300.gameObject.activeInHierarchy)
-            {
-                withDrawPanel_300.ShowWithCoinsFly(lastCash);
-            }
+            // if (withDrawPanel_300!=null&& withDrawPanel_300.gameObject.activeInHierarchy)
+            // {
+            //     withDrawPanel_300.ShowWithCoinsFly(lastCash);
+            // }
         }
         private float lastValue = -1f;
 

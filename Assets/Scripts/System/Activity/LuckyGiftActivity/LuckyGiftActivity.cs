@@ -56,6 +56,17 @@ namespace Activity
         /// </summary>
         public int GetRandomReward()
         {
+            // 如果启用了IntervalDataPattern模式，使用对应的倍率计算奖励
+            if (OnLineEarningMgr.Instance.isIntervalDataPatternOpen())
+            {
+                var intervalPattern = OnLineEarningMgr.Instance.GetIntervalDataPattern();
+                if (intervalPattern != null)
+                {
+                    return intervalPattern.GetRewardsByName(OnLineEarningConstants.REWARD_LuckyGift);
+                }
+            }
+
+            // 否则使用配置的随机范围
             return UnityEngine.Random.Range(MinReward, MaxReward + 1);
         }
 

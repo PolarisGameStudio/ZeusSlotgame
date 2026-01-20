@@ -218,11 +218,11 @@ public class SlotBottomPanel : MonoBehaviour
         bet_300.text = Utils.Utilities.ThousandSeparatorNumber (BaseSlotMachineController.Instance.currentBetting);
         win.SetText("0");
         RefreshCashState(false);
-        BetPanel.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
-        if (BetPanel_300!=null)
-        {
-            BetPanel_300.SetActive(!OnLineEarningMgr.Instance.isInfiniteOpen());
-        }
+        // BetPanel.SetActive(OnLineEarningMgr.Instance.isInfiniteOpen());
+        // if (BetPanel_300!=null)
+        // {
+        //     BetPanel_300.SetActive(!OnLineEarningMgr.Instance.isInfiniteOpen());
+        // }
         if (!OnLineEarningMgr.Instance.isInfiniteOpen())
         {
             if (CoinsPanelBottom!=null)
@@ -237,10 +237,10 @@ public class SlotBottomPanel : MonoBehaviour
 	private void SetBetText(long value)
     {
 		bet.text = Utils.Utilities.ThousandSeparatorNumber (value);
-        if (bet_300!=null)
-        {
-            bet_300.text = Utils.Utilities.ThousandSeparatorNumber (value);
-        }
+        // if (bet_300!=null)
+        // {
+        //     bet_300.text = Utils.Utilities.ThousandSeparatorNumber (value);
+        // }
         MaxBetShow();
     }
 

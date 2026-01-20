@@ -207,6 +207,8 @@ namespace System
 
         private void OnSequentialTaskChildTaskCompleted(BaseTask childTask)
         {
+            //上报每天的子任务完成
+            WithDrawManager.Instance.SendTaskMsg(childTask.TaskId);
             if (childTask.IsSpinRelated())
             {
                 haveTaskCompleted = true;
@@ -232,6 +234,8 @@ namespace System
             //当天任务已完成，已切换至下一天任务
             if (task.TaskId == SequentialTask.TaskId)
             {
+                //上报每天的任务完成
+                WithDrawManager.Instance.SendTaskMsg(SequentialChildTask.TaskId);
                 UnBindSequentialTaskEvents();
                 SequentialChildTask = SequentialTask.GetOnGoingChildTask() as SequentialTask;
                 //此处记录SequentialChildTask激活时间,为了显示至下一天倒计时
@@ -241,7 +245,6 @@ namespace System
                 {
                     itemUI.RefreshUI();
                 }
-                
             }else if (task.TaskId == SequentialChildTask.TaskId)
             {
                 //已切换至当天的下一个子任务
@@ -254,6 +257,8 @@ namespace System
         
         private void OnSequentialTaskCompleted(BaseTask task)
         {
+            //上报循环任务完成
+            WithDrawManager.Instance.SendTaskMsg(task.TaskId);
             WithDrawFailed();
         }
         

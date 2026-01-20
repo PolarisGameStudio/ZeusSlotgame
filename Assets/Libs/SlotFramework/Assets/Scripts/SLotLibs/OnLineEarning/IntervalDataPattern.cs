@@ -29,12 +29,24 @@ namespace Core
         public int CurSpinLimit = 1;
         private int maxValue = 300;
         private int multiple = 1;
+
+        //此处新增三个倍率解析
+        //FreeGame的倍率
+        private float freeGameMultiple = 1f;
+        //FloatingReward的倍率
+        private float floatingRewardMultiple = 1f;
+        //JackPotGame的倍率
+        private float jackPotGameMultiple = 1f;
+
         public override void ParseConfig(Dictionary<string, object> config)
         {
             base.ParseConfig(config);
             CurSpinLimit = Utilities.GetInt(config, OnLineEarningConstants.Spin, 1);
             maxValue = Utilities.GetInt(config, OnLineEarningConstants.MaxValue, 1);
             multiple = Utilities.GetInt(config, OnLineEarningConstants.Multiple, 1);
+            freeGameMultiple = Utilities.GetFloat(config, OnLineEarningConstants.FreeGameMultiple, 1f);
+            floatingRewardMultiple = Utilities.GetFloat(config, OnLineEarningConstants.FloatingRewardMultiple, 1f);
+            jackPotGameMultiple = Utilities.GetFloat(config, OnLineEarningConstants.JackPotGameMultiple, 1f);
             List<object> intervalRewards = Utils.Utilities.GetValue<List<object>>(config, OnLineEarningConstants.IntervalArray, null);
             if (intervalRewards == null || intervalRewards.Count == 0)
             {
@@ -151,6 +163,18 @@ namespace Core
             if (key == OnLineEarningConstants.REWARD_ExtraAward)
             {
                 reward =(int)Math.Floor(reward * OnLineEarningMgr.Instance.popRewardRate);
+            }
+            if (key == OnLineEarningConstants.REWARD_FloatingReward)
+            {
+                reward =(int)Math.Floor(reward * floatingRewardMultiple);
+            }
+            if (key == OnLineEarningConstants.REWARD_FREEGAMEEND)
+            {
+                reward =(int)Math.Floor(reward * freeGameMultiple);
+            }
+            if (key == OnLineEarningConstants.REWARD_JACKPOT)
+            {
+                reward =(int)Math.Floor(reward * jackPotGameMultiple);
             }
             return reward;
         }

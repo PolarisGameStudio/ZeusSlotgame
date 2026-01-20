@@ -207,6 +207,8 @@ namespace System
 
         private void OnSequentialTaskChildTaskCompleted(BaseTask childTask)
         {
+            //上报每天的子任务完成
+            WithDrawManager.Instance.SendTaskMsg(childTask.TaskId);
             if (childTask.IsSpinRelated())
             {
                 haveTaskCompleted = true;

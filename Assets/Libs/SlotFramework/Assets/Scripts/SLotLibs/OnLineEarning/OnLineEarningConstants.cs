@@ -11,6 +11,8 @@ public class OnLineEarningConstants
     public static readonly string REWARD_FREEGAMEEND = "FreeGameEnd";
     public static readonly string REWARD_ExtraAward = "ExtraAward";
     public static readonly string REWARD_FloatingReward = "FloatingReward";
+    public static readonly string REWARD_LuckyGift = "LuckyGift";
+    public static readonly string REWARD_CardGift = "CardGift";
 
 
     public static readonly string IncreaseCashMsg= "IncreaseCashMsg";
@@ -34,6 +36,8 @@ public class OnLineEarningConstants
     public static readonly string FreeGameMultiple = "FreeGameMultiple";
     public static readonly string FloatingRewardMultiple = "FloatingRewardMultiple";
     public static readonly string JackPotGameMultiple = "JackPotGameMultiple";
+    public static readonly string LuckyGiftMultiple = "LuckyGiftMultiple";
+    public static readonly string CardGiftMultiple = "CardGiftMultiple";
 
     #region Message
     public static readonly string HideH5TagKey = "HideH5TagKey";

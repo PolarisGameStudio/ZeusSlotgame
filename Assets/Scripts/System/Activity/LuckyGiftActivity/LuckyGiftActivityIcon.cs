@@ -384,6 +384,13 @@ namespace Activity
             }
 
             int reward = currentAdItem.GetReward();
+
+            // 如果启用了IntervalDataPattern模式，重新从activity获取奖励值
+            if (OnLineEarningMgr.Instance.isIntervalDataPatternOpen() && activity != null)
+            {
+                reward = activity.GetRandomReward();
+            }
+
             Debug.Log($"[LuckyGiftActivityIcon] Reward granted: {reward}");
 
             Messenger.Broadcast<int, Action>(GameDialogManager.OpenExtraAwardCashDialogMsg, reward, () =>

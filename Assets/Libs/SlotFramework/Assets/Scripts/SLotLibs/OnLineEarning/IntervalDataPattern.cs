@@ -37,6 +37,10 @@ namespace Core
         private float floatingRewardMultiple = 1f;
         //JackPotGame的倍率
         private float jackPotGameMultiple = 1f;
+        //LuckyGift的倍率
+        private float luckyGiftMultiple = 1f;
+        //CardGift的倍率
+        private float cardGiftMultiple = 1f;
 
         public override void ParseConfig(Dictionary<string, object> config)
         {
@@ -47,6 +51,8 @@ namespace Core
             freeGameMultiple = Utilities.GetFloat(config, OnLineEarningConstants.FreeGameMultiple, 1f);
             floatingRewardMultiple = Utilities.GetFloat(config, OnLineEarningConstants.FloatingRewardMultiple, 1f);
             jackPotGameMultiple = Utilities.GetFloat(config, OnLineEarningConstants.JackPotGameMultiple, 1f);
+            luckyGiftMultiple = Utilities.GetFloat(config, OnLineEarningConstants.LuckyGiftMultiple, 1f);
+            cardGiftMultiple = Utilities.GetFloat(config, OnLineEarningConstants.CardGiftMultiple, 1f);
             List<object> intervalRewards = Utils.Utilities.GetValue<List<object>>(config, OnLineEarningConstants.IntervalArray, null);
             if (intervalRewards == null || intervalRewards.Count == 0)
             {
@@ -175,6 +181,14 @@ namespace Core
             if (key == OnLineEarningConstants.REWARD_JACKPOT)
             {
                 reward =(int)Math.Floor(reward * jackPotGameMultiple);
+            }
+            if (key == OnLineEarningConstants.REWARD_LuckyGift)
+            {
+                reward =(int)Math.Floor(reward * luckyGiftMultiple);
+            }
+            if (key == OnLineEarningConstants.REWARD_CardGift)
+            {
+                reward =(int)Math.Floor(reward * cardGiftMultiple);
             }
             return reward;
         }

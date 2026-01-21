@@ -26,7 +26,7 @@ public class SlotGameconsole : BaseGameConsole {
 	protected override void OnGameConsoleGUI() {
 		base.OnGameConsoleGUI();
 		#if UNITY_EDITOR
-		DrawFPS();
+		// DrawFPS();
 		#else
 		if (Debug.isDebugBuild) {
 		DrawFPS();

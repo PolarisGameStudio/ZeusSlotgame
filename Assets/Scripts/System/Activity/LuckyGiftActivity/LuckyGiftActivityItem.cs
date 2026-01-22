@@ -35,6 +35,10 @@ namespace Activity
         private RectTransform bgGuang;
         private Image bgAD;
         private Image biankuanguang;
+        // 背景切换相关
+        private GameObject bgInfinite;
+        private GameObject bg300;
+        private GameObject bgInterval;
         // Animator组件（状态机）
         private Animator animator;
         private const string BIANKUANG_TRIGGER = "biankuang"; // 切换到biankuang动画的trigger名称
@@ -52,11 +56,27 @@ namespace Activity
             bgAD = Utilities.RealFindObj<Image>(transform, "imagead");
             biankuanguang = Utilities.RealFindObj<Image>(transform, "biankuangguang");
 
+            // 查找背景对象
+            Transform bgInfiniteTransform = Utilities.RealFindObj<Transform>(transform, "bg_infinite");
+            bgInfinite = bgInfiniteTransform != null ? bgInfiniteTransform.gameObject : null;
+
+            Transform bg300Transform = Utilities.RealFindObj<Transform>(transform, "bg_300");
+            bg300 = bg300Transform != null ? bg300Transform.gameObject : null;
+
+            Transform bgIntervalTransform = Utilities.RealFindObj<Transform>(transform, "bg_interval");
+            bgInterval = bgIntervalTransform != null ? bgIntervalTransform.gameObject : null;
+
             // 查找rewardtext子物体
             rewardText = Utilities.RealFindObj<TextMeshProUGUI>(transform, "text_reward");
             if (rewardText == null)
             {
                 rewardText = Utilities.RealFindObj<TextMeshProUGUI>(transform, "text_reward");
+            }
+
+            // 初始化时先隐藏rewardText，等Initialize调用UpdateRewardDisplay时再根据模式显示
+            if (rewardText != null)
+            {
+                rewardText.gameObject.SetActive(false);
             }
 
             // 获取Animator组件
@@ -97,6 +117,9 @@ namespace Activity
             // 设置奖励文本
             UpdateRewardDisplay();
 
+            // 切换背景
+            SwitchBackgroundByMode();
+
             // 前 freeCount 个历史 item（免费）不显示广告图片
             if (bgAD != null)
             {
@@ -119,6 +142,7 @@ namespace Activity
             this.totalItemCount = totalItemCount;
             bgGuang.gameObject.SetActive(false);
             UpdateRewardDisplay();
+            SwitchBackgroundByMode();
             isAnimating = false;
 
             // 前 freeCount 个历史 item（免费）不显示广告图片
@@ -133,7 +157,10 @@ namespace Activity
                 animator.enabled = true;
                 SwitchToBiankuangAnimation();
             }
-            Debug.Log($"[LuckyGiftActivityItem] InitializeWithoutAnimation - slotIndex: {slotIndex}, totalItemCount: {totalItemCount}, freeCount: {freeCount}, showAd: {totalItemCount > freeCount}");
+
+            bool isInfinite = OnLineEarningMgr.Instance.isInfiniteOpen();
+            bool rewardTextActive = rewardText != null && rewardText.gameObject.activeSelf;
+            Debug.Log($"[LuckyGiftActivityItem] InitializeWithoutAnimation - slotIndex: {slotIndex}, totalItemCount: {totalItemCount}, freeCount: {freeCount}, showAd: {totalItemCount > freeCount}, isInfinite: {isInfinite}, rewardTextActive: {rewardTextActive}");
         }
 
         /// <summary>
@@ -246,12 +273,43 @@ namespace Activity
             if (rewardText != null)
             {
                 rewardText.text = OnLineEarningMgr.Instance.GetMoneyStr(reward, needIcon: false, needBigNum: true);
+
+                // 无限模式显示，其他模式隐藏
+                bool shouldShowRewardText = OnLineEarningMgr.Instance.isInfiniteOpen();
+                rewardText.gameObject.SetActive(shouldShowRewardText);
             }
 
             if (particleEffect != null)
             {
                 particleEffect.gameObject.SetActive(false);
             }
+        }
+
+        /// <summary>
+        /// 根据OnLineEarningMgr的模式切换背景
+        /// </summary>
+        private void SwitchBackgroundByMode()
+        {
+            bool isInfinite = OnLineEarningMgr.Instance.isInfiniteOpen();
+            bool is300 = OnLineEarningMgr.Instance.isThreeHundredOpen();
+            bool isInterval = OnLineEarningMgr.Instance.isIntervalDataPatternOpen();
+
+            if (bgInfinite != null)
+            {
+                bgInfinite.SetActive(isInfinite);
+            }
+
+            if (bg300 != null)
+            {
+                bg300.SetActive(is300);
+            }
+
+            if (bgInterval != null)
+            {
+                bgInterval.SetActive(isInterval);
+            }
+
+            Debug.Log($"[LuckyGiftActivityItem] SwitchBackground - Infinite: {isInfinite}, 300: {is300}, Interval: {isInterval}");
         }
 
         /// <summary>

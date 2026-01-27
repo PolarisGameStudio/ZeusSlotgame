@@ -1,0 +1,16 @@
+{
+    "alwaysThinkingEnabled": true,
+    "model": "opus",
+    "features": {
+      "confirmFileWrites": false
+    },
+    "includeCoAuthoredBy": false,
+    "maxTokens": 40960,
+    "language":"chinese",
+    "permissions": {
+      "allow": [],
+      "deny": [],
+      "ask": [],
+      "defaultMode":"bypassPermissions"
+    }
+}

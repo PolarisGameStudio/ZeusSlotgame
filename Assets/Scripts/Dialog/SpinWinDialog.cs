@@ -94,9 +94,9 @@ public class SpinWinDialog : UIDialog
 			UpdateTextUI(coins);
 			tween = null;
 		});
-		int popCount = OnLineEarningMgr.Instance.AddPopSpinWinCount();
-		isFirstTime = popCount==1;
-		isSecondTime = popCount==2;
+		// int popCount = OnLineEarningMgr.Instance.AddPopSpinWinCount();
+		// isFirstTime = popCount==1;
+		// isSecondTime = popCount==2;
 		if (!PlatformManager.Instance.IsWhiteBao())
 		{
 			totalCash = OnLineEarningMgr.Instance.GetSpinWinReward((int)spinWinType);
@@ -119,33 +119,33 @@ public class SpinWinDialog : UIDialog
 		}
 		
 		bool showCashOnCollectBtn = false;
-		if (isFirstTime)
-		{
-			Debug.Log("SpinWinDialogNew OnStart isFirstTime");
-			//第一次免费，不显示广告按钮
-			WatchAdBtn.gameObject.SetActive(false);
-			CloseBtnOnAd.gameObject.SetActive(false);
-			//显示免费的收集按钮
-			CollectBtn.gameObject.SetActive(true);
-			showCashOnCollectBtn = true;
+		// if (isFirstTime)
+		// {
+		// 	Debug.Log("SpinWinDialogNew OnStart isFirstTime");
+		// 	//第一次免费，不显示广告按钮
+		// 	WatchAdBtn.gameObject.SetActive(false);
+		// 	CloseBtnOnAd.gameObject.SetActive(false);
+		// 	//显示免费的收集按钮
+		// 	CollectBtn.gameObject.SetActive(true);
+		// 	showCashOnCollectBtn = true;
 
-		}else if (isSecondTime)
-		{
-			Debug.Log("SpinWinDialogNew OnStart isSecondTime");
-			//第一次免费，不显示广告按钮
-			WatchAdBtn.gameObject.SetActive(false);
-			CloseBtnOnAd.gameObject.SetActive(false);
-			//显示免费的收集按钮
-			CollectBtn.gameObject.SetActive(true);
-			Transform x2Image = Utilities.RealFindObj<Transform>(CollectBtn.transform, "x2");
-			x2Image.gameObject.SetActive(true);
-			Transform numImage = Utilities.RealFindObj<Transform>(CollectBtn.transform, "number");
-			numImage.gameObject.SetActive(true);
-			RewardAdMultiple = 2;
-			showCashOnCollectBtn = true;
-		}
-		else
-		{
+		// }else if (isSecondTime)
+		// {
+		// 	Debug.Log("SpinWinDialogNew OnStart isSecondTime");
+		// 	//第一次免费，不显示广告按钮
+		// 	WatchAdBtn.gameObject.SetActive(false);
+		// 	CloseBtnOnAd.gameObject.SetActive(false);
+		// 	//显示免费的收集按钮
+		// 	CollectBtn.gameObject.SetActive(true);
+		// 	Transform x2Image = Utilities.RealFindObj<Transform>(CollectBtn.transform, "x2");
+		// 	x2Image.gameObject.SetActive(true);
+		// 	Transform numImage = Utilities.RealFindObj<Transform>(CollectBtn.transform, "number");
+		// 	numImage.gameObject.SetActive(true);
+		// 	RewardAdMultiple = 2;
+		// 	showCashOnCollectBtn = true;
+		// }
+		// else
+		// {
 			//Debug.Log("SpinWinDialogNew OnStart isThirdTime");
 			//第三次之后有广告和插屏的按钮，此时插屏的广告进度并未累计完毕，所以不能看插屏
 			//增加插屏广告的检测进度
@@ -169,7 +169,7 @@ public class SpinWinDialog : UIDialog
 				CollectBtn.gameObject.SetActive(false);
 				DelayShowCloseOnAdBtn();
 			}
-		}
+		// }
 		
 		if (showCashOnCollectBtn)
 		{

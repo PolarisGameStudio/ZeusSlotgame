@@ -248,6 +248,14 @@ public class LuckyCashDialog : UIDialog
         }
         HasClicked = true;
         OnClickStopUpdate();
+
+        // 停止滑块移动（BtnNotWatch 不使用滑块倍率）
+        if (sliderMultiplierComponent != null)
+        {
+            sliderMultiplierComponent.PauseMovement();
+            Debug.Log("[LuckyCashDialog] Slider paused when BtnNotWatch clicked");
+        }
+
         Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance,ADEntrances.Interstitial_Entrance_CLOSELUCKYCASH);
     }
     

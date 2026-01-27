@@ -9,6 +9,7 @@ using DG.Tweening;
 using Ads;
 using UnityEngine.Localization;
 using Utils;
+using System.SliderMultiplier;
 
 public class FreeGameEndDialog : UIDialog 
 {
@@ -22,6 +23,14 @@ public class FreeGameEndDialog : UIDialog
     public UIText FreeGameWinCoins;
     [Header("FreeGame金钱奖励")]
     public UIText FreeGameWinCash;
+
+    [Header("Slider Multiplier")]
+    [SerializeField] private SliderMultiplierComponent sliderMultiplierComponent;
+
+    [Header("Multiplier Stamp")]
+    [SerializeField] private GameObject multiplierStampObject;
+    [SerializeField] private Text multiplierStampText;
+
     private Tween tween = null;
     private Tween Cashtween = null;
     private long curCoins = 0;
@@ -45,9 +54,22 @@ public class FreeGameEndDialog : UIDialog
         {
             _taskTipPanel.RefreshInfo(TaskConstants.CollectFreeGameTriggerCountTask_Key);
         }
+
+        // 隐藏金币显示（保留数值逻辑）
+        if (FreeGameWinCoins != null)
+        {
+            FreeGameWinCoins.gameObject.SetActive(false);
+        }
+
+        // 初始化倍率盖章节点（隐藏）
+        if (multiplierStampObject != null)
+        {
+            multiplierStampObject.SetActive(false);
+        }
+
         // this.bResponseBackButton = false;
         // this.AutoQuit = true;
-        // this.DisplayTime = 4; 
+        // this.DisplayTime = 4;
     }
 
     void OnEnable()
@@ -55,6 +77,12 @@ public class FreeGameEndDialog : UIDialog
         Messenger.AddListener<int>(ADConstants.PlayFreeSpinEndAD,AdIsPlaySuccessful);
         Messenger.AddListener<int>(ADConstants.PlayFreeSpinEndADFailed,AdIsPlayFailed);
         Messenger.AddListener<string>(ADConstants.NotMeetConditionMsg,HandleNotMeetConditionMsg);
+
+        // 每次启用时初始化滑块（会自动检查提现状态）
+        if (sliderMultiplierComponent != null)
+        {
+            sliderMultiplierComponent.OnInit();
+        }
     }
     void OnDisable()
     {
@@ -107,6 +135,14 @@ public class FreeGameEndDialog : UIDialog
         }
         HasClicked = true;
         OnClickStopUpdate();
+
+        // 停止滑块移动（EndBtn 不使用滑块倍率）
+        if (sliderMultiplierComponent != null)
+        {
+            sliderMultiplierComponent.PauseMovement();
+            Debug.Log("[FreeGameEndDialog] Slider paused when EndBtn clicked");
+        }
+
         //不播广告直接加钱
         if (totalCash>0)
         {
@@ -119,7 +155,7 @@ public class FreeGameEndDialog : UIDialog
         {
             this.Close();
         }
-           
+
         // }
         SendMsg();
     }
@@ -141,6 +177,21 @@ public class FreeGameEndDialog : UIDialog
             return;
         }
         isPlayAd = true;
+
+        OnClickStopUpdate();
+
+        // 停止滑块移动并计算倍率
+        if (sliderMultiplierComponent != null)
+        {
+            int finalMultiplier = sliderMultiplierComponent.CalculateFinalMultiplier();
+            Debug.Log($"[FreeGameEndDialog] Slider final multiplier: {finalMultiplier}");
+
+            // 使用滑块倍率
+            RewardAdMultiple = finalMultiplier;
+
+            Debug.Log($"[FreeGameEndDialog] Final RewardAdMultiple: {RewardAdMultiple}");
+        }
+
         Messenger.Broadcast<string>(ADConstants.PlayAdByEntrance, ADEntrances.REWARD_VIDEO_ENTRANCE_FREESPINEND);
         SendMsg(2);
     }
@@ -150,12 +201,24 @@ public class FreeGameEndDialog : UIDialog
         if (type == 0)
         {
             RewardADIsPlaySuccess();
+
+            // 广告播放成功后，推进配置索引（只针对激励广告）
+            if (sliderMultiplierComponent != null)
+            {
+                SliderMultiplierManager.Instance.AdvanceToNextConfig();
+                Debug.Log("[FreeGameEndDialog] Configuration advanced after successful reward ad");
+            }
+
+            // 播放倍率盖章动画（只针对现金，金币不显示）
+            PlayMultiplierStampAnimation(RewardAdMultiple);
         }
-        // //插屏广告
+        // 插屏广告（不推进配置索引，不使用滑块倍率）
         else if (type == 1)
         {
-            totalCash  =(int)(totalCash* OnLineEarningMgr.Instance.GetClaimRewardRate());
+            totalCash = (int)(totalCash * OnLineEarningMgr.Instance.GetClaimRewardRate());
             DoneADCallBack();
+
+            Debug.Log("[FreeGameEndDialog] Interstitial ad completed, no config advance");
         }
     }
     
@@ -176,9 +239,13 @@ public class FreeGameEndDialog : UIDialog
     void RewardADIsPlaySuccess()
     {
         totalCash *= RewardAdMultiple;
-        //钱已经加过一次了，所以需要倍数减1
-        totalCoins *= (RewardAdMultiple-1);
-        DoneADCallBack();
+
+        // 金币倍率逻辑保留（不显示，但数值要对）
+        // 钱已经加过一次了，所以需要倍数减1
+        totalCoins *= (RewardAdMultiple - 1);
+
+        // 不调用 DoneADCallBack，改为在盖章动画完成后调用
+        // DoneADCallBack();
     }
     
     //加钱动画
@@ -189,8 +256,11 @@ public class FreeGameEndDialog : UIDialog
         {
             FlyCash(needFly);
         }
-       
-        FlyCoins(false);
+
+        // 注释：金币不显示飞行动画，改为无动画发放
+        // FlyCoins(false);
+        FlyCoinsWithoutAnimation();
+
         Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
         // AudioEntity.Instance.StopFreeGameEndDialogMusic();
         // AudioEntity.Instance.PlayFeatureBtnEffect();
@@ -241,31 +311,45 @@ public class FreeGameEndDialog : UIDialog
     {
         totalCoins = coins;
         totalCash = !OnLineEarningMgr.Instance.isInfiniteOpen()?OnLineEarningMgr.Instance.GetRewardsByName(OnLineEarningConstants.REWARD_FREEGAMEEND):cash;
-        if(FreeGameCount != null) 
+        if(FreeGameCount != null)
             FreeGameCount.SetText(count.ToString());
         if (FreeGameWinCash!=null)
         {
             FreeGameWinCash.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao() && totalCash > 0);
         }
-        AudioEntity.Instance.PlayRollUpEffect();
-        tween = Utils.Utilities.AnimationTo (this.curCoins, coins, time, UpdateTextUI, null,()=>
-        {
-            AudioEntity.Instance.StopRollingUpEffect();
-            tween = null;
-		}).SetUpdate(true);
+
+        // 注释：隐藏金币显示，保留数值逻辑
+        // AudioEntity.Instance.PlayRollUpEffect();
+        // tween = Utils.Utilities.AnimationTo (this.curCoins, coins, time, UpdateTextUI, null,()=>
+        // {
+        //     AudioEntity.Instance.StopRollingUpEffect();
+        //     tween = null;
+        // }).SetUpdate(true);
+
+        // 直接设置金币数值（不显示动画）
+        this.curCoins = coins;
+
         if (!PlatformManager.Instance.IsWhiteBao())
         {
-            //金币滚动
+            //现金滚动
             Cashtween = Utils.Utilities.AnimationTo(curCash, totalCash, time, SetCashCoins, null, () =>
             {
                 SetCashCoins(totalCash);
                 Cashtween = null;
             });
-            RewardAdMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
-            Text adMultiple = Util.FindObject<Text>(WatchADBtn.transform, "num");
-            adMultiple.text = "" + RewardAdMultiple;
+
+            // 注释掉原有的倍率显示（改为使用滑块倍率）
+            // RewardAdMultiple = ADManager.Instance.GetADRewardMultiple(ADEntrances.REWARD_VIDEO_ENTRANCE_SPINWIN);
+            // Text adMultiple = Util.FindObject<Text>(WatchADBtn.transform, "num");
+            // adMultiple.text = "" + RewardAdMultiple;
+
+            // 设置 WatchADBtn 按钮文本为 "Claim" 多语言
             TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
-            claim.text = OnLineEarningMgr.Instance.GetMoneyStr(totalCash*RewardAdMultiple,needIcon:false,needBigNum:true);
+            if (claim != null)
+            {
+                LocalizedString localizedString = new LocalizedString(LocalizationManager.Instance.tableName, "Claim");
+                claim.text = localizedString.GetLocalizedString();
+            }
         }
     }
     
@@ -274,13 +358,20 @@ public class FreeGameEndDialog : UIDialog
         base.Close();
         Libs.AudioEntity.Instance.StopCoinCollectionEffect();
         tween?.Kill();
+
+        // 清理滑块状态
+        if (sliderMultiplierComponent != null)
+        {
+            sliderMultiplierComponent.PauseMovement();
+        }
     }
     
-    private void UpdateTextUI(long num)
-    {
-        this.curCoins = num;
-        FreeGameWinCoins.SetText(string.Format("<sprite=0>{0}",Utils.Utilities.ThousandSeparatorNumber(curCoins)));
-    }
+    // 注释：金币不再显示
+    // private void UpdateTextUI(long num)
+    // {
+    //     this.curCoins = num;
+    //     FreeGameWinCoins.SetText(string.Format("<sprite=0>{0}",Utils.Utilities.ThousandSeparatorNumber(curCoins)));
+    // }
     
     private void SetCashCoins(int cash)
     {
@@ -290,12 +381,15 @@ public class FreeGameEndDialog : UIDialog
     }
     public void OnClickStopUpdate()
     {
-        if (tween == null) return;
-        isStop = true;
-        tween?.Kill(true);
-        AudioEntity.Instance.StopRollingUpEffect();
-        this.UpdateTextUI(totalCoins);
-        if (Cashtween!=null)
+        // 注释：金币不再显示滚动动画
+        // if (tween == null) return;
+        // isStop = true;
+        // tween?.Kill(true);
+        // AudioEntity.Instance.StopRollingUpEffect();
+        // this.UpdateTextUI(totalCoins);
+
+        // 保留现金的停止滚动
+        if (Cashtween != null)
         {
             Cashtween.Kill(true);
             this.SetCashCoins(totalCash);
@@ -307,6 +401,87 @@ public class FreeGameEndDialog : UIDialog
         msgName +=multiple.ToString();
         //发送消息给平台
         PlatformManager.Instance.SendMsgToPlatFormByType(MessageType.BuryPoint,msgName);
+    }
+
+    /// <summary>
+    /// 发放金币奖励（不显示动画）
+    /// </summary>
+    private void FlyCoinsWithoutAnimation()
+    {
+        // 金币已经在GetResultAward()计算奖励时加过了，看完广告之后因为翻倍所以需要再加一次
+        if (isPlayAd)
+        {
+            UserManager.GetInstance().IncreaseBalance(totalCoins);
+        }
+        // 不播放飞行动画，只发放奖励和更新显示
+        Messenger.Broadcast(SlotControllerConstants.OnBlanceChangeForDisPlay);
+    }
+
+    /// <summary>
+    /// 播放倍率盖章动画（只针对现金）
+    /// 顺序：盖章出现（从大到小）-> 现金数值滚动 -> 飞钱动画
+    /// </summary>
+    private void PlayMultiplierStampAnimation(int multiplier)
+    {
+        if (multiplierStampObject == null)
+        {
+            Debug.LogWarning("[FreeGameEndDialog] multiplierStampObject is null, skipping stamp animation");
+            PlayCashRollUpWithMultiplier();
+            return;
+        }
+
+        // 1. 设置倍率文本
+        if (multiplierStampText != null)
+        {
+            multiplierStampText.text = $"{multiplier}";
+        }
+
+        // 2. 显示对象并设置初始缩放
+        multiplierStampObject.SetActive(true);
+        multiplierStampObject.transform.localScale = Vector3.one * 2.0f;
+
+        // 3. 播放盖章动画
+        multiplierStampObject.transform.DOScale(Vector3.one * 0.7f, 0.5f)
+            .SetEase(Ease.OutBack)
+            .OnComplete(() =>
+            {
+                new DelayAction(0.3f, null, () =>
+                {
+                    PlayCashRollUpWithMultiplier();
+                }).Play();
+            });
+    }
+
+    /// <summary>
+    /// 播放现金滚动到最终倍率后的数值，然后播放飞钱动画
+    /// </summary>
+    private void PlayCashRollUpWithMultiplier()
+    {
+        // 停止之前的滚动动画
+        if (Cashtween != null)
+        {
+            Cashtween.Kill();
+            Cashtween = null;
+        }
+
+        // 计算最终金额（已经在 RewardADIsPlaySuccess 中计算过了）
+        int finalCash = totalCash;
+
+        // 从当前显示的金额滚动到最终金额
+        Cashtween = Utils.Utilities.AnimationTo(curCash, finalCash, time, SetCashCoins, null, () =>
+        {
+            SetCashCoins(finalCash);
+            Cashtween = null;
+
+            // 隐藏倍率盖章节点
+            if (multiplierStampObject != null)
+            {
+                multiplierStampObject.SetActive(false);
+            }
+
+            // 播放飞钱动画
+            DoneADCallBack();
+        });
     }
 }
    

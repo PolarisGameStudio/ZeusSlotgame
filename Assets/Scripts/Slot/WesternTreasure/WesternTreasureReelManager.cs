@@ -42,6 +42,7 @@ public class WesternTreasureReelManager : GoldsReelManager
         base.OnDestroy();
     }
 
+
     public void OnChangBet(long bet)
     {
         jackPotData.UpdataUI(true);
@@ -288,14 +289,36 @@ public class WesternTreasureReelManager : GoldsReelManager
         Messenger.Broadcast(WesternTreasureBonusGame.TreeBonusGameEnd);
         this.HasBonusGame = false;
         spinResult.isOpenEndDialog = false;
-        
+
         this.spinResult.ClearJackpotData();
         westernTreasureFly.ChangeSkin(1);
         westernTreasureFly.ClearAnimation();
-        
+
         westernTreasureFly.RefreshSlider();
-       
-        
+
+        // 在网赚无限模式下，刷新获奖的 Jackpot 的 cash 值
+        if (jackPotData != null && OnLineEarningMgr.Instance != null && OnLineEarningMgr.Instance.isInfiniteOpen())
+        {
+            // 刷新获奖的 Jackpot 的 cash 值
+            if (spinResult.winType >= 2 && spinResult.winType <= 5)
+            {
+                string awardName = jackPotData.GetJackPotName(spinResult.winType);
+                JackPotPrizePool prizePool = GetJackpotPrizePoolByName(awardName);
+                if (prizePool != null)
+                {
+                    // 从 OnLineEarningMgr 获取新的 cash 值并保存到缓存
+                    int newCash = OnLineEarningMgr.Instance.GetJackpotGameWinReward(spinResult.winType);
+                    prizePool.SaveCash(newCash);
+                }
+            }
+        }
+
+        // 刷新 Jackpot UI 显示（包括金币和 cash）
+        if (jackPotData != null)
+        {
+            jackPotData.UpdataUI();
+        }
+
         if (westernTreasureJackpotGame != null)
         {
             westernTreasureJackpotGame.gameObject.SetActive(false);
@@ -305,31 +328,71 @@ public class WesternTreasureReelManager : GoldsReelManager
             jackpotGameBack.SetActive(false);
         }
 
-       
+
+    }
+
+    /// <summary>
+    /// 根据名称获取对应的 JackPotPrizePool
+    /// </summary>
+    private JackPotPrizePool GetJackpotPrizePoolByName(string awardName)
+    {
+        if (jackPotData != null && jackPotData.JackPotPrizePoolInfos != null)
+        {
+            foreach (var pool in jackPotData.JackPotPrizePoolInfos)
+            {
+                if (pool.AwardName == awardName)
+                {
+                    return pool;
+                }
+            }
+        }
+        return null;
     }
 
     public void OpenJackpotEndDialog(int jackpotType,double money)
     {
         if (jackpotType==2)
         {
-            
+
             UIManager.Instance.OpenMachineDialog<WesternTreasureGrandDialog>((dialog) =>
             {
                 AudioManager.Instance.AsyncPlayEffectAudio("Bonus_grand");
+
+                // 在网赚无限模式下，从 jackPotData 获取 cash 值（与金币逻辑一致）
+                if (OnLineEarningMgr.Instance != null && OnLineEarningMgr.Instance.isInfiniteOpen())
+                {
+                    if (jackPotData != null)
+                    {
+                        int cash = jackPotData.GetJackPotCash(jackpotType);
+                        dialog.SetExternalCash(cash);
+                    }
+                }
+
                 dialog.OnStart(money,jackpotType);
             }, () =>
             {
-               
+
                 CloseJackpotGame();
                 //westernTreasureJackpotGame.ClearGame();
             });
         }
         else if (jackpotType==3)
         {
-            
+
             UIManager.Instance.OpenMachineDialog<WesternTreasureMajorDialog>( (dialog) =>
             {
                 AudioManager.Instance.AsyncPlayEffectAudio("Bonus_jackpot");
+
+                // 在网赚无限模式下，从 jackPotData 获取 cash 值（与金币逻辑一致）
+                if (OnLineEarningMgr.Instance != null && OnLineEarningMgr.Instance.isInfiniteOpen())
+                {
+                    if (jackPotData != null)
+                    {
+                        int cash = jackPotData.GetJackPotCash(jackpotType);
+                        dialog.SetExternalCash(cash);
+                    }
+                }
+
                 dialog.OnStart(money,jackpotType);
             }, () => {   
                
@@ -342,6 +405,17 @@ public class WesternTreasureReelManager : GoldsReelManager
             UIManager.Instance.OpenMachineDialog<WesternTreasureManorDialog>((dialog) =>
             {
                 AudioManager.Instance.AsyncPlayEffectAudio("Bonus_jackpot");
+
+                // 在网赚无限模式下，从 jackPotData 获取 cash 值（与金币逻辑一致）
+                if (OnLineEarningMgr.Instance != null && OnLineEarningMgr.Instance.isInfiniteOpen())
+                {
+                    if (jackPotData != null)
+                    {
+                        int cash = jackPotData.GetJackPotCash(jackpotType);
+                        dialog.SetExternalCash(cash);
+                    }
+                }
+
                 dialog.OnStart(money,jackpotType);
             }, () => {  
                
@@ -353,6 +427,17 @@ public class WesternTreasureReelManager : GoldsReelManager
             UIManager.Instance.OpenMachineDialog<WesternTreasureMiniDialog>((dialog) =>
             {
                 AudioManager.Instance.AsyncPlayEffectAudio("Bonus_jackpot");
+
+                // 在网赚无限模式下，从 jackPotData 获取 cash 值（与金币逻辑一致）
+                if (OnLineEarningMgr.Instance != null && OnLineEarningMgr.Instance.isInfiniteOpen())
+                {
+                    if (jackPotData != null)
+                    {
+                        int cash = jackPotData.GetJackPotCash(jackpotType);
+                        dialog.SetExternalCash(cash);
+                    }
+                }
+
                 dialog.OnStart(money,jackpotType);
             }, () => { 
                

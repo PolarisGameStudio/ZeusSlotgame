@@ -41,6 +41,18 @@ public class WesternTreasureMiniDialog : UIDialog
     [SerializeField] private GameObject multiplierStampObject;
     [SerializeField] private Text multiplierStampText;
 
+        // 外部传入的 cash（用于避免在对话框内部重复计算）
+        private bool hasExternalCash = false;
+
+        /// <summary>
+        /// 由外部在打开 MiniDialog 前传入已经计算好的 cash
+        /// </summary>
+        public void SetExternalCash(int cash)
+        {
+            totalCash = cash;
+            hasExternalCash = true;
+        }
+
     protected override void Awake()
     {
         base.Awake();
@@ -78,8 +90,19 @@ public class WesternTreasureMiniDialog : UIDialog
     public void OnStart(double coins,int jackpotType = 0)
     {
         totalCoins = Utils.Utilities.CastValueLong(coins);
-        //根据 jackpot类型获取奖励值
-        totalCash = OnLineEarningMgr.Instance.GetJackpotGameWinReward(jackpotType);
+        //根据 jackpot类型获取奖励值（仅在未由外部传入或非无限模式下才重新计算）
+        if (OnLineEarningMgr.Instance.isInfiniteOpen())
+        {
+            if (!hasExternalCash)
+            {
+                totalCash = OnLineEarningMgr.Instance.GetJackpotGameWinReward(jackpotType);
+            }
+        }
+        else
+        {
+            // 非无限模式维持原有行为
+            totalCash = OnLineEarningMgr.Instance.GetJackpotGameWinReward(jackpotType);
+        }
         // BonusGameWinCash.gameObject.SetActive(totalCash>0);
         // if (totalCash>0)
         // {

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Classic;
 
@@ -12,10 +11,7 @@ public class WesternTreasureJackpotData
     {
         this.jackpotItemRenders = _jackpotItemRenders;
         this.InitJackPot(_slotConfig);
-       
     }
-
-    
 
     private void InitJackPot(SlotMachineConfig slotConfig)
     {
@@ -25,8 +21,21 @@ public class WesternTreasureJackpotData
         {
             Utils.Utilities.LogPlistError("WesternTreasure JackPotData not config in classicconfig.plist.xml! ");
         }
+
+        // 初始化奖池数据和对应的渲染器
         for (int i = 0; i < JackPotPrizePoolInfos.Count; i++)
         {
+            // 在无限模式下初始化 cash 值（优先从缓存读取）
+            if (OnLineEarningMgr.Instance != null && OnLineEarningMgr.Instance.isInfiniteOpen())
+            {
+                int jackpotType = GetJackpotTypeByAwardName(JackPotPrizePoolInfos[i].AwardName);
+                if (jackpotType > 0)
+                {
+                    int defaultCash = OnLineEarningMgr.Instance.GetJackpotGameWinReward(jackpotType);
+                    JackPotPrizePoolInfos[i].InitCash(defaultCash);
+                }
+            }
+
             switch (JackPotPrizePoolInfos[i].AwardName)
             {
                 case "GRAND":
@@ -59,7 +68,28 @@ public class WesternTreasureJackpotData
         }
     }
 
-    
+    /// <summary>
+    /// 根据 AwardName（GRAND/MAJOR/MINOR/MINI）映射到 jackpotType（2~5）
+    /// 与 WesternTreasureSpinResult.winType 及 GetJackPotName 保持一致
+    /// </summary>
+    private int GetJackpotTypeByAwardName(string awardName)
+    {
+        switch (awardName)
+        {
+            case "GRAND":
+                return 2;
+            case "MAJOR":
+                return 3;
+            case "MINOR":
+                return 4;
+            case "MINI":
+                return 5;
+            default:
+                return -1;
+        }
+    }
+
+
     public void OnSpinJackPot()
     {
         if (BaseSlotMachineController.Instance.isFreeRun)
@@ -112,7 +142,7 @@ public class WesternTreasureJackpotData
     public double GetJackPotAward(int index)
     {
         string name = GetJackPotName(index);
-            
+
         //Debug.LogError("获取jackpot           "+name);
         JackPotPrizePool jackPotPrizePool = GetJackPotInof(name);
         double jackpotAward = 0;
@@ -122,8 +152,35 @@ public class WesternTreasureJackpotData
             jackPotPrizePool.ExtraAward = 0;
             jackPotPrizePool.SaveExtraAward(jackPotPrizePool.ExtraAward);
         }
-       
+
         return jackpotAward;
+    }
+
+    /// <summary>
+    /// 获取 Jackpot 对应的 Cash 值（与 GetJackPotAward 逻辑一致）
+    /// </summary>
+    public int GetJackPotCash(string name)
+    {
+        JackPotPrizePool jackPotPrizePool = GetJackPotInof(name);
+        if (jackPotPrizePool != null)
+        {
+            return jackPotPrizePool.Cash;
+        }
+        return 0;
+    }
+
+    /// <summary>
+    /// 根据索引获取 Jackpot 对应的 Cash 值
+    /// </summary>
+    public int GetJackPotCash(int index)
+    {
+        string name = GetJackPotName(index);
+        JackPotPrizePool jackPotPrizePool = GetJackPotInof(name);
+        if (jackPotPrizePool != null)
+        {
+            return jackPotPrizePool.Cash;
+        }
+        return 0;
     }
 
     private JackPotPrizePool GetJackPotInof(string jackPotName)

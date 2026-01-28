@@ -156,11 +156,6 @@ public class WesternTreasureMiniDialog : UIDialog
             TextMeshProUGUI x2 = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "x2");
             if (x2 != null) x2.gameObject.SetActive(false);
         }
-        else
-        {
-            TextMeshProUGUI claim = Utilities.RealFindObj<TextMeshProUGUI>(WatchADBtn.transform, "Claim");
-            claim.gameObject.SetActive(false);
-        }
         BonusGameWinCash.gameObject.SetActive(!PlatformManager.Instance.IsWhiteBao() && totalCash > 0);
     }
     

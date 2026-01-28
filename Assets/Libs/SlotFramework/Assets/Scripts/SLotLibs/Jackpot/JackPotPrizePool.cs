@@ -44,6 +44,11 @@ public class JackPotPrizePool
 
 	public	double ExtraAward;
 
+	/// <summary>
+	/// 对应的现金值（网赚无限模式下使用，固定值）
+	/// </summary>
+	public int Cash { get; set; }
+
 	public void SetServerFeatureOpenBet(long bet)
 	{
 		this.serverFeatureOpenBet = bet;
@@ -133,6 +138,49 @@ public class JackPotPrizePool
 	{
 		string extraAwardKey = themeName + SAVE_NAME + this.JackPotIndex;
 		this.ExtraAward = Utils.Utilities.GetValueDoubleFromFloat (extraAwardKey);
+	}
+
+	/// <summary>
+	/// 保存 Cash 值到本地缓存（网赚无限模式使用）
+	/// </summary>
+	public void SaveCash(int cash)
+	{
+		Cash = cash;
+		if (!string.IsNullOrEmpty(themeName) && !string.IsNullOrEmpty(AwardName))
+		{
+			string cashKey = themeName + "_cash_" + AwardName;
+			SharedPlayerPrefs.SetPlayerPrefsIntValue(cashKey, cash);
+		}
+	}
+
+	/// <summary>
+	/// 从本地缓存获取 Cash 值
+	/// </summary>
+	private int GetCashFromCache()
+	{
+		if (!string.IsNullOrEmpty(themeName) && !string.IsNullOrEmpty(AwardName))
+		{
+			string cashKey = themeName + "_cash_" + AwardName;
+			return SharedPlayerPrefs.GetPlayerPrefsIntValue(cashKey, -1);
+		}
+		return -1;
+	}
+
+	/// <summary>
+	/// 初始化 Cash 值（优先从缓存读取）
+	/// </summary>
+	public void InitCash(int defaultCash)
+	{
+		int cachedCash = GetCashFromCache();
+		if (cachedCash > 0)
+		{
+			Cash = cachedCash;
+		}
+		else
+		{
+			Cash = defaultCash;
+			SaveCash(defaultCash);
+		}
 	}
 	public static readonly string SAVE_NAME ="_progress_";
 	public static readonly string CONTRIBUTION = "Contribution";   //添加的奖池倍率

@@ -383,10 +383,8 @@ namespace Ads
             Messenger.Broadcast(ADConstants.ResetSpinWinMsg);
             
 #if UNITY_EDITOR
-            ShowLoadingADsUI(2f,() =>
-            {
-                HandlePlayVideoResult(0);
-            },"play reward ad:"+requestEntranceName);
+            // 编辑器环境下直接执行回调，不显示加载UI
+            HandlePlayVideoResult(0);
 #else
             if (!RewardAdIsOk(entranceName))
             {
@@ -433,10 +431,8 @@ namespace Ads
             this.requestEntranceName = entranceName;
             
 #if UNITY_EDITOR
-            ShowLoadingADsUI(2f,() =>
-            {
-                HandlePlayVideoResult(1);
-            },"play Interstitial ad:"+requestEntranceName);
+            // 编辑器环境下直接执行回调，不显示加载UI
+            HandlePlayVideoResult(1);
 #else
             if (!InterstitialAdIsOk(entranceName))
             {
@@ -483,10 +479,8 @@ namespace Ads
             this.requestEntranceName = entranceName;
             
 #if UNITY_EDITOR
-            ShowLoadingADsUI(2f,() =>
-            {
-                HandlePlayVideoResult(1);
-            },"play AdMob ad:"+requestEntranceName);
+            // 编辑器环境下直接执行回调，不显示加载UI
+            HandlePlayVideoResult(1);
 #else
             if (!AdMobAdIsOk(entranceName))
             {

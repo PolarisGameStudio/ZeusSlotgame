@@ -81,6 +81,9 @@ public class OnLineEarningMgr
     public float popRewardRate = 1f;
     public float claimMultipleRate = 1f;
 
+    //额外奖励弹窗的总Spin次数限制（超过此次数后不再弹出）
+    private int maxSpinCountForReward = 100;
+
     public const string PopSpinWinCountKey = "PopSpinWinCountKey";
     public int PopSpinWinCount
     {
@@ -148,6 +151,7 @@ public class OnLineEarningMgr
         newUserSpinCount = Utilities.GetInt(config,OnLineEarningConstants.NewUserLimitKey,0);
         PopRewardLimit = Utilities.GetInt(config,OnLineEarningConstants.PopRewardLimitKey,0);
         popRewardRate = Utilities.GetFloat(config,OnLineEarningConstants.PopRewardRateKey,1f);
+        maxSpinCountForReward = Utilities.GetInt(config,"MaxSpinCountForReward",100);
 
         //加载本地化数据
         LoadProgressData();
@@ -198,10 +202,25 @@ public class OnLineEarningMgr
     {
         curRewardCount++;
         SaveProgressData();
+
+        // 检查总Spin次数是否超过限制
+        long totalSpins = UserManager.GetInstance().UserProfile().GetTotalSpinCounter();
+        if (totalSpins > maxSpinCountForReward)
+        {
+            return false;  // 超过限制，不再弹出
+        }
+
         return curRewardCount>=PopRewardLimit && !PlatformManager.Instance.IsWhiteBao();
     }
     public bool PredictShowRewardCash()
     {
+        // 提前预测：检查总Spin次数是否会超过限制
+        long totalSpins = UserManager.GetInstance().UserProfile().GetTotalSpinCounter();
+        if (totalSpins >= maxSpinCountForReward)
+        {
+            return false;  // 即将超过或已超过限制，不再弹出
+        }
+
         return curRewardCount+1>=PopRewardLimit && !PlatformManager.Instance.IsWhiteBao();
     }
 

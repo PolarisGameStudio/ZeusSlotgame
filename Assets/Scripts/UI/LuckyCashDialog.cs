@@ -198,7 +198,14 @@ public class LuckyCashDialog : UIDialog
     }
     void AdIsPlayFailed(int type)
     {
-        AdIsPlaySuccessful(type);
+        // 广告失败不发放现金奖励
+        totalCash = 0;
+
+        // 不播放飞钱动画和倍率盖章动画
+
+        // 继续游戏流程：关闭弹窗
+        Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
+        this.Close();
     }
     //激励广告
     public void OnWatchADButtonClick()

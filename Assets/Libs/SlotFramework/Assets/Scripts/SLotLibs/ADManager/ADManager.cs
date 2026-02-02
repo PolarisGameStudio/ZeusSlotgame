@@ -1,6 +1,5 @@
 using System;
 using System.BuffSystem;
-using Classic;
 using Libs;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,16 +18,24 @@ namespace Ads
         InterstitialAD = 1, //插屏广告
         AdMob = 2,        //AdMob广告
     }
-    public class ADManager
+    public class ADManager : MonoSingleton<ADManager>
     {
-        public static ADManager Instance => Singleton<ADManager>.Instance;
         private Action<bool> adCB = null;
         public string requestEntranceName = string.Empty;
         public IAcbAdsCallbackHandler adsCallbackHandler = null;
 
         public int RewardCount = 0;
-    
+
         public int InterstitialCount = 0;
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Unity Editor环境下的测试标志
+        /// true = 模拟广告成功, false = 模拟广告失败
+        /// 可在运行时通过 ADManager.Instance.EditorSimulateAdSuccess 切换
+        /// </summary>
+        public bool EditorSimulateAdSuccess = false;  // 默认模拟失败用于测试
+#endif
         
         public int SpinCount = 0; //SpinCount
         public int SpinInterval = 0;
@@ -39,11 +46,20 @@ namespace Ads
 
         public ADProgressData adProgressData = new ADProgressData(); //广告本地保存数据
 
-        public void Init()
+        public void OnInit()
         {
             adsCallbackHandler = new ADCallBack();
             LoadProgressData();
             ParseEntranceConfig();
+        }
+
+        public override void Dispose()
+        {
+            // 清理资源
+            SaveADProgressData();
+            adCB = null;
+            adsCallbackHandler = null;
+            ADConditions.Clear();
         }
         
         void LoadProgressData()
@@ -381,12 +397,23 @@ namespace Ads
             }
             this.requestEntranceName = entranceName;
             Messenger.Broadcast(ADConstants.ResetSpinWinMsg);
-            
+
 #if UNITY_EDITOR
-            ShowLoadingADsUI(2f,() =>
+            // 编辑器环境下根据测试标志模拟成功或失败
+            if (EditorSimulateAdSuccess)
             {
-                HandlePlayVideoResult(0);
-            },"play reward ad:"+requestEntranceName);
+                HandlePlayVideoResult(0);  // 模拟广告成功
+                Debug.Log($"[ADManager] Editor模拟激励视频成功 - 入口: {entranceName}");
+            }
+            else
+            {
+                // 模拟失败时也显示Loading UI，更真实地模拟实际失败场景
+                ShowLoadingADsUI(endCallBack:()=>
+                {
+                    HandlePlayVideoFailedResult(0);  // 模拟广告失败
+                    Debug.LogWarning($"[ADManager] Editor模拟激励视频失败 - 入口: {entranceName}");
+                });
+            }
 #else
             if (!RewardAdIsOk(entranceName))
             {
@@ -429,14 +456,25 @@ namespace Ads
             {
                 return;
             }
-            
+
             this.requestEntranceName = entranceName;
-            
+
 #if UNITY_EDITOR
-            ShowLoadingADsUI(2f,() =>
+            // 编辑器环境下根据测试标志模拟成功或失败
+            if (EditorSimulateAdSuccess)
             {
-                HandlePlayVideoResult(1);
-            },"play Interstitial ad:"+requestEntranceName);
+                HandlePlayVideoResult(1);  // 模拟广告成功
+                Debug.Log($"[ADManager] Editor模拟插屏广告成功 - 入口: {entranceName}");
+            }
+            else
+            {
+                // 模拟失败时也显示Loading UI，更真实地模拟实际失败场景
+                ShowLoadingADsUI(endCallBack:()=>
+                {
+                    HandlePlayVideoFailedResult(1);  // 模拟广告失败
+                    Debug.LogWarning($"[ADManager] Editor模拟插屏广告失败 - 入口: {entranceName}");
+                });
+            }
 #else
             if (!InterstitialAdIsOk(entranceName))
             {
@@ -479,14 +517,25 @@ namespace Ads
             {
                 return;
             }
-            
+
             this.requestEntranceName = entranceName;
-            
+
 #if UNITY_EDITOR
-            ShowLoadingADsUI(2f,() =>
+            // 编辑器环境下根据测试标志模拟成功或失败
+            if (EditorSimulateAdSuccess)
             {
-                HandlePlayVideoResult(1);
-            },"play AdMob ad:"+requestEntranceName);
+                HandlePlayVideoResult(1);  // 模拟广告成功
+                Debug.Log($"[ADManager] Editor模拟AdMob广告成功 - 入口: {entranceName}");
+            }
+            else
+            {
+                // 模拟失败时也显示Loading UI，更真实地模拟实际失败场景
+                ShowLoadingADsUI(endCallBack:()=>
+                {
+                    HandlePlayVideoFailedResult(2);  // 模拟广告失败
+                    Debug.LogWarning($"[ADManager] Editor模拟AdMob广告失败 - 入口: {entranceName}");
+                });
+            }
 #else
             if (!AdMobAdIsOk(entranceName))
             {
@@ -538,7 +587,7 @@ namespace Ads
             if (string.IsNullOrEmpty(msg))
             {
                 //展示未加载好广告的提示
-                msg = "Loading ADs";
+                msg = "No ADs";
             }
             UIManager.ShowLoadingUI(duration, msg, endCB: endCallBack);
         }

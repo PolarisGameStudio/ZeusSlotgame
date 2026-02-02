@@ -327,7 +327,12 @@ namespace Activity
             {
                 return;
             }
-            HandleAdResult();
+
+            // 广告失败，不再发放奖励，只移除item并继续游戏流程
+            RemoveItem(currentAdItem);
+            currentAdItem = null;
+
+            // 不调用HandleAdResult()，避免发放奖励
         }
 
         /// <summary>

@@ -403,7 +403,17 @@ public class SpinWinDialog : UIDialog
     //广告播放失败
     void AdIsPlayFailed(int type)
     {
-	    AdIsPlaySuccessful(1);
+        // 广告失败：现金奖励设为0
+        totalCash = 0;
+
+        // 金币奖励也设为0（因为已经在其他地方加过了）
+        totalCoins = 0;
+
+        // 不播放飞钱动画
+
+        // 继续游戏流程：关闭弹窗
+        Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
+        this.Close();
     }
     
     void RewardADIsPlaySuccess()

@@ -415,20 +415,18 @@ namespace Activity
 
         private void OnAdFailed(int type)
         {
-            // 广告播放失败，也给予奖励
+            // 广告播放失败，不再给予奖励
             Debug.Log($"[FloatingRewardIcon] Ad failed, no reward");
-            
-            // 广告回调完成，隐藏icon
-            Action closeCallBack = () =>
+
+            // 不发放现金奖励，直接隐藏图标并继续游戏流程
+            HideIcon();
+
+            if (!PlatformManager.Instance.IsWhiteBao())
             {
-                // 广告回调完成，隐藏icon
-                HideIcon();
-                if (!PlatformManager.Instance.IsWhiteBao())
-                {
-                    Messenger.Broadcast(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL);
-                }
-            };
-            Messenger.Broadcast<int,Action>(GameDialogManager.OpenExtraAwardCashDialogMsg,currentReward,closeCallBack);
+                Messenger.Broadcast(GameConstants.SHOW_WITH_DRAW_TIPS_PANEL);
+            }
+
+            // 不再广播OpenExtraAwardCashDialogMsg，避免打开奖励对话框
         }
 
         private IEnumerator ShowIconCoroutine()

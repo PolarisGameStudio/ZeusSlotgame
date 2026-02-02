@@ -258,7 +258,7 @@ public class BaseGameConsole :MonoBehaviour
 		_slotMachines = new List<SlotMachineConfig> (Plugins.Configuration.GetInstance ().ConfigurationParseResult ().SlotMachineConfigs ());
 		yield return GameConstants.FrameTime;;
 		//初始化LevelPlan，与 bet相关
-		ADManager.Instance.Init();
+		ADManager.Instance.OnInit(); 
 		SetupPlatformFPS ();
 		Settings.GetInstance ().SetupPlatform ();
 		UIManager.Instance.Init();

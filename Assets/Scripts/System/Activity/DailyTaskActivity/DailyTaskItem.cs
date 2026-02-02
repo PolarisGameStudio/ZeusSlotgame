@@ -117,11 +117,13 @@ namespace System.Activity.DailyTaskActivity
         {
             Messenger.RemoveListener(_dailyTaskData.Task.UpdateTaskDataMsg, UpdateProgress);
             Messenger.RemoveListener<int>(ADConstants.PlayDailyTaskAD, ShowVideoCallBack);
+            Messenger.RemoveListener<int>(ADConstants.PlayDailyTaskADFailed, ShowVideoFailedCallBack);
         }
-        
+
         private void OnEnable()
         {
             Messenger.AddListener<int>(ADConstants.PlayDailyTaskAD, ShowVideoCallBack);
+            Messenger.AddListener<int>(ADConstants.PlayDailyTaskADFailed, ShowVideoFailedCallBack);
         }
         private void ShowVideoCallBack(int arg0)
         {
@@ -135,7 +137,26 @@ namespace System.Activity.DailyTaskActivity
             RefreshMask();
         }
 
-    
+        private void ShowVideoFailedCallBack(int arg0)
+        {
+            if( DailyTaskActivity.PlayAdTaskId != _dailyTaskData.Task.TaskId) return;
+
+            // 广告失败，不发放现金奖励
+            // 仅更新状态，不调用SetCoins()
+            _dailyTaskData.SetRewardState(DailyTaskActivity.GetMoneyFinish);
+
+            // 更新红点显示
+            if (ActivityManager.Instance.GetActivityByID(DailyTaskActivity.ActivityId) is DailyTaskActivity activity)
+            {
+                Messenger.Broadcast(DailyTaskActivity.SetRedPointState,activity.CheckHasFinishTask());
+            }
+
+            RefreshMask();
+
+            // 不播放飞钱动画，不发放奖励
+        }
+
+
 
         private string GetTaskAwardCountDesc()
         {

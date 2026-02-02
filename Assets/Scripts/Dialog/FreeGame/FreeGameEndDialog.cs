@@ -232,7 +232,16 @@ public class FreeGameEndDialog : UIDialog
     
     void AdIsPlayFailed(int type)
     {
-        AdIsPlaySuccessful(type);
+        // 广告失败：现金奖励设为0
+        totalCash = 0;
+
+        // 金币奖励也设为0（避免重复发放）
+        totalCoins = 0;
+
+        // 不播放飞钱动画和倍率盖章动画
+
+        // 继续游戏流程：调用修改后的DoneADCallBack
+        DoneADCallBack();
     }
 
     void HandleNotMeetConditionMsg(string msg)
@@ -260,23 +269,30 @@ public class FreeGameEndDialog : UIDialog
     private void DoneADCallBack()
     {
         bool needFly = true;
-        if (!PlatformManager.Instance.IsWhiteBao())
+
+        // 只有现金奖励大于0时才调用FlyCash
+        if (!PlatformManager.Instance.IsWhiteBao() && totalCash > 0)
         {
             FlyCash(needFly);
         }
 
-        // 注释：金币不显示飞行动画，改为无动画发放
-        // FlyCoins(false);
-        FlyCoinsWithoutAnimation();
+        // 只有金币奖励大于0时才调用FlyCoinsWithoutAnimation
+        if (totalCoins > 0)
+        {
+            FlyCoinsWithoutAnimation();
+        }
 
         Messenger.Broadcast(SlotControllerConstants.AUTO_SPIN_RESUME);
         // AudioEntity.Instance.StopFreeGameEndDialogMusic();
         // AudioEntity.Instance.PlayFeatureBtnEffect();
         Libs.AudioEntity.Instance.StopAllEffect();
-        if (!PlatformManager.Instance.IsWhiteBao())
+
+        // 只有在有现金奖励时才播放音效
+        if (!PlatformManager.Instance.IsWhiteBao() && totalCash > 0)
         {
             Libs.AudioEntity.Instance.PlayCoinCollectionEffect();
         }
+
         new DelayAction( .8f, null, () =>
         {
             this.Close();
